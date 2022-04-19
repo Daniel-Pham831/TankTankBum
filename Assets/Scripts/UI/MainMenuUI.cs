@@ -6,6 +6,8 @@ public class MainMenuUI : MonoBehaviour
 {
     public MainMenuUI Singleton { get; private set; }
 
+    private Animator mainMenuAnimator;
+
     private void Awake()
     {
         if (Singleton != null)
@@ -14,9 +16,15 @@ public class MainMenuUI : MonoBehaviour
         Singleton = this;
     }
 
+    private void Start()
+    {
+        mainMenuAnimator = GetComponent<Animator>();
+
+    }
+
     public void OnOnlineBtn()
     {
-
+        mainMenuAnimator.SetTrigger("ToHostJoinMenu");
     }
 
     public void OnSettingBtn()
@@ -26,17 +34,17 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnHostBtn()
     {
-
+        mainMenuAnimator.SetTrigger("ToLobbyMenu");
     }
 
     public void OnJoinBtn()
     {
-
+        mainMenuAnimator.SetTrigger("ToConnectMenu");
     }
 
     public void OnConnectBtn()
     {
-
+        mainMenuAnimator.SetTrigger("ToLobbyMenu");
     }
 
     public void OnStartBtn()
@@ -51,6 +59,6 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnLeaveBtn()
     {
-
+        mainMenuAnimator.SetTrigger("ToOnlineSettingMenu");
     }
 }
