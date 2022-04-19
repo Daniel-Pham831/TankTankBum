@@ -13,4 +13,44 @@ public class MainMenuUI : MonoBehaviour
 
         Singleton = this;
     }
+
+    public void OnOnlineBtn()
+    {
+
+    }
+
+    public void OnSettingBtn()
+    {
+
+    }
+
+    public void OnHostBtn()
+    {
+
+    }
+
+    public void OnJoinBtn()
+    {
+
+    }
+
+    public void OnConnectBtn()
+    {
+
+    }
+
+    public void OnStartBtn()
+    {
+
+    }
+
+    public void OnReadyBtn()
+    {
+
+    }
+
+    public void OnLeaveBtn()
+    {
+
+    }
 }
