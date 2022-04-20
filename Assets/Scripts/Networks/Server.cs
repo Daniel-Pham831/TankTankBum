@@ -42,6 +42,9 @@ public class Server : MonoBehaviour
 
         this.connections = new NativeList<NetworkConnection>(maximumConnection, Allocator.Persistent);
         this.isActive = true;
+
+        //Init server information
+        ServerInformation serverInfomation = new ServerInformation();
     }
 
     public void Shutdown()

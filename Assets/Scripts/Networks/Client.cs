@@ -6,6 +6,8 @@ public class Client : MonoBehaviour
 {
     public static Client Singleton { get; private set; }
 
+    private string playerName;
+
     private void Awake()
     {
         Singleton = this;
@@ -21,7 +23,7 @@ public class Client : MonoBehaviour
     public Action connectionDropped;
 
     // Methods
-    public void Init(string ip, ushort port)
+    public void Init(string ip, ushort port, string playerName)
     {
         this.driver = NetworkDriver.Create();
         NetworkEndPoint endPoint = NetworkEndPoint.Parse(ip, port);
@@ -33,6 +35,8 @@ public class Client : MonoBehaviour
         this.isActive = true;
 
         this.RegisterToEvent();
+
+        this.playerName = playerName != "" ? playerName : "I forgot to name myself";
     }
 
     public void Shutdown()
@@ -80,8 +84,7 @@ public class Client : MonoBehaviour
             switch (cmd)
             {
                 case NetworkEvent.Type.Connect:
-                    this.SendToServer(new NetWelcome());
-                    Debug.Log("Connected");
+                    this.SendToServer(new NetSendName(this.playerName));
                     break;
 
                 case NetworkEvent.Type.Data:

@@ -1,12 +1,19 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class MainMenuUI : MonoBehaviour
 {
-    public MainMenuUI Singleton { get; private set; }
+    public static MainMenuUI Singleton { get; private set; }
+    [SerializeField] private TMP_InputField nameInputField;
+    public Server server;
+    public Client client;
 
     private Animator mainMenuAnimator;
+
+    public Action<string> OnHostOrJoinRoom;
 
     private void Awake()
     {
@@ -18,13 +25,13 @@ public class MainMenuUI : MonoBehaviour
 
     private void Start()
     {
-        mainMenuAnimator = GetComponent<Animator>();
+        this.mainMenuAnimator = GetComponent<Animator>();
 
     }
 
     public void OnOnlineBtn()
     {
-        mainMenuAnimator.SetTrigger("ToHostJoinMenu");
+        this.mainMenuAnimator.SetTrigger("ToHostJoinMenu");
     }
 
     public void OnSettingBtn()
@@ -32,19 +39,27 @@ public class MainMenuUI : MonoBehaviour
 
     }
 
+    /*
+    Switch in to Lobby Menu
+    Take the name from ipf + assign it to the player
+    */
     public void OnHostBtn()
     {
-        mainMenuAnimator.SetTrigger("ToLobbyMenu");
+        server.Init(8007, 10); //This need to change (Stop hard-coded)
+        client.Init("127.0.0.1", 8007, this.nameInputField.text);
+
+        this.OnHostOrJoinRoom?.Invoke(this.nameInputField.text);
+        this.mainMenuAnimator.SetTrigger("ToLobbyMenu");
     }
 
     public void OnJoinBtn()
     {
-        mainMenuAnimator.SetTrigger("ToConnectMenu");
+        this.mainMenuAnimator.SetTrigger("ToConnectMenu");
     }
 
     public void OnConnectBtn()
     {
-        mainMenuAnimator.SetTrigger("ToLobbyMenu");
+        this.mainMenuAnimator.SetTrigger("ToLobbyMenu");
     }
 
     public void OnStartBtn()
@@ -59,6 +74,6 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnLeaveBtn()
     {
-        mainMenuAnimator.SetTrigger("ToOnlineSettingMenu");
+        this.mainMenuAnimator.SetTrigger("ToOnlineSettingMenu");
     }
 }

@@ -5,15 +5,18 @@ using UnityEngine;
 public enum OpCode
 {
     KEEP_ALIVE = 1,
-    WELCOME = 2,
+    SEND_NAME = 2,
+    WELCOME = 3,
 }
 
 public static class NetUtility
 {
     // Net messages
     public static Action<NetMessage> C_KEEP_ALIVE;
+    public static Action<NetMessage> C_SEND_NAME;
     public static Action<NetMessage> C_WELCOME;
     public static Action<NetMessage, NetworkConnection> S_KEEP_ALIVE;
+    public static Action<NetMessage, NetworkConnection> S_SEND_NAME;
     public static Action<NetMessage, NetworkConnection> S_WELCOME;
 
     public static void OnData(DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
@@ -24,6 +27,10 @@ public static class NetUtility
         {
             case OpCode.KEEP_ALIVE:
                 msg = new NetKeepAlive(streamReader);
+                break;
+
+            case OpCode.SEND_NAME:
+                msg = new NetSendName(streamReader);
                 break;
 
             case OpCode.WELCOME:
