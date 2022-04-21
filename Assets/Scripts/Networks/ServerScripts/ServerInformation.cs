@@ -14,6 +14,8 @@ public class ServerInformation
     public static ServerInformation Singleton;
     public List<Player> playerList;
     private Queue<byte> idList;
+    private Queue<byte> blueSlots;
+    private Queue<byte> redSlots;
 
     #region ClassInitMethods
     public ServerInformation()
@@ -22,8 +24,8 @@ public class ServerInformation
             Singleton = this;
 
         this.playerList = new List<Player>();
-        this.idList = new Queue<byte>();
         this.GenerateIdList();
+        this.GenerateLobbySlots();
         this.registerToEvent(true);
     }
 
@@ -45,8 +47,20 @@ public class ServerInformation
         }
     }
 
+    private void GenerateLobbySlots()
+    {
+        this.blueSlots = new Queue<byte>();
+        this.redSlots = new Queue<byte>();
+        for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer; i++)
+        {
+            this.blueSlots.Enqueue(i);
+            this.redSlots.Enqueue(i);
+        }
+    }
+
     private void GenerateIdList()
     {
+        this.idList = new Queue<byte>();
         for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer; i++)
         {
             this.idList.Enqueue(i);
@@ -58,19 +72,33 @@ public class ServerInformation
     //Server
     private void OnSendNameServer(NetMessage message, NetworkConnection connectedClient)
     {
-        NetSendName sendNameMessage = message as NetSendName;
-        /*  At this moment server just received a sendNameMessage from connectedClient which contains clientName
+        /*  At this moment server just received a sendNameMessage from connectedClient which contains his name
             Server need to send a welcomeMessage back to him which contains
-                id (server need to assign an id for him)
+                id + team + lobbyIndex(server need to assign an id for him)
                 number of players in lobby
                 a List<Player>
         */
+        NetSendName sendNameMessage = message as NetSendName;
+        Player connectedPlayer = this.GetNewPlayerInformation(sendNameMessage.Name);
+        Server.Singleton.SendToClient(connectedClient, new NetWelcome(connectedPlayer, (byte)this.playerList.Count, this.playerList));
 
-        byte newId = this.GetIdForNewPlayer();
-        this.playerList.Add(new Player(newId, sendNameMessage.Name));
+        // BroadCast to all player that a new player just joined
+        Server.Singleton.BroadCastExcept(new NetJoin(connectedPlayer), connectedClient);
 
-        NetWelcome welcomeMessage = new NetWelcome(newId, (byte)this.playerList.Count, this.playerList);
-        Server.Singleton.SendToClient(connectedClient, welcomeMessage);
+        this.playerList.Add(connectedPlayer);
+    }
+
+    private Player GetNewPlayerInformation(string playerName)
+    {
+        byte id = GetIdForNewPlayer();
+        Team team = id % 2 == 0 ? Team.Blue : Team.Red;
+        byte lobbyIndex = this.GetSlotIndexForNewPlayer(team);
+        return new Player(id, team, lobbyIndex, playerName);
+    }
+
+    private byte GetSlotIndexForNewPlayer(Team team)
+    {
+        return team == Team.Blue ? this.blueSlots.Dequeue() : this.redSlots.Dequeue();
     }
 
     private byte GetIdForNewPlayer()

@@ -59,6 +59,9 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnConnectBtn()
     {
+        client.Init("127.0.0.1", 8007, this.nameInputField.text);
+        this.OnHostOrJoinRoom?.Invoke(this.nameInputField.text);
+
         this.mainMenuAnimator.SetTrigger("ToLobbyMenu");
     }
 

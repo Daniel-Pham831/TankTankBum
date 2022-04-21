@@ -4,14 +4,20 @@ using Unity.Networking.Transport;
 public class NetWelcome : NetMessage
 {
     public byte AssignedId { set; get; }
+    public Team Team { set; get; }
+    public byte SlotIndex { set; get; }
+
     public byte TotalPlayer { set; get; }
     public List<Player> PlayerList { set; get; }
 
-    public NetWelcome(byte id, byte totalPlayer, List<Player> playerList)
+    public NetWelcome(Player player, byte totalPlayer, List<Player> playerList)
     {
         this.Code = OpCode.WELCOME;
 
-        this.AssignedId = id;
+        this.AssignedId = player.Id;
+        this.Team = player.Team;
+        this.SlotIndex = player.SlotIndex;
+
         this.TotalPlayer = totalPlayer;
         this.PlayerList = playerList;
     }
@@ -27,27 +33,27 @@ public class NetWelcome : NetMessage
         base.Serialize(ref writer);
 
         writer.WriteByte(this.AssignedId);
+        writer.WriteByte((byte)this.Team);
+        writer.WriteByte(this.SlotIndex);
 
         writer.WriteByte(this.TotalPlayer);
         foreach (Player player in this.PlayerList)
         {
-            writer.WriteByte(player.Id);
-            writer.WriteFixedString32(player.Name);
+            Player.SerializePlayer(ref writer, player);
         }
     }
 
     public override void Deserialize(DataStreamReader reader)
     {
         this.AssignedId = reader.ReadByte();
+        this.Team = (Team)reader.ReadByte();
+        this.SlotIndex = reader.ReadByte();
 
         this.TotalPlayer = reader.ReadByte();
         this.PlayerList = new List<Player>();
         for (int i = 0; i < this.TotalPlayer; i++)
         {
-            byte playerId = reader.ReadByte();
-            string playerName = reader.ReadFixedString32().ToString();
-
-            this.PlayerList.Add(new Player(playerId, playerName));
+            this.PlayerList.Add(Player.DeserializePlayer(reader));
         }
     }
 

@@ -9579,6 +9579,7 @@ GameObject:
   - component: {fileID: 1803509535}
   - component: {fileID: 1803509536}
   - component: {fileID: 1803509537}
+  - component: {fileID: 1803509538}
   m_Layer: 5
   m_Name: Lobby
   m_TagString: Untagged
@@ -9628,6 +9629,18 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!114 &1803509538
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1803509534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 686efcd0e62c4d047a8df0754e2f4365, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1869499882
 GameObject:
   m_ObjectHideFlags: 0

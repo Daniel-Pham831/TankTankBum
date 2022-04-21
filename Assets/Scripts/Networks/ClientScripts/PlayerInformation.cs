@@ -9,6 +9,8 @@ public class PlayerInformation : MonoBehaviour
 
     private Player myInformation;
     public List<Player> playerList;
+    public List<byte> idList;
+    public List<string> nameList;
 
     void Awake()
     {
@@ -16,6 +18,10 @@ public class PlayerInformation : MonoBehaviour
             Singleton = this;
 
         this.myInformation = new Player();
+
+        this.idList = new List<byte>();
+        this.nameList = new List<string>();
+
         DontDestroyOnLoad(this.gameObject);
     }
 
@@ -36,11 +42,13 @@ public class PlayerInformation : MonoBehaviour
         if (confirm)
         {
             NetUtility.C_WELCOME += this.OnWelcomeClient;
+            NetUtility.C_JOIN += this.OnNewJoinClient;
             MainMenuUI.Singleton.OnHostOrJoinRoom += this.OnHostOrJoinRoom;
         }
         else
         {
             NetUtility.C_WELCOME -= this.OnWelcomeClient;
+            NetUtility.C_JOIN -= this.OnNewJoinClient;
             MainMenuUI.Singleton.OnHostOrJoinRoom -= this.OnHostOrJoinRoom;
         }
     }
@@ -50,12 +58,33 @@ public class PlayerInformation : MonoBehaviour
         this.myInformation.Name = inputName;
     }
 
+    private void OnNewJoinClient(NetMessage message)
+    {
+        NetJoin joinMessage = message as NetJoin;
+
+        this.playerList.Add(joinMessage.JoinedPlayer);
+
+        Debug.Log($"{joinMessage.JoinedPlayer.Name} just joined");
+
+        this.idList.Add(joinMessage.JoinedPlayer.Id);
+        this.nameList.Add(joinMessage.JoinedPlayer.Name);
+    }
+
     private void OnWelcomeClient(NetMessage message)
     {
         NetWelcome welcomeMessage = message as NetWelcome;
 
         this.myInformation.Id = welcomeMessage.AssignedId;
+        this.myInformation.Team = welcomeMessage.Team;
+        this.myInformation.SlotIndex = welcomeMessage.SlotIndex;
+
         this.playerList = welcomeMessage.PlayerList;
+
+        foreach (Player player in this.playerList)
+        {
+            this.idList.Add(player.Id);
+            this.nameList.Add(player.Name);
+        }
 
         Debug.Log("Connected To Server");
         Debug.Log($"My ID:{this.myInformation.Id}\nMy Name:{this.myInformation.Name}");

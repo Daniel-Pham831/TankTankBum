@@ -155,4 +155,16 @@ public class Server : MonoBehaviour
             }
         }
     }
+
+    public void BroadCastExcept(NetMessage msg, NetworkConnection exceptClient)
+    {
+        for (int i = 0; i < this.connections.Length; i++)
+        {
+            if (this.connections[i].IsCreated && this.connections[i] != exceptClient)
+            {
+                Debug.Log($"Sending {msg.Code} to: {this.connections[i].InternalId}");
+                this.SendToClient(this.connections[i], msg);
+            }
+        }
+    }
 }

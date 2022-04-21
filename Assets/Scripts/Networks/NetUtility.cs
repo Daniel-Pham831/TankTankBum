@@ -6,7 +6,8 @@ public enum OpCode
 {
     KEEP_ALIVE = 1,
     SEND_NAME = 2,
-    WELCOME = 3,
+    JOIN = 3,
+    WELCOME = 4,
 }
 
 public static class NetUtility
@@ -14,9 +15,11 @@ public static class NetUtility
     // Net messages
     public static Action<NetMessage> C_KEEP_ALIVE;
     public static Action<NetMessage> C_SEND_NAME;
+    public static Action<NetMessage> C_JOIN;
     public static Action<NetMessage> C_WELCOME;
     public static Action<NetMessage, NetworkConnection> S_KEEP_ALIVE;
     public static Action<NetMessage, NetworkConnection> S_SEND_NAME;
+    public static Action<NetMessage, NetworkConnection> S_JOIN;
     public static Action<NetMessage, NetworkConnection> S_WELCOME;
 
     public static void OnData(DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
@@ -31,6 +34,10 @@ public static class NetUtility
 
             case OpCode.SEND_NAME:
                 msg = new NetSendName(streamReader);
+                break;
+
+            case OpCode.JOIN:
+                msg = new NetJoin(streamReader);
                 break;
 
             case OpCode.WELCOME:
