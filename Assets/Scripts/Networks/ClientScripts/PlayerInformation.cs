@@ -12,6 +12,7 @@ public class PlayerInformation : MonoBehaviour
     public List<byte> idList;
     public List<string> nameList;
 
+    public Action<Player> OnNewJoinedPlayer;
     void Awake()
     {
         if (Singleton == null)
@@ -68,6 +69,8 @@ public class PlayerInformation : MonoBehaviour
 
         this.idList.Add(joinMessage.JoinedPlayer.Id);
         this.nameList.Add(joinMessage.JoinedPlayer.Name);
+
+        this.OnNewJoinedPlayer?.Invoke(joinMessage.JoinedPlayer);
     }
 
     private void OnWelcomeClient(NetMessage message)
@@ -84,10 +87,13 @@ public class PlayerInformation : MonoBehaviour
         {
             this.idList.Add(player.Id);
             this.nameList.Add(player.Name);
+            this.OnNewJoinedPlayer?.Invoke(player);
         }
 
         Debug.Log("Connected To Server");
         Debug.Log($"My ID:{this.myInformation.Id}\nMy Name:{this.myInformation.Name}");
 
+
+        this.OnNewJoinedPlayer?.Invoke(this.myInformation);
     }
 }

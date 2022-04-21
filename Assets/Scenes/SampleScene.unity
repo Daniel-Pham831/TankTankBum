@@ -2976,6 +2976,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 94ccc53d8ba3b944ab44a859841a951d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  idList: 
+  nameList: []
 --- !u!4 &692426821
 Transform:
   m_ObjectHideFlags: 0
@@ -9641,6 +9643,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 686efcd0e62c4d047a8df0754e2f4365, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blueSlots:
+  - {fileID: 1790697606}
+  - {fileID: 684971638}
+  - {fileID: 2106971458}
+  - {fileID: 1542761004}
+  - {fileID: 2060300942}
+  redSlots:
+  - {fileID: 1535442190}
+  - {fileID: 377803645}
+  - {fileID: 1774036039}
+  - {fileID: 1386057506}
+  - {fileID: 610920812}
 --- !u!1 &1869499882
 GameObject:
   m_ObjectHideFlags: 0

@@ -51,7 +51,7 @@ public class ServerInformation
     {
         this.blueSlots = new Queue<byte>();
         this.redSlots = new Queue<byte>();
-        for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer; i++)
+        for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer / 2; i++)
         {
             this.blueSlots.Enqueue(i);
             this.redSlots.Enqueue(i);
