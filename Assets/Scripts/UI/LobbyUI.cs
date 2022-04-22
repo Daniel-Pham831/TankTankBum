@@ -8,8 +8,14 @@ using UnityEngine.UI;
 public class LobbyUI : MonoBehaviour
 {
     public static LobbyUI Singleton { get; private set; }
-    [SerializeField] private GameObject[] blueSlots;
-    [SerializeField] private GameObject[] redSlots;
+    [SerializeField] private GameObject blueSlotRoot;
+    [SerializeField] private GameObject redSlotRoot;
+    [SerializeField] private GameObject slotPrefab;
+
+    public Action<Player> OnPlayerJoinedSlot;
+    public Action<Team, byte, SlotState> OnSlotStateChanged;
+    public Action<Team, byte> OnSlotReset;
+    public Action OnAllSlotReset;
 
     private void Awake()
     {
@@ -19,19 +25,29 @@ public class LobbyUI : MonoBehaviour
 
     private void Start()
     {
-        foreach (GameObject slot in this.blueSlots)
-        {
-            slot.GetComponentInChildren<Toggle>().isOn = false;
-            slot.GetComponentInChildren<TMP_Text>().SetText("");
-        }
-
-        foreach (GameObject slot in this.redSlots)
-        {
-            slot.GetComponentInChildren<Toggle>().isOn = false;
-            slot.GetComponentInChildren<TMP_Text>().SetText("");
-        }
-
         this.registerToEvent(true);
+
+        this.GenerateAllSlots();
+    }
+
+    private void GenerateAllSlots()
+    {
+        for (int i = 0; i < (GameInformation.Singleton.MaxPlayer / 2) + 1; i++)
+        {
+            this.GenerateOneSlot(Team.Blue, (byte)i);
+            this.GenerateOneSlot(Team.Red, (byte)i);
+            this.OnSlotStateChanged?.Invoke(Team.Blue, (byte)i, SlotState.Empty);
+            this.OnSlotStateChanged?.Invoke(Team.Red, (byte)i, SlotState.Empty);
+        }
+    }
+
+    private void GenerateOneSlot(Team slotTeam, byte slotIndex)
+    {
+        GameObject newSlot = Instantiate(this.slotPrefab, slotTeam == Team.Blue ? this.blueSlotRoot.transform : this.redSlotRoot.transform);
+        newSlot.name = $"{slotTeam} Slot: Index {slotIndex}";
+        Slot slotInfo = newSlot.GetComponent<Slot>();
+        slotInfo.SlotTeam = slotTeam;
+        slotInfo.SlotIndex = slotIndex;
     }
 
     private void OnDestroy()
@@ -55,16 +71,6 @@ public class LobbyUI : MonoBehaviour
 
     private void OnNewJoinedPlayer(Player joinedPlayer)
     {
-        GameObject joinedSlot;
-        if (joinedPlayer.Team == Team.Blue)
-        {
-            joinedSlot = this.blueSlots[joinedPlayer.SlotIndex];
-        }
-        else
-        {
-            joinedSlot = this.redSlots[joinedPlayer.SlotIndex];
-        }
-
-        joinedSlot.GetComponentInChildren<TMP_Text>().SetText(joinedPlayer.Name);
+        this.OnPlayerJoinedSlot?.Invoke(joinedPlayer);
     }
 }

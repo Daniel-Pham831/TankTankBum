@@ -77,9 +77,7 @@ public class PlayerInformation : MonoBehaviour
     {
         NetWelcome welcomeMessage = message as NetWelcome;
 
-        this.myInformation.Id = welcomeMessage.AssignedId;
-        this.myInformation.Team = welcomeMessage.Team;
-        this.myInformation.SlotIndex = welcomeMessage.SlotIndex;
+        this.myInformation = welcomeMessage.MyPlayerInformation;
 
         this.playerList = welcomeMessage.PlayerList;
 

@@ -46,9 +46,11 @@ public class MainMenuUI : MonoBehaviour
     public void OnHostBtn()
     {
         server.Init(8007, 10); //This need to change (Stop hard-coded)
-        client.Init("127.0.0.1", 8007, this.nameInputField.text);
+        string playerName = this.nameInputField.text != "" ? this.nameInputField.text : "I forgot to name myself";
 
-        this.OnHostOrJoinRoom?.Invoke(this.nameInputField.text);
+        client.Init("127.0.0.1", 8007, playerName);
+
+        this.OnHostOrJoinRoom?.Invoke(playerName);
         this.mainMenuAnimator.SetTrigger("ToLobbyMenu");
     }
 

@@ -4,9 +4,7 @@ using Unity.Networking.Transport;
 
 public class NetWelcome : NetMessage
 {
-    public byte AssignedId { set; get; }
-    public Team Team { set; get; }
-    public byte SlotIndex { set; get; }
+    public Player MyPlayerInformation { set; get; }
 
     public byte TotalPlayer { set; get; }
     public List<Player> PlayerList { set; get; }
@@ -15,9 +13,7 @@ public class NetWelcome : NetMessage
     {
         this.Code = OpCode.WELCOME;
 
-        this.AssignedId = player.Id;
-        this.Team = player.Team;
-        this.SlotIndex = player.SlotIndex;
+        this.MyPlayerInformation = player;
 
         this.TotalPlayer = totalPlayer;
         this.PlayerList = playerList;
@@ -33,9 +29,7 @@ public class NetWelcome : NetMessage
     {
         base.Serialize(ref writer);
 
-        writer.WriteByte(this.AssignedId);
-        writer.WriteByte((byte)this.Team);
-        writer.WriteByte(this.SlotIndex);
+        Player.SerializePlayer(ref writer, this.MyPlayerInformation);
 
         writer.WriteByte(this.TotalPlayer);
         foreach (Player player in this.PlayerList)
@@ -46,9 +40,7 @@ public class NetWelcome : NetMessage
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        this.AssignedId = reader.ReadByte();
-        this.Team = (Team)reader.ReadByte();
-        this.SlotIndex = reader.ReadByte();
+        this.MyPlayerInformation = Player.DeserializePlayer(ref reader);
 
         this.TotalPlayer = reader.ReadByte();
         this.PlayerList = new List<Player>();
