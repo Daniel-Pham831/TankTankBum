@@ -121,6 +121,8 @@ public class Server : MonoBehaviour
 
                     case NetworkEvent.Type.Disconnect:
                         Debug.Log("Client disconnected from the server");
+                        this.BroadCast(new NetDisconnect((byte)this.connections[i].InternalId)); // send disconnectedClientId to all clients
+
                         this.connections[i] = default(NetworkConnection);
                         this.connections.RemoveAt(i);
                         this.connectionDropped?.Invoke();

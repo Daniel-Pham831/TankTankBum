@@ -13,6 +13,7 @@ public class PlayerInformation : MonoBehaviour
     public List<string> nameList;
 
     public Action<Player> OnNewJoinedPlayer;
+    public Action<Team, byte> OnDisconnectedSlot;
     void Awake()
     {
         if (Singleton == null)
@@ -44,13 +45,30 @@ public class PlayerInformation : MonoBehaviour
         {
             NetUtility.C_WELCOME += this.OnWelcomeClient;
             NetUtility.C_JOIN += this.OnNewJoinClient;
+            NetUtility.C_DISCONNECT += this.OnDisconnectedClient;
             MainMenuUI.Singleton.OnHostOrJoinRoom += this.OnHostOrJoinRoom;
         }
         else
         {
             NetUtility.C_WELCOME -= this.OnWelcomeClient;
             NetUtility.C_JOIN -= this.OnNewJoinClient;
+            NetUtility.C_DISCONNECT -= this.OnDisconnectedClient;
             MainMenuUI.Singleton.OnHostOrJoinRoom -= this.OnHostOrJoinRoom;
+        }
+    }
+
+    private void OnDisconnectedClient(NetMessage message)
+    {
+        NetDisconnect disconnectedMessage = message as NetDisconnect;
+
+        Player disconnectedPlayer = FindPlayer(disconnectedMessage.DisconnectedClientId);
+
+        if (disconnectedPlayer != null)
+        {
+            this.playerList.Remove(disconnectedPlayer);
+            this.idList.Remove(disconnectedPlayer.Id);
+            this.nameList.Remove(disconnectedPlayer.Name);
+            this.OnDisconnectedSlot?.Invoke(disconnectedPlayer.Team, disconnectedPlayer.SlotIndex);
         }
     }
 
@@ -93,5 +111,16 @@ public class PlayerInformation : MonoBehaviour
 
 
         this.OnNewJoinedPlayer?.Invoke(this.MyPlayerInformation);
+    }
+
+    private Player FindPlayer(byte disconnectedClientId)
+    {
+        foreach (Player player in this.playerList)
+        {
+            if (player.Id == disconnectedClientId)
+                return player;
+        }
+
+        return null;
     }
 }

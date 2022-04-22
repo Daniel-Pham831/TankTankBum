@@ -61,12 +61,18 @@ public class LobbyUI : MonoBehaviour
         if (confirm)
         {
             PlayerInformation.Singleton.OnNewJoinedPlayer += OnNewJoinedPlayer;
+            PlayerInformation.Singleton.OnDisconnectedSlot += OnDisconnectedClient;
         }
         else
         {
             PlayerInformation.Singleton.OnNewJoinedPlayer -= OnNewJoinedPlayer;
-
+            PlayerInformation.Singleton.OnDisconnectedSlot -= OnDisconnectedClient;
         }
+    }
+
+    private void OnDisconnectedClient(Team team, byte id)
+    {
+        this.OnSlotReset?.Invoke(team, id);
     }
 
     private void OnNewJoinedPlayer(Player joinedPlayer)
