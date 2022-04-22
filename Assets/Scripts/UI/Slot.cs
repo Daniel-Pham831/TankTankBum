@@ -8,7 +8,8 @@ using UnityEngine.UI;
 public enum SlotState
 {
     Empty = 0,
-    Occupied = 1
+    Occupied = 1,
+    OwnerOccupied = 2
 }
 
 public class Slot : MonoBehaviour
@@ -23,12 +24,20 @@ public class Slot : MonoBehaviour
 
     [SerializeField] private Color emptySlotColor;
     [SerializeField] private Color occupiedSlotColor;
+    [SerializeField] private Color ownerOccupiedSlotColor;
     [SerializeField] private Image slotColor;
 
 
     private bool IsThisSlot(Team slotTeam, byte slotIndex)
     {
         return this.SlotTeam == slotTeam && this.SlotIndex == slotIndex;
+    }
+
+    private bool IsOwnerSlot(Team slotTeam, byte slotIndex)
+    {
+        Player ownerInformation = PlayerInformation.Singleton.MyPlayerInformation;
+
+        return ownerInformation.Team == slotTeam && ownerInformation.SlotIndex == slotIndex;
     }
 
     private void ResetSlot(Team slotTeam, byte slotIndex)
@@ -48,7 +57,24 @@ public class Slot : MonoBehaviour
     private void SetSlotStage(SlotState state)
     {
         this.slotState = state;
-        this.slotColor.color = this.slotState == SlotState.Empty ? this.emptySlotColor : this.occupiedSlotColor;
+
+        Color color = this.emptySlotColor;
+        switch (state)
+        {
+            case SlotState.Empty:
+                color = this.emptySlotColor;
+                break;
+
+            case SlotState.Occupied:
+                color = this.occupiedSlotColor;
+                break;
+
+            case SlotState.OwnerOccupied:
+                color = this.ownerOccupiedSlotColor;
+                break;
+        }
+
+        this.slotColor.color = color;
     }
 
     private void SetSlotInformationBasedOf(Player player)
@@ -56,7 +82,11 @@ public class Slot : MonoBehaviour
         if (this.IsThisSlot(player.Team, player.SlotIndex))
         {
             this.slotName.SetText(player.Name);
-            this.SetSlotStage(SlotState.Occupied);
+
+            if (this.IsOwnerSlot(player.Team, player.SlotIndex))
+                this.SetSlotStage(SlotState.OwnerOccupied);
+            else
+                this.SetSlotStage(SlotState.Occupied);
         }
     }
 
@@ -93,6 +123,7 @@ public class Slot : MonoBehaviour
 
     private void OnPlayerJoinedSlot(Player player)
     {
+        Debug.Log("OnPlayerJoinedSlot");
         this.SetSlotInformationBasedOf(player);
     }
 

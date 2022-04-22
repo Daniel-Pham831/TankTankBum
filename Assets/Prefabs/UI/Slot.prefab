@@ -222,7 +222,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.28919986, g: 0.9150943, b: 0.12517802, a: 0.4627451}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.4627451}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -477,7 +477,7 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7307596801642090936}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -547,4 +547,5 @@ MonoBehaviour:
   slotState: 0
   emptySlotColor: {r: 0, g: 0, b: 0, a: 0.4627451}
   occupiedSlotColor: {r: 1, g: 1, b: 1, a: 0.4627451}
+  ownerOccupiedSlotColor: {r: 0.84313726, g: 0.85882354, b: 0.3764706, a: 0.4627451}
   slotColor: {fileID: 7307596800936115037}

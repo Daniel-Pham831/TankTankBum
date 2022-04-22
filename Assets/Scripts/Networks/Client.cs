@@ -92,7 +92,7 @@ public class Client : MonoBehaviour
                     break;
 
                 case NetworkEvent.Type.Disconnect:
-                    Debug.Log("Client got disconnected from server");
+                    Debug.Log("Client Disconnected");
                     this.connection = default(NetworkConnection);
                     this.connectionDropped?.Invoke();
                     this.Shutdown();

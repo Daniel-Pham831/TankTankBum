@@ -29,6 +29,7 @@ public class NetKeepAlive : NetMessage
 
         NetUtility.C_KEEP_ALIVE?.Invoke(this);
     }
+
     public override void ReceivedOnServer(NetworkConnection cnn)
     {
         base.ReceivedOnServer(cnn);

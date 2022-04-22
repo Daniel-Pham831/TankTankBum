@@ -13,7 +13,6 @@ public class ServerInformation
 {
     public static ServerInformation Singleton;
     public List<Player> playerList;
-    private Queue<byte> idList;
     private Queue<byte> blueSlots;
     private Queue<byte> redSlots;
 
@@ -24,7 +23,6 @@ public class ServerInformation
             Singleton = this;
 
         this.playerList = new List<Player>();
-        this.GenerateIdList();
         this.GenerateLobbySlots();
         this.registerToEvent(true);
     }
@@ -58,14 +56,6 @@ public class ServerInformation
         }
     }
 
-    private void GenerateIdList()
-    {
-        this.idList = new Queue<byte>();
-        for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer; i++)
-        {
-            this.idList.Enqueue(i);
-        }
-    }
     #endregion
 
 
@@ -79,7 +69,7 @@ public class ServerInformation
                 a List<Player>
         */
         NetSendName sendNameMessage = message as NetSendName;
-        Player connectedPlayer = this.GetNewPlayerInformation(sendNameMessage.Name);
+        Player connectedPlayer = this.GetNewPlayerInformation((byte)connectedClient.InternalId, sendNameMessage.Name);
         Server.Singleton.SendToClient(connectedClient, new NetWelcome(connectedPlayer, (byte)this.playerList.Count, this.playerList));
 
         // BroadCast to all player that a new player just joined
@@ -88,10 +78,9 @@ public class ServerInformation
         this.playerList.Add(connectedPlayer);
     }
 
-    private Player GetNewPlayerInformation(string playerName)
+    private Player GetNewPlayerInformation(byte id, string playerName)
     {
-        byte id = GetIdForNewPlayer();
-        Team team = id % 2 == 0 ? Team.Blue : Team.Red;
+        Team team = this.playerList.Count % 2 == 0 ? Team.Blue : Team.Red;
         byte lobbyIndex = this.GetSlotIndexForNewPlayer(team);
         return new Player(id, team, lobbyIndex, playerName);
     }
@@ -99,15 +88,5 @@ public class ServerInformation
     private byte GetSlotIndexForNewPlayer(Team team)
     {
         return team == Team.Blue ? this.blueSlots.Dequeue() : this.redSlots.Dequeue();
-    }
-
-    private byte GetIdForNewPlayer()
-    {
-        return this.idList.Dequeue();
-    }
-
-    private void ReturnToIdList(byte id)
-    {
-        this.idList.Enqueue(id);
     }
 }

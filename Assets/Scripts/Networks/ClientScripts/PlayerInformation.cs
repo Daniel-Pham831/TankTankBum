@@ -7,7 +7,7 @@ public class PlayerInformation : MonoBehaviour
 {
     public static PlayerInformation Singleton { get; private set; }
 
-    private Player myInformation;
+    public Player MyPlayerInformation;
     public List<Player> playerList;
     public List<byte> idList;
     public List<string> nameList;
@@ -18,7 +18,7 @@ public class PlayerInformation : MonoBehaviour
         if (Singleton == null)
             Singleton = this;
 
-        this.myInformation = new Player();
+        this.MyPlayerInformation = new Player();
 
         this.idList = new List<byte>();
         this.nameList = new List<string>();
@@ -56,7 +56,7 @@ public class PlayerInformation : MonoBehaviour
 
     private void OnHostOrJoinRoom(string inputName)
     {
-        this.myInformation.Name = inputName;
+        this.MyPlayerInformation.Name = inputName;
     }
 
     private void OnNewJoinClient(NetMessage message)
@@ -77,7 +77,7 @@ public class PlayerInformation : MonoBehaviour
     {
         NetWelcome welcomeMessage = message as NetWelcome;
 
-        this.myInformation = welcomeMessage.MyPlayerInformation;
+        this.MyPlayerInformation = welcomeMessage.MyPlayerInformation;
 
         this.playerList = welcomeMessage.PlayerList;
 
@@ -89,9 +89,9 @@ public class PlayerInformation : MonoBehaviour
         }
 
         Debug.Log("Connected To Server");
-        Debug.Log($"My ID:{this.myInformation.Id}\nMy Name:{this.myInformation.Name}");
+        Debug.Log($"My ID:{this.MyPlayerInformation.Id}\nMy Name:{this.MyPlayerInformation.Name}");
 
 
-        this.OnNewJoinedPlayer?.Invoke(this.myInformation);
+        this.OnNewJoinedPlayer?.Invoke(this.MyPlayerInformation);
     }
 }

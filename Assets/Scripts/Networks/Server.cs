@@ -122,13 +122,9 @@ public class Server : MonoBehaviour
                     case NetworkEvent.Type.Disconnect:
                         Debug.Log("Client disconnected from the server");
                         this.connections[i] = default(NetworkConnection);
+                        this.connections.RemoveAt(i);
                         this.connectionDropped?.Invoke();
 
-                        /*
-                         *  Shut down the server when 1 of the 2 players disconnect
-                         *  Because this is a chess game. It needs 2 people to play
-                         */
-                        this.Shutdown();
                         break;
                 }
             }
