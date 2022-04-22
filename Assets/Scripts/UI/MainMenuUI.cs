@@ -14,6 +14,7 @@ public class MainMenuUI : MonoBehaviour
     private Animator mainMenuAnimator;
 
     public Action<string> OnHostOrJoinRoom;
+    public Action OnLobbyLeft;
 
     private void Awake()
     {
@@ -79,6 +80,18 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnLeaveBtn()
     {
+        if (PlayerInformation.Singleton.MyPlayerInformation.Id == 0)
+        {
+            Debug.Log("Server");
+            server.Shutdown();
+        }
+        else
+        {
+            Debug.Log("Client");
+            client.Shutdown();
+        }
+
+        this.OnLobbyLeft?.Invoke();
         this.mainMenuAnimator.SetTrigger("ToOnlineSettingMenu");
     }
 }

@@ -62,12 +62,28 @@ public class LobbyUI : MonoBehaviour
         {
             PlayerInformation.Singleton.OnNewJoinedPlayer += OnNewJoinedPlayer;
             PlayerInformation.Singleton.OnDisconnectedSlot += OnDisconnectedClient;
+            MainMenuUI.Singleton.OnLobbyLeft += OnLobbyLeft;
+
+            Client.Singleton.OnServerShutDown += OnServerShutDown;
         }
         else
         {
             PlayerInformation.Singleton.OnNewJoinedPlayer -= OnNewJoinedPlayer;
             PlayerInformation.Singleton.OnDisconnectedSlot -= OnDisconnectedClient;
+            MainMenuUI.Singleton.OnLobbyLeft -= OnLobbyLeft;
+
+            Client.Singleton.OnServerShutDown -= OnServerShutDown;
         }
+    }
+
+    private void OnLobbyLeft()
+    {
+        this.OnAllSlotReset?.Invoke();
+    }
+
+    private void OnServerShutDown()
+    {
+        this.OnAllSlotReset?.Invoke();
     }
 
     private void OnDisconnectedClient(Team team, byte id)

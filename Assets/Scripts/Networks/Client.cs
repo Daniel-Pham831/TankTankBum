@@ -20,7 +20,7 @@ public class Client : MonoBehaviour
 
     private bool isActive = false;
 
-    public Action connectionDropped;
+    public Action OnServerShutDown;
 
     // Methods
     public void Init(string ip, ushort port, string playerName)
@@ -43,10 +43,7 @@ public class Client : MonoBehaviour
     {
         if (this.isActive)
         {
-            this.UnregisterToEvent();
-            this.driver.Dispose();
-            this.isActive = false;
-            connection = default(NetworkConnection);
+            this.SendToServer(new NetDisconnect(PlayerInformation.Singleton.MyPlayerInformation.Id));
         }
     }
 
@@ -69,7 +66,7 @@ public class Client : MonoBehaviour
         if (!this.connection.IsCreated && this.isActive)
         {
             Debug.Log("Something went wrong, lost connection to server!");
-            this.connectionDropped?.Invoke();
+            this.OnServerShutDown?.Invoke();
             this.Shutdown();
         }
     }
@@ -92,9 +89,9 @@ public class Client : MonoBehaviour
                     break;
 
                 case NetworkEvent.Type.Disconnect:
-                    Debug.Log("Client Disconnected");
+                    Debug.Log("Server has been Shutdown");
                     this.connection = default(NetworkConnection);
-                    this.connectionDropped?.Invoke();
+                    this.OnServerShutDown?.Invoke();
                     this.Shutdown();
                     break;
             }
@@ -113,11 +110,34 @@ public class Client : MonoBehaviour
     private void RegisterToEvent()
     {
         NetUtility.C_KEEP_ALIVE += this.OnKeepAlive;
+        NetUtility.C_DISCONNECT += this.OnDisconnectedClient;
     }
 
     private void UnregisterToEvent()
     {
+        NetUtility.C_DISCONNECT -= this.OnDisconnectedClient;
         NetUtility.C_KEEP_ALIVE -= this.OnKeepAlive;
+    }
+
+    private void OnDisconnectedClient(NetMessage message)
+    {
+        NetDisconnect disconnectedMessage = message as NetDisconnect;
+
+        if (PlayerInformation.Singleton.MyPlayerInformation.Id == disconnectedMessage.DisconnectedClientId)
+        {
+            this.DisconnectWithServer();
+        }
+    }
+
+    private void DisconnectWithServer()
+    {
+        if (this.isActive)
+        {
+            this.UnregisterToEvent();
+            this.driver.Dispose();
+            this.isActive = false;
+            connection = default(NetworkConnection);
+        }
     }
 
     private void OnKeepAlive(NetMessage keepAliveMessage)

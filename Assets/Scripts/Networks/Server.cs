@@ -124,7 +124,6 @@ public class Server : MonoBehaviour
                         this.BroadCast(new NetDisconnect((byte)this.connections[i].InternalId)); // send disconnectedClientId to all clients
 
                         this.connections[i] = default(NetworkConnection);
-                        this.connections.RemoveAt(i);
                         this.connectionDropped?.Invoke();
 
                         break;

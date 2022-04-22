@@ -19,11 +19,13 @@ public class ServerInformation
     #region ClassInitMethods
     public ServerInformation()
     {
+        if (Singleton != null) return;
+
         if (Singleton == null)
             Singleton = this;
 
-        this.playerList = new List<Player>();
-        this.GenerateLobbySlots();
+
+        this.ResetServerInformation();
         this.registerToEvent(true);
     }
 
@@ -38,15 +40,39 @@ public class ServerInformation
         if (confirm)
         {
             NetUtility.S_SEND_NAME += this.OnSendNameServer;
+            NetUtility.S_DISCONNECT += this.OnDisconnectedClientOnServer;
+            MainMenuUI.Singleton.OnLobbyLeft += OnLobbyLeft;
         }
         else
         {
             NetUtility.S_SEND_NAME -= this.OnSendNameServer;
+            NetUtility.S_DISCONNECT -= this.OnDisconnectedClientOnServer;
+            MainMenuUI.Singleton.OnLobbyLeft -= OnLobbyLeft;
         }
     }
 
-    private void GenerateLobbySlots()
+    private void OnDisconnectedClientOnServer(NetMessage message, NetworkConnection disconnectedClient)
     {
+        NetDisconnect disconnectedMessage = message as NetDisconnect;
+        Server.Singleton.BroadCast(disconnectedMessage);
+
+        Player disconnectedPlayer = Player.FindPlayer(ref this.playerList, disconnectedMessage.DisconnectedClientId);
+
+        this.playerList.Remove(disconnectedPlayer);
+        if (disconnectedPlayer.Team == Team.Blue)
+            this.blueSlots.Enqueue(disconnectedPlayer.SlotIndex);
+        else
+            this.redSlots.Enqueue(disconnectedPlayer.SlotIndex);
+    }
+
+    private void OnLobbyLeft()
+    {
+        this.ResetServerInformation();
+    }
+
+    private void ResetServerInformation()
+    {
+        this.playerList = new List<Player>();
         this.blueSlots = new Queue<byte>();
         this.redSlots = new Queue<byte>();
         for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer / 2; i++)

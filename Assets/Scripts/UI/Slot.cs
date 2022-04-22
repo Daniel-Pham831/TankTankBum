@@ -123,7 +123,6 @@ public class Slot : MonoBehaviour
 
     private void OnPlayerJoinedSlot(Player player)
     {
-        Debug.Log("OnPlayerJoinedSlot");
         this.SetSlotInformationBasedOf(player);
     }
 
