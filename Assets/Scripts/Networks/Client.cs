@@ -88,7 +88,7 @@ public class Client : MonoBehaviour
                     break;
 
                 case NetworkEvent.Type.Data:
-                    NetUtility.OnData(streamReader, default(NetworkConnection));
+                    NetUtility.OnData(ref streamReader, default(NetworkConnection));
                     break;
 
                 case NetworkEvent.Type.Disconnect:

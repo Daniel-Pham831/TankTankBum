@@ -7,10 +7,10 @@ public class NetKeepAlive : NetMessage
         this.Code = OpCode.KEEP_ALIVE;
     }
 
-    public NetKeepAlive(DataStreamReader reader)
+    public NetKeepAlive(ref DataStreamReader reader)
     {
         this.Code = OpCode.KEEP_ALIVE;
-        this.Deserialize(reader);
+        this.Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)
@@ -18,7 +18,7 @@ public class NetKeepAlive : NetMessage
         base.Serialize(ref writer);
     }
 
-    public override void Deserialize(DataStreamReader reader)
+    public override void Deserialize(ref DataStreamReader reader)
     {
 
     }

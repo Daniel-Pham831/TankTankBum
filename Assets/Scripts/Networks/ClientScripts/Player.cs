@@ -39,7 +39,7 @@ public class Player
         writer.WriteFixedString32(player.Name);
     }
 
-    public static Player DeserializePlayer(DataStreamReader reader)
+    public static Player DeserializePlayer(ref DataStreamReader reader)
     {
         byte playerId = reader.ReadByte();
         Team playerTeam = (Team)reader.ReadByte();

@@ -116,7 +116,7 @@ public class Server : MonoBehaviour
                 switch (cmd)
                 {
                     case NetworkEvent.Type.Data:
-                        NetUtility.OnData(streamReader, this.connections[i], this);
+                        NetUtility.OnData(ref streamReader, this.connections[i], this);
                         break;
 
                     case NetworkEvent.Type.Disconnect:

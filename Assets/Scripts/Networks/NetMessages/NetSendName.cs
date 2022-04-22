@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Unity.Networking.Transport;
 
 public class NetSendName : NetMessage
@@ -11,10 +10,10 @@ public class NetSendName : NetMessage
         this.Name = name;
     }
 
-    public NetSendName(DataStreamReader reader)
+    public NetSendName(ref DataStreamReader reader)
     {
         this.Code = OpCode.SEND_NAME;
-        this.Deserialize(reader);
+        this.Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)
@@ -24,7 +23,7 @@ public class NetSendName : NetMessage
         writer.WriteFixedString32(this.Name);
     }
 
-    public override void Deserialize(DataStreamReader reader)
+    public override void Deserialize(ref DataStreamReader reader)
     {
         this.Name = reader.ReadFixedString32().ToString();
     }

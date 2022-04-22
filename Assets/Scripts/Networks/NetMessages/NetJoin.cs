@@ -13,10 +13,10 @@ public class NetJoin : NetMessage
         this.JoinedPlayer = joinedPlayer;
     }
 
-    public NetJoin(DataStreamReader reader)
+    public NetJoin(ref DataStreamReader reader)
     {
         this.Code = OpCode.JOIN;
-        this.Deserialize(reader);
+        this.Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)
@@ -26,9 +26,9 @@ public class NetJoin : NetMessage
         Player.SerializePlayer(ref writer, this.JoinedPlayer);
     }
 
-    public override void Deserialize(DataStreamReader reader)
+    public override void Deserialize(ref DataStreamReader reader)
     {
-        this.JoinedPlayer = Player.DeserializePlayer(reader);
+        this.JoinedPlayer = Player.DeserializePlayer(ref reader);
     }
 
     public override void ReceivedOnClient()

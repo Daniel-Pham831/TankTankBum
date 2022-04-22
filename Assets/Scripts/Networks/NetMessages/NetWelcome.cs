@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Networking.Transport;
 
@@ -22,10 +23,10 @@ public class NetWelcome : NetMessage
         this.PlayerList = playerList;
     }
 
-    public NetWelcome(DataStreamReader reader)
+    public NetWelcome(ref DataStreamReader reader)
     {
         this.Code = OpCode.WELCOME;
-        this.Deserialize(reader);
+        this.Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)
@@ -43,7 +44,7 @@ public class NetWelcome : NetMessage
         }
     }
 
-    public override void Deserialize(DataStreamReader reader)
+    public override void Deserialize(ref DataStreamReader reader)
     {
         this.AssignedId = reader.ReadByte();
         this.Team = (Team)reader.ReadByte();
@@ -53,7 +54,7 @@ public class NetWelcome : NetMessage
         this.PlayerList = new List<Player>();
         for (int i = 0; i < this.TotalPlayer; i++)
         {
-            this.PlayerList.Add(Player.DeserializePlayer(reader));
+            this.PlayerList.Add(Player.DeserializePlayer(ref reader));
         }
     }
 

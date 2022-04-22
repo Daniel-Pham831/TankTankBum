@@ -22,26 +22,26 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_JOIN;
     public static Action<NetMessage, NetworkConnection> S_WELCOME;
 
-    public static void OnData(DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
+    public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
     {
         NetMessage msg = null;
         var OpCode = (OpCode)streamReader.ReadByte();
         switch (OpCode)
         {
             case OpCode.KEEP_ALIVE:
-                msg = new NetKeepAlive(streamReader);
+                msg = new NetKeepAlive(ref streamReader);
                 break;
 
             case OpCode.SEND_NAME:
-                msg = new NetSendName(streamReader);
+                msg = new NetSendName(ref streamReader);
                 break;
 
             case OpCode.JOIN:
-                msg = new NetJoin(streamReader);
+                msg = new NetJoin(ref streamReader);
                 break;
 
             case OpCode.WELCOME:
-                msg = new NetWelcome(streamReader);
+                msg = new NetWelcome(ref streamReader);
                 break;
 
             default:
