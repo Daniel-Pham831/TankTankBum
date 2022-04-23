@@ -40,14 +40,21 @@ public class ServerInformation
     {
         if (confirm)
         {
-            NetUtility.S_SEND_NAME += this.OnSendNameServer;
+            NetUtility.S_SEND_NAME += this.OnServerReceivedSendNameMessage;
             Server.Singleton.OnClientDisconnected += OnClientDisconnected;
+            Server.Singleton.OnServerDisconnect += OnServerDisconnect;
         }
         else
         {
-            NetUtility.S_SEND_NAME -= this.OnSendNameServer;
+            NetUtility.S_SEND_NAME -= this.OnServerReceivedSendNameMessage;
             Server.Singleton.OnClientDisconnected -= OnClientDisconnected;
+            Server.Singleton.OnServerDisconnect -= OnServerDisconnect;
         }
+    }
+
+    private void OnServerDisconnect()
+    {
+        this.ResetServerInformation();
     }
 
     private void OnClientDisconnected(byte disconnectedClientId)
@@ -83,7 +90,7 @@ public class ServerInformation
 
 
     //Server
-    private void OnSendNameServer(NetMessage message, NetworkConnection connectedClient)
+    private void OnServerReceivedSendNameMessage(NetMessage message, NetworkConnection connectedClient)
     {
         /*  At this moment server just received a sendNameMessage from connectedClient which contains his name
             Server need to send a welcomeMessage back to him which contains

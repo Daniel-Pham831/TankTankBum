@@ -64,7 +64,7 @@ public class ClientInformation : MonoBehaviour
             NetUtility.C_WELCOME += this.OnClientReceivedWelcomeMessage;
             NetUtility.C_JOIN += this.OnClientReceivedJoinMessage;
             NetUtility.C_DISCONNECT += this.OnClientReceivedDisconnectedMessage;
-            Client.Singleton.OnServerDisconnect += this.OnServerDisconnect;
+            Client.Singleton.OnClientDisconnect += this.OnClientDisconnect;
 
             MainMenuUI.Singleton.OnHostOrJoinRoom += this.OnHostOrJoinRoom;
         }
@@ -73,13 +73,13 @@ public class ClientInformation : MonoBehaviour
             NetUtility.C_WELCOME -= this.OnClientReceivedWelcomeMessage;
             NetUtility.C_JOIN -= this.OnClientReceivedJoinMessage;
             NetUtility.C_DISCONNECT -= this.OnClientReceivedDisconnectedMessage;
-            Client.Singleton.OnServerDisconnect += this.OnServerDisconnect;
+            Client.Singleton.OnClientDisconnect -= this.OnClientDisconnect;
 
             MainMenuUI.Singleton.OnHostOrJoinRoom -= this.OnHostOrJoinRoom;
         }
     }
 
-    private void OnServerDisconnect()
+    private void OnClientDisconnect()
     {
         this.ResetClientInformation();
     }

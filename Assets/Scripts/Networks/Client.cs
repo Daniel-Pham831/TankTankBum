@@ -20,13 +20,16 @@ public class Client : MonoBehaviour
 
     private bool isActive = false;
 
+    public Action OnClientDisconnect;
     public Action OnServerDisconnect;
 
     // Methods
     public void Init(string ip, ushort port, string playerName)
     {
         if (this.isActive)
+        {
             this.ClientReset();
+        }
 
         this.driver = NetworkDriver.Create();
         NetworkEndPoint endPoint = NetworkEndPoint.Parse(ip, port);
@@ -55,7 +58,7 @@ public class Client : MonoBehaviour
         if (this.isActive)
         {
             this.connection.Disconnect(this.driver);
-            this.OnServerDisconnect?.Invoke();
+            this.OnClientDisconnect?.Invoke();
         }
     }
 
@@ -101,6 +104,7 @@ public class Client : MonoBehaviour
 
                 case NetworkEvent.Type.Disconnect:
                     Debug.Log("Client Disconnected");
+                    this.OnServerDisconnect?.Invoke();
                     this.Shutdown();
                     break;
             }
@@ -118,15 +122,15 @@ public class Client : MonoBehaviour
     #region Network Received
     private void RegisterToEvent()
     {
-        NetUtility.C_KEEP_ALIVE += this.OnKeepAlive;
+        NetUtility.C_KEEP_ALIVE += this.OnClientReceivedKeepAliveMessage;
     }
 
     private void UnregisterToEvent()
     {
-        NetUtility.C_KEEP_ALIVE -= this.OnKeepAlive;
+        NetUtility.C_KEEP_ALIVE -= this.OnClientReceivedKeepAliveMessage;
     }
 
-    private void OnKeepAlive(NetMessage keepAliveMessage)
+    private void OnClientReceivedKeepAliveMessage(NetMessage keepAliveMessage)
     {
         // Send it back, to keep both side alive
         this.SendToServer(keepAliveMessage);

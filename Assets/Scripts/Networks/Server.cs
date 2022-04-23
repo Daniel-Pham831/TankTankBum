@@ -21,10 +21,14 @@ public class Server : MonoBehaviour
     private float lastKeepAlive;
 
     public Action<byte> OnClientDisconnected;
+    public Action OnServerDisconnect;
 
     // Methods
     public void Init(ushort port, int maximumConnection)
     {
+        if (this.isActive)
+            this.ServerReset();
+
         this.driver = NetworkDriver.Create();
         NetworkEndPoint endPoint = NetworkEndPoint.AnyIpv4;
         endPoint.Port = port;
@@ -44,16 +48,29 @@ public class Server : MonoBehaviour
         this.isActive = true;
 
         //Init server information
-        ServerInformation serverInfomation = new ServerInformation();
+        if (ServerInformation.Singleton == null)
+        {
+            ServerInformation serverInfomation = new ServerInformation();
+        }
+    }
+
+    private void ServerReset()
+    {
+        this.driver.Dispose();
+        this.connections.Dispose();
+        this.isActive = false;
     }
 
     public void Shutdown()
     {
         if (this.isActive)
         {
-            this.driver.Dispose();
-            this.connections.Dispose();
-            this.isActive = false;
+            foreach (NetworkConnection connection in this.connections)
+            {
+                this.driver.Disconnect(connection);
+            }
+
+            this.OnServerDisconnect?.Invoke();
         }
     }
 

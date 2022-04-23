@@ -28,6 +28,24 @@ public class MainMenuUI : MonoBehaviour
     {
         this.mainMenuAnimator = GetComponent<Animator>();
 
+        this.registerToEvent(true);
+    }
+
+    private void OnDestroy()
+    {
+        this.registerToEvent(false);
+    }
+
+    private void registerToEvent(bool confirm)
+    {
+        if (confirm)
+        {
+            client.OnServerDisconnect += OnLeaveBtn;
+        }
+        else
+        {
+            client.OnServerDisconnect -= OnLeaveBtn;
+        }
     }
 
     public void OnOnlineBtn()
