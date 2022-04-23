@@ -20,7 +20,7 @@ public class Client : MonoBehaviour
 
     private bool isActive = false;
 
-    public Action connectionDropped;
+    public Action OnServerDisconnect;
 
     // Methods
     public void Init(string ip, ushort port, string playerName)
@@ -55,7 +55,7 @@ public class Client : MonoBehaviour
         if (this.isActive)
         {
             this.connection.Disconnect(this.driver);
-            this.connectionDropped?.Invoke();
+            this.OnServerDisconnect?.Invoke();
         }
     }
 
@@ -78,7 +78,6 @@ public class Client : MonoBehaviour
         if (!this.connection.IsCreated && this.isActive)
         {
             Debug.Log("Something went wrong, lost connection to server!");
-            this.connectionDropped?.Invoke();
             this.Shutdown();
         }
     }
