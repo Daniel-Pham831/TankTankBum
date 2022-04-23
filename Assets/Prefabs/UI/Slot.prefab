@@ -111,8 +111,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0.5}
   m_AnchorMax: {x: 0, y: 0.5}
-  m_AnchoredPosition: {x: 25, y: 0}
-  m_SizeDelta: {x: 50, y: 50}
+  m_AnchoredPosition: {x: 30, y: 0}
+  m_SizeDelta: {x: 45, y: 45}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &7307596800857919977
 MonoBehaviour:
@@ -198,8 +198,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 24, y: 0}
-  m_SizeDelta: {x: -52, y: -4}
+  m_AnchoredPosition: {x: 25, y: 0}
+  m_SizeDelta: {x: -64, y: -14}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7307596800936115034
 CanvasRenderer:
@@ -513,7 +513,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.2735849, g: 0.2735849, b: 0.2735849, a: 0.4627451}
+  m_Color: {r: 0.8396226, g: 0.8396226, b: 0.8396226, a: 0.4627451}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -547,5 +547,9 @@ MonoBehaviour:
   slotState: 0
   emptySlotColor: {r: 0, g: 0, b: 0, a: 0.4627451}
   occupiedSlotColor: {r: 1, g: 1, b: 1, a: 0.4627451}
-  ownerOccupiedSlotColor: {r: 0.84313726, g: 0.85882354, b: 0.3764706, a: 0.4627451}
-  slotColor: {fileID: 7307596800936115037}
+  ownerOccupiedSlotColor: {r: 0.90588236, g: 0.9254902, b: 0.5294118, a: 0.6039216}
+  nameBackgroundColor: {fileID: 7307596800936115037}
+  emptyBackground: {r: 0.8392157, g: 0.8392157, b: 0.8392157, a: 0.4627451}
+  blueBackground: {r: 0.36078432, g: 0.8156863, b: 0.8980392, a: 1}
+  redBackground: {r: 0.972549, g: 0.40784314, b: 0.40784314, a: 1}
+  slotBackgroundColor: {fileID: 7307596801642090934}

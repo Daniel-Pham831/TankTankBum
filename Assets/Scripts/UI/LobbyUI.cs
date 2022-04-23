@@ -8,16 +8,16 @@ using UnityEngine.UI;
 public class LobbyUI : MonoBehaviour
 {
     public static LobbyUI Singleton { get; private set; }
-    [SerializeField] private GameObject blueSlotRoot;
-    [SerializeField] private GameObject redSlotRoot;
+    [SerializeField] private GameObject leftSlotRoot;
+    [SerializeField] private GameObject rightSlotRoot;
     [SerializeField] private GameObject slotPrefab;
     [SerializeField] private GameObject readyOrStartBtn;
 
     public Action<Player> OnPlayerJoinedSlot;
     public Action<Player> OnPlayerExitedSlot;
-    public Action<Team, byte, SlotState> OnSlotStateChanged;
-    public Action<Team, byte> OnSlotReadyOrStartPress;
-    public Action<Team, byte> OnSlotReset;
+    public Action<byte, SlotState> OnSlotStateChanged;
+    public Action<byte> OnSlotReadyOrStartPress;
+    public Action<byte> OnSlotReset;
     public Action OnAllSlotReset;
 
     public Action OnLobbyLeft;
@@ -38,21 +38,18 @@ public class LobbyUI : MonoBehaviour
 
     private void GenerateAllSlots()
     {
-        for (int i = 0; i < (GameInformation.Singleton.MaxPlayer / 2) + 1; i++)
+        for (int i = 0; i < GameInformation.Singleton.MaxPlayer; i++)
         {
-            this.GenerateOneSlot(Team.Blue, (byte)i);
-            this.GenerateOneSlot(Team.Red, (byte)i);
-            this.OnSlotStateChanged?.Invoke(Team.Blue, (byte)i, SlotState.Empty);
-            this.OnSlotStateChanged?.Invoke(Team.Red, (byte)i, SlotState.Empty);
+            this.GenerateOneSlot((byte)i);
+            this.OnSlotStateChanged?.Invoke((byte)i, SlotState.Empty);
         }
     }
 
-    private void GenerateOneSlot(Team slotTeam, byte slotIndex)
+    private void GenerateOneSlot(byte slotIndex)
     {
-        GameObject newSlot = Instantiate(this.slotPrefab, slotTeam == Team.Blue ? this.blueSlotRoot.transform : this.redSlotRoot.transform);
-        newSlot.name = $"{slotTeam} Slot: Index {slotIndex}";
+        GameObject newSlot = Instantiate(this.slotPrefab, slotIndex % 2 == 0 ? this.leftSlotRoot.transform : this.rightSlotRoot.transform);
+        newSlot.name = $"Slot: Index {slotIndex}";
         Slot slotInfo = newSlot.GetComponent<Slot>();
-        slotInfo.SlotTeam = slotTeam;
         slotInfo.SlotIndex = slotIndex;
     }
 
@@ -84,7 +81,7 @@ public class LobbyUI : MonoBehaviour
 
     public void OnStartOrReadyBtn()
     {
-        this.OnSlotReadyOrStartPress?.Invoke(ClientInformation.Singleton.MyPlayerInformation.Team, ClientInformation.Singleton.MyPlayerInformation.SlotIndex);
+        this.OnSlotReadyOrStartPress?.Invoke(ClientInformation.Singleton.MyPlayerInformation.SlotIndex);
     }
 
     public void OnLeaveBtn()

@@ -13,8 +13,7 @@ public class ServerInformation
     public static ServerInformation Singleton;
 
     public List<Player> playerList;
-    private SortedSet<byte> blueSlotSet;
-    private SortedSet<byte> redSlotSet;
+    private SortedSet<byte> availableSlotSet;
 
     #region ClassInitMethods
     public ServerInformation()
@@ -23,8 +22,7 @@ public class ServerInformation
             Singleton = this;
 
         this.playerList = new List<Player>();
-        this.blueSlotSet = new SortedSet<byte>();
-        this.redSlotSet = new SortedSet<byte>();
+        this.availableSlotSet = new SortedSet<byte>();
 
         this.ResetServerInformation();
         this.registerToEvent(true);
@@ -60,29 +58,19 @@ public class ServerInformation
     private void OnClientDisconnected(byte disconnectedClientId)
     {
         Player disconnectedPlayer = Player.FindPlayerWithID(ref this.playerList, disconnectedClientId);
-
         this.playerList.Remove(disconnectedPlayer);
-        if (disconnectedPlayer.Team == Team.Blue)
-        {
-            this.blueSlotSet.Add(disconnectedPlayer.SlotIndex);
-        }
-        else
-        {
-            this.redSlotSet.Add(disconnectedPlayer.SlotIndex);
-        }
+
+        this.availableSlotSet.Add(disconnectedPlayer.SlotIndex);
     }
 
     private void ResetServerInformation()
     {
         this.playerList?.Clear();
+        this.availableSlotSet?.Clear();
 
-        this.blueSlotSet?.Clear();
-        this.redSlotSet?.Clear();
-
-        for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer / 2; i++)
+        for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer; i++)
         {
-            this.blueSlotSet?.Add(i);
-            this.redSlotSet?.Add(i);
+            this.availableSlotSet.Add(i);
         }
     }
 
@@ -110,31 +98,15 @@ public class ServerInformation
 
     private Player GetNewPlayerInformation(byte id, string playerName)
     {
-        Team team = GetTeamForNewPlayer();
-        byte lobbyIndex = this.GetSlotIndexForNewPlayer(team);
+        Team team = Team.Blue; //new joined player will be on Team.Blue on default
+        byte lobbyIndex = this.GetSlotIndexForNewPlayer();
         return new Player(id, team, lobbyIndex, playerName);
     }
 
-    /*
-        Choose team which has more slots, if equals then Team.Blue
-    */
-    private Team GetTeamForNewPlayer()
+    private byte GetSlotIndexForNewPlayer()
     {
-        return this.blueSlotSet.Count >= this.redSlotSet.Count ? Team.Blue : Team.Red;
-    }
-
-    private byte GetSlotIndexForNewPlayer(Team team)
-    {
-        byte slotIndex = team == Team.Blue ? this.blueSlotSet.Min : this.redSlotSet.Min;
-        if (team == Team.Blue)
-        {
-            this.blueSlotSet.Remove(slotIndex);
-        }
-        else
-        {
-            this.redSlotSet.Remove(slotIndex);
-        }
-
+        byte slotIndex = this.availableSlotSet.Min;
+        this.availableSlotSet.Remove(slotIndex);
         return slotIndex;
     }
 }
