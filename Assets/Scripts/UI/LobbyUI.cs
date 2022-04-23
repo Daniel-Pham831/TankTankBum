@@ -60,13 +60,21 @@ public class LobbyUI : MonoBehaviour
     {
         if (confirm)
         {
-            PlayerInformation.Singleton.OnNewJoinedPlayer += OnNewJoinedPlayer;
+            ClientInformation.Singleton.OnNewJoinedPlayer += OnNewJoinedPlayer;
+
+            MainMenuUI.Singleton.OnLobbyLeft += OnLobbyLeft;
         }
         else
         {
-            PlayerInformation.Singleton.OnNewJoinedPlayer -= OnNewJoinedPlayer;
+            ClientInformation.Singleton.OnNewJoinedPlayer -= OnNewJoinedPlayer;
 
+            MainMenuUI.Singleton.OnLobbyLeft -= OnLobbyLeft;
         }
+    }
+
+    private void OnLobbyLeft()
+    {
+        this.OnAllSlotReset?.Invoke();
     }
 
     private void OnNewJoinedPlayer(Player joinedPlayer)

@@ -14,6 +14,7 @@ public class MainMenuUI : MonoBehaviour
     private Animator mainMenuAnimator;
 
     public Action<string> OnHostOrJoinRoom;
+    public Action OnLobbyLeft;
 
     private void Awake()
     {
@@ -46,11 +47,9 @@ public class MainMenuUI : MonoBehaviour
     public void OnHostBtn()
     {
         server.Init(8007, 10); //This need to change (Stop hard-coded)
-        string playerName = this.nameInputField.text != "" ? this.nameInputField.text : "I forgot to name myself";
+        client.Init("127.0.0.1", 8007, this.GetPlayerName);
 
-        client.Init("127.0.0.1", 8007, playerName);
-
-        this.OnHostOrJoinRoom?.Invoke(playerName);
+        this.OnHostOrJoinRoom?.Invoke(this.GetPlayerName);
         this.mainMenuAnimator.SetTrigger("ToLobbyMenu");
     }
 
@@ -61,8 +60,8 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnConnectBtn()
     {
-        client.Init("127.0.0.1", 8007, this.nameInputField.text);
-        this.OnHostOrJoinRoom?.Invoke(this.nameInputField.text);
+        client.Init("127.0.0.1", 8007, this.GetPlayerName);
+        this.OnHostOrJoinRoom?.Invoke(this.GetPlayerName);
 
         this.mainMenuAnimator.SetTrigger("ToLobbyMenu");
     }
@@ -79,6 +78,22 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnLeaveBtn()
     {
+        //backend
+        if (ClientInformation.Singleton.IsHost)
+        {
+            Debug.Log("Server");
+            server.Shutdown();
+        }
+        else
+        {
+            Debug.Log("Client");
+            client.Shutdown();
+        }
+
+        //frontend
+        this.OnLobbyLeft?.Invoke();
         this.mainMenuAnimator.SetTrigger("ToOnlineSettingMenu");
     }
+
+    private string GetPlayerName => this.nameInputField.text != "" ? this.nameInputField.text : "I forgot to name myself";
 }

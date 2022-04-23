@@ -2,12 +2,11 @@ using System;
 using System.Collections.Generic;
 using Unity.Networking.Transport;
 
-
 /*
-    This class is for storing players information
-
-    *Need to add a access prevention from client
-    *Only Server is allow to access the class
+    This class is for storing server information
+    playerList -> all of the players in server include the host
+    blueSlots -> current available blue slots
+    redSlots -> current available red slots
 */
 public class ServerInformation
 {
@@ -23,7 +22,10 @@ public class ServerInformation
             Singleton = this;
 
         this.playerList = new List<Player>();
-        this.GenerateLobbySlots();
+        this.blueSlots = new Queue<byte>();
+        this.redSlots = new Queue<byte>();
+
+        this.ResetServerInformation();
         this.registerToEvent(true);
     }
 
@@ -45,14 +47,16 @@ public class ServerInformation
         }
     }
 
-    private void GenerateLobbySlots()
+    private void ResetServerInformation()
     {
-        this.blueSlots = new Queue<byte>();
-        this.redSlots = new Queue<byte>();
+        this.playerList?.Clear();
+        this.blueSlots?.Clear();
+        this.redSlots?.Clear();
+
         for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer / 2; i++)
         {
-            this.blueSlots.Enqueue(i);
-            this.redSlots.Enqueue(i);
+            this.blueSlots?.Enqueue(i);
+            this.redSlots?.Enqueue(i);
         }
     }
 
@@ -85,8 +89,5 @@ public class ServerInformation
         return new Player(id, team, lobbyIndex, playerName);
     }
 
-    private byte GetSlotIndexForNewPlayer(Team team)
-    {
-        return team == Team.Blue ? this.blueSlots.Dequeue() : this.redSlots.Dequeue();
-    }
+    private byte GetSlotIndexForNewPlayer(Team team) => team == Team.Blue ? this.blueSlots.Dequeue() : this.redSlots.Dequeue();
 }

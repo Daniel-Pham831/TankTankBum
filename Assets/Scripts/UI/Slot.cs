@@ -35,7 +35,7 @@ public class Slot : MonoBehaviour
 
     private bool IsOwnerSlot(Team slotTeam, byte slotIndex)
     {
-        Player ownerInformation = PlayerInformation.Singleton.MyPlayerInformation;
+        Player ownerInformation = ClientInformation.Singleton.MyPlayerInformation;
 
         return ownerInformation.Team == slotTeam && ownerInformation.SlotIndex == slotIndex;
     }
@@ -100,7 +100,7 @@ public class Slot : MonoBehaviour
 
     private void OnDestroy()
     {
-        this.registerToEvent(false);
+        //  this.registerToEvent(false);
     }
 
     private void registerToEvent(bool confirm)
