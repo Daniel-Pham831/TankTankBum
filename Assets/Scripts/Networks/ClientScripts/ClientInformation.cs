@@ -23,6 +23,7 @@ public class ClientInformation : MonoBehaviour
 
     public Action<Player> OnNewJoinedPlayer;
     public Action<Player> OnDisconnectedClient;
+    public Action<bool> OnDeclareHost;
     void Awake()
     {
         if (Singleton == null)
@@ -130,14 +131,20 @@ public class ClientInformation : MonoBehaviour
             this.NameList.Add(player.Name);
             this.OnNewJoinedPlayer?.Invoke(player);
         }
-        Debug.Log($"\nMy ID:{this.MyPlayerInformation.Id}\nMy Name:{this.MyPlayerInformation.Name}");
+        Debug.Log($"\nMy ID:{this.MyPlayerInformation.Id} My Name:{this.MyPlayerInformation.Name}");
 
         if (this.MyPlayerInformation.Id == GameInformation.Singleton.HostId)
         {
             Debug.Log("I'm the host");
             this.IsHost = true;
         }
+        else
+        {
+            Debug.Log("I'm a client");
+            this.IsHost = false;
+        }
 
+        this.OnDeclareHost?.Invoke(this.IsHost);
         this.OnNewJoinedPlayer?.Invoke(this.MyPlayerInformation);
     }
 }

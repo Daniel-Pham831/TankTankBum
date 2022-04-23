@@ -11,12 +11,17 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject blueSlotRoot;
     [SerializeField] private GameObject redSlotRoot;
     [SerializeField] private GameObject slotPrefab;
+    [SerializeField] private GameObject readyOrStartBtn;
 
     public Action<Player> OnPlayerJoinedSlot;
     public Action<Player> OnPlayerExitedSlot;
     public Action<Team, byte, SlotState> OnSlotStateChanged;
+    public Action<Team, byte> OnSlotReadyOrStartPress;
     public Action<Team, byte> OnSlotReset;
     public Action OnAllSlotReset;
+
+    public Action OnLobbyLeft;
+
 
     private void Awake()
     {
@@ -63,21 +68,42 @@ public class LobbyUI : MonoBehaviour
         {
             ClientInformation.Singleton.OnNewJoinedPlayer += OnNewJoinedPlayer;
             ClientInformation.Singleton.OnDisconnectedClient += OnDisconnectedClient;
+            ClientInformation.Singleton.OnDeclareHost += OnDeclareHost;
 
-            MainMenuUI.Singleton.OnLobbyLeft += OnLobbyLeft;
+            Client.Singleton.OnServerDisconnect += OnLeaveBtn;
         }
         else
         {
             ClientInformation.Singleton.OnNewJoinedPlayer -= OnNewJoinedPlayer;
             ClientInformation.Singleton.OnDisconnectedClient -= OnDisconnectedClient;
+            ClientInformation.Singleton.OnDeclareHost -= OnDeclareHost;
 
-            MainMenuUI.Singleton.OnLobbyLeft -= OnLobbyLeft;
+            Client.Singleton.OnServerDisconnect += OnLeaveBtn;
         }
     }
 
-    private void OnLobbyLeft()
+    public void OnStartOrReadyBtn()
     {
+        this.OnSlotReadyOrStartPress?.Invoke(ClientInformation.Singleton.MyPlayerInformation.Team, ClientInformation.Singleton.MyPlayerInformation.SlotIndex);
+    }
+
+    public void OnLeaveBtn()
+    {
+        //backend
+        if (ClientInformation.Singleton.IsHost)
+            Server.Singleton.Shutdown();
+        else
+            Client.Singleton.Shutdown();
+
+        //frontend
+        this.OnLobbyLeft?.Invoke();
         this.OnAllSlotReset?.Invoke();
+    }
+
+    private void OnDeclareHost(bool isHost)
+    {
+        TMP_Text readyOrStartBtnName = this.readyOrStartBtn.GetComponentInChildren<TMP_Text>();
+        readyOrStartBtnName.SetText(isHost ? "StartGame" : "Ready");
     }
 
     private void OnDisconnectedClient(Player disconnectedPlayer)
