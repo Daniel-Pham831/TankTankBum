@@ -98,15 +98,9 @@ public class MainMenuUI : MonoBehaviour
     {
         //backend
         if (ClientInformation.Singleton.IsHost)
-        {
-            Debug.Log("Server");
             server.Shutdown();
-        }
         else
-        {
-            Debug.Log("Client");
             client.Shutdown();
-        }
 
         //frontend
         this.OnLobbyLeft?.Invoke();

@@ -110,9 +110,17 @@ public class ServerInformation
 
     private Player GetNewPlayerInformation(byte id, string playerName)
     {
-        Team team = this.playerList.Count % 2 == 0 ? Team.Blue : Team.Red;
+        Team team = GetTeamForNewPlayer();
         byte lobbyIndex = this.GetSlotIndexForNewPlayer(team);
         return new Player(id, team, lobbyIndex, playerName);
+    }
+
+    /*
+        Choose team which has more slots, if equals then Team.Blue
+    */
+    private Team GetTeamForNewPlayer()
+    {
+        return this.blueSlotSet.Count >= this.redSlotSet.Count ? Team.Blue : Team.Red;
     }
 
     private byte GetSlotIndexForNewPlayer(Team team)

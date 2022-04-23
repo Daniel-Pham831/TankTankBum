@@ -17,6 +17,7 @@ public class Server : MonoBehaviour
     private NativeList<NetworkConnection> connections;
 
     private bool isActive = false;
+    private bool isServerShutDown = false;
     private float keepAliveTickRate = 20f;
     private float lastKeepAlive;
 
@@ -46,6 +47,7 @@ public class Server : MonoBehaviour
 
         this.connections = new NativeList<NetworkConnection>(maximumConnection, Allocator.Persistent);
         this.isActive = true;
+        this.isServerShutDown = false;
 
         //Init server information
         if (ServerInformation.Singleton == null)
@@ -59,6 +61,7 @@ public class Server : MonoBehaviour
         this.driver.Dispose();
         this.connections.Dispose();
         this.isActive = false;
+        this.isServerShutDown = false;
     }
 
     public void Shutdown()
@@ -71,6 +74,7 @@ public class Server : MonoBehaviour
             }
 
             this.OnServerDisconnect?.Invoke();
+            this.isServerShutDown = true;
         }
     }
 
@@ -90,6 +94,11 @@ public class Server : MonoBehaviour
         this.CleanupConnections();
         this.AcceptNewConnections();
         this.UpdateMessagePump();
+
+        if (isServerShutDown)
+        {
+            this.ServerReset();
+        }
     }
 
     private void KeepAlive()

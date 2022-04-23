@@ -19,6 +19,7 @@ public class Client : MonoBehaviour
     private NetworkConnection connection;
 
     private bool isActive = false;
+    private bool isClientShutDown = false;
 
     public Action OnClientDisconnect;
     public Action OnServerDisconnect;
@@ -39,6 +40,7 @@ public class Client : MonoBehaviour
         Debug.Log($"Attemping to connect to Server on {endPoint.Address}");
 
         this.isActive = true;
+        this.isClientShutDown = false;
 
         this.RegisterToEvent();
 
@@ -51,6 +53,7 @@ public class Client : MonoBehaviour
         this.connection = default(NetworkConnection);
         this.isActive = false;
         this.UnregisterToEvent();
+        this.isClientShutDown = true;
     }
 
     public void Shutdown()
@@ -74,6 +77,9 @@ public class Client : MonoBehaviour
         this.driver.ScheduleUpdate().Complete();
         this.CheckAlive();
         this.UpdateMessagePump();
+
+        if (this.isClientShutDown)
+            this.ClientReset();
     }
 
     private void CheckAlive()
@@ -103,7 +109,7 @@ public class Client : MonoBehaviour
                     break;
 
                 case NetworkEvent.Type.Disconnect:
-                    Debug.Log("Client Disconnected");
+                    Debug.Log("Server has been shutdown!!");
                     this.OnServerDisconnect?.Invoke();
                     this.Shutdown();
                     break;

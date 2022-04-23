@@ -130,9 +130,7 @@ public class ClientInformation : MonoBehaviour
             this.NameList.Add(player.Name);
             this.OnNewJoinedPlayer?.Invoke(player);
         }
-
-        Debug.Log("Connected To Server");
-        Debug.Log($"My ID:{this.MyPlayerInformation.Id}\nMy Name:{this.MyPlayerInformation.Name}");
+        Debug.Log($"\nMy ID:{this.MyPlayerInformation.Id}\nMy Name:{this.MyPlayerInformation.Name}");
 
         if (this.MyPlayerInformation.Id == GameInformation.Singleton.HostId)
         {
