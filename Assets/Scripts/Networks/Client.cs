@@ -19,12 +19,19 @@ public class Client : MonoBehaviour
     private NetworkConnection connection;
 
     private bool isActive = false;
+    private bool isClientShutDown = false;
 
-    public Action OnServerShutDown;
+    public Action OnClientDisconnect;
+    public Action OnServerDisconnect;
 
     // Methods
     public void Init(string ip, ushort port, string playerName)
     {
+        if (this.isActive)
+        {
+            this.ClientReset();
+        }
+
         this.driver = NetworkDriver.Create();
         NetworkEndPoint endPoint = NetworkEndPoint.Parse(ip, port);
 
@@ -33,33 +40,28 @@ public class Client : MonoBehaviour
         Debug.Log($"Attemping to connect to Server on {endPoint.Address}");
 
         this.isActive = true;
+        this.isClientShutDown = false;
 
         this.RegisterToEvent();
 
         this.playerName = playerName != "" ? playerName : "I forgot to name myself";
     }
 
+    private void ClientReset()
+    {
+        this.driver.Dispose();
+        this.connection = default(NetworkConnection);
+        this.isActive = false;
+        this.UnregisterToEvent();
+        this.isClientShutDown = true;
+    }
+
     public void Shutdown()
     {
         if (this.isActive)
         {
-            this.SendToServer(new NetDisconnect(PlayerInformation.Singleton.MyPlayerInformation.Id));
-            // this.driver.Disconnect(this.connection);
-
-            //this.UnregisterToEvent();
-            // this.driver.Dispose();
-            this.isActive = false;
-            //  connection = default(NetworkConnection);
-        }
-    }
-    private void Disconnect()
-    {
-        if (this.isActive)
-        {
-            this.UnregisterToEvent();
-            this.driver.Dispose();
-            this.isActive = false;
-            connection = default(NetworkConnection);
+            this.connection.Disconnect(this.driver);
+            this.OnClientDisconnect?.Invoke();
         }
     }
 
@@ -75,6 +77,9 @@ public class Client : MonoBehaviour
         this.driver.ScheduleUpdate().Complete();
         this.CheckAlive();
         this.UpdateMessagePump();
+
+        if (this.isClientShutDown)
+            this.ClientReset();
     }
 
     private void CheckAlive()
@@ -82,7 +87,6 @@ public class Client : MonoBehaviour
         if (!this.connection.IsCreated && this.isActive)
         {
             Debug.Log("Something went wrong, lost connection to server!");
-            this.OnServerShutDown?.Invoke();
             this.Shutdown();
         }
     }
@@ -105,10 +109,9 @@ public class Client : MonoBehaviour
                     break;
 
                 case NetworkEvent.Type.Disconnect:
-                    Debug.Log("Server has been Shutdown");
-                    this.connection = default(NetworkConnection);
-                    this.OnServerShutDown?.Invoke();
-                    this.Disconnect();
+                    Debug.Log("Server has been shutdown!!");
+                    this.OnServerDisconnect?.Invoke();
+                    this.Shutdown();
                     break;
             }
         }
@@ -125,28 +128,18 @@ public class Client : MonoBehaviour
     #region Network Received
     private void RegisterToEvent()
     {
-        NetUtility.C_KEEP_ALIVE += this.OnKeepAlive;
-        PlayerInformation.Singleton.OnSelfDisconnect += OnSelfDisconnect;
+        NetUtility.C_KEEP_ALIVE += this.OnClientReceivedKeepAliveMessage;
     }
 
     private void UnregisterToEvent()
     {
-        NetUtility.C_KEEP_ALIVE -= this.OnKeepAlive;
-        PlayerInformation.Singleton.OnSelfDisconnect -= OnSelfDisconnect;
+        NetUtility.C_KEEP_ALIVE -= this.OnClientReceivedKeepAliveMessage;
     }
 
-    private void OnSelfDisconnect()
-    {
-        this.OnServerShutDown?.Invoke();
-        this.Disconnect();
-
-    }
-
-    private void OnKeepAlive(NetMessage keepAliveMessage)
+    private void OnClientReceivedKeepAliveMessage(NetMessage keepAliveMessage)
     {
         // Send it back, to keep both side alive
         this.SendToServer(keepAliveMessage);
-        Debug.Log(this.connection.InternalId);
     }
     #endregion
 

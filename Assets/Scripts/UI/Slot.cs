@@ -35,7 +35,7 @@ public class Slot : MonoBehaviour
 
     private bool IsOwnerSlot(Team slotTeam, byte slotIndex)
     {
-        Player ownerInformation = PlayerInformation.Singleton.MyPlayerInformation;
+        Player ownerInformation = ClientInformation.Singleton.MyPlayerInformation;
 
         return ownerInformation.Team == slotTeam && ownerInformation.SlotIndex == slotIndex;
     }
@@ -98,10 +98,10 @@ public class Slot : MonoBehaviour
         this.ResetSlot();
     }
 
-    // private void OnDestroy()
-    // {
-    //     this.registerToEvent(false);
-    // }
+    private void OnDestroy()
+    {
+        //  this.registerToEvent(false);
+    }
 
     private void registerToEvent(bool confirm)
     {
@@ -111,6 +111,8 @@ public class Slot : MonoBehaviour
             LobbyUI.Singleton.OnAllSlotReset += OnAllSlotReset;
             LobbyUI.Singleton.OnSlotReset += OnSlotReset;
             LobbyUI.Singleton.OnSlotStateChanged += OnSlotStateChanged;
+            LobbyUI.Singleton.OnPlayerExitedSlot += OnPlayerExitedSlot;
+            LobbyUI.Singleton.OnSlotReadyOrStartPress += OnSlotReadyOrStartPress;
         }
         else
         {
@@ -118,12 +120,27 @@ public class Slot : MonoBehaviour
             LobbyUI.Singleton.OnAllSlotReset -= OnAllSlotReset;
             LobbyUI.Singleton.OnSlotReset -= OnSlotReset;
             LobbyUI.Singleton.OnSlotStateChanged -= OnSlotStateChanged;
+            LobbyUI.Singleton.OnPlayerExitedSlot -= OnPlayerExitedSlot;
+            LobbyUI.Singleton.OnSlotReadyOrStartPress -= OnSlotReadyOrStartPress;
         }
     }
 
-    private void OnPlayerJoinedSlot(Player player)
+    private void OnSlotReadyOrStartPress(Team slotTeam, byte slotIndex)
     {
-        this.SetSlotInformationBasedOf(player);
+        if (this.IsThisSlot(slotTeam, slotIndex))
+        {
+            this.slotReadyToggle.isOn = !this.slotReadyToggle.isOn;
+        }
+    }
+
+    private void OnPlayerExitedSlot(Player exitedPlayer)
+    {
+        this.ResetSlot(exitedPlayer.Team, exitedPlayer.SlotIndex);
+    }
+
+    private void OnPlayerJoinedSlot(Player joinedPlayer)
+    {
+        this.SetSlotInformationBasedOf(joinedPlayer);
     }
 
     private void OnAllSlotReset()

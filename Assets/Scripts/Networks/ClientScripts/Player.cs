@@ -50,14 +50,12 @@ public class Player
         return new Player(playerId, playerTeam, playerSlotIndex, playerName);
     }
 
-    public static Player FindPlayer(ref List<Player> playerList, byte disconnectedClientId)
+    public static Player FindPlayerWithID(ref List<Player> playerList, byte playerId)
     {
         foreach (Player player in playerList)
         {
-            if (player.Id == disconnectedClientId)
-                return player;
+            if (player.Id == playerId) return player;
         }
-
         return null;
     }
 }

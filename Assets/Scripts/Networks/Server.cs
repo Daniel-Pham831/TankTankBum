@@ -17,14 +17,19 @@ public class Server : MonoBehaviour
     private NativeList<NetworkConnection> connections;
 
     private bool isActive = false;
+    private bool isServerShutDown = false;
     private float keepAliveTickRate = 20f;
     private float lastKeepAlive;
 
-    public Action connectionDropped;
+    public Action<byte> OnClientDisconnected;
+    public Action OnServerDisconnect;
 
     // Methods
     public void Init(ushort port, int maximumConnection)
     {
+        if (this.isActive)
+            this.ServerReset();
+
         this.driver = NetworkDriver.Create();
         NetworkEndPoint endPoint = NetworkEndPoint.AnyIpv4;
         endPoint.Port = port;
@@ -42,35 +47,34 @@ public class Server : MonoBehaviour
 
         this.connections = new NativeList<NetworkConnection>(maximumConnection, Allocator.Persistent);
         this.isActive = true;
+        this.isServerShutDown = false;
 
         //Init server information
         if (ServerInformation.Singleton == null)
         {
             ServerInformation serverInfomation = new ServerInformation();
         }
-        else
-        {
-            ServerInformation.Singleton.ResetServerInformation();
-        }
+    }
+
+    private void ServerReset()
+    {
+        this.driver.Dispose();
+        this.connections.Dispose();
+        this.isActive = false;
+        this.isServerShutDown = false;
     }
 
     public void Shutdown()
     {
         if (this.isActive)
         {
-            for (int i = 0; i < this.connections.Length; i++)
+            foreach (NetworkConnection connection in this.connections)
             {
-                if (this.connections[i].IsCreated)
-                {
-                    Debug.Log($"Sending {OpCode.DISCONNECT} to: {this.connections[i].InternalId}");
-                    this.connections[i].Disconnect(this.driver);
-                    this.connections[i] = default(NetworkConnection);
-                }
+                this.driver.Disconnect(connection);
             }
 
-            this.driver.Dispose();
-            this.connections.Dispose();
-            this.isActive = false;
+            this.OnServerDisconnect?.Invoke();
+            this.isServerShutDown = true;
         }
     }
 
@@ -90,6 +94,11 @@ public class Server : MonoBehaviour
         this.CleanupConnections();
         this.AcceptNewConnections();
         this.UpdateMessagePump();
+
+        if (isServerShutDown)
+        {
+            this.ServerReset();
+        }
     }
 
     private void KeepAlive()
@@ -132,21 +141,16 @@ public class Server : MonoBehaviour
             {
                 switch (cmd)
                 {
-                    case NetworkEvent.Type.Connect:
-                        Debug.Log("New client just connected");
-                        break;
-
                     case NetworkEvent.Type.Data:
                         NetUtility.OnData(ref streamReader, this.connections[i], this);
                         break;
 
                     case NetworkEvent.Type.Disconnect:
                         Debug.Log("Client disconnected from the server");
-                        this.BroadCast(new NetDisconnect((byte)this.connections[i].InternalId)); // send disconnectedClientId to all clients
+                        this.BroadCast(new NetDisconnect((byte)this.connections[i].InternalId));
+                        this.OnClientDisconnected?.Invoke((byte)this.connections[i].InternalId);
 
                         this.connections[i] = default(NetworkConnection);
-                        this.connectionDropped?.Invoke();
-
                         break;
                 }
             }

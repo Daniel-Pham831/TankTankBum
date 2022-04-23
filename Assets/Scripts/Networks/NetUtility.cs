@@ -7,8 +7,8 @@ public enum OpCode
     KEEP_ALIVE = 1,
     SEND_NAME = 2,
     JOIN = 3,
-    WELCOME = 4,
-    DISCONNECT = 5
+    DISCONNECT = 4,
+    WELCOME = 5
 }
 
 public static class NetUtility
@@ -43,12 +43,12 @@ public static class NetUtility
                 msg = new NetJoin(ref streamReader);
                 break;
 
-            case OpCode.WELCOME:
-                msg = new NetWelcome(ref streamReader);
-                break;
-
             case OpCode.DISCONNECT:
                 msg = new NetDisconnect(ref streamReader);
+                break;
+
+            case OpCode.WELCOME:
+                msg = new NetWelcome(ref streamReader);
                 break;
 
             default:

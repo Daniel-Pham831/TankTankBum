@@ -10,6 +10,7 @@ public class NetDisconnect : NetMessage
     public NetDisconnect(byte disconnectedClientId)
     {
         this.Code = OpCode.DISCONNECT;
+
         this.DisconnectedClientId = disconnectedClientId;
     }
 
@@ -41,6 +42,7 @@ public class NetDisconnect : NetMessage
     public override void ReceivedOnServer(NetworkConnection cnn)
     {
         base.ReceivedOnServer(cnn);
+
         NetUtility.S_DISCONNECT?.Invoke(this, cnn);
     }
 }

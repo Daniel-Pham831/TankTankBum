@@ -11,11 +11,17 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject blueSlotRoot;
     [SerializeField] private GameObject redSlotRoot;
     [SerializeField] private GameObject slotPrefab;
+    [SerializeField] private GameObject readyOrStartBtn;
 
     public Action<Player> OnPlayerJoinedSlot;
+    public Action<Player> OnPlayerExitedSlot;
     public Action<Team, byte, SlotState> OnSlotStateChanged;
+    public Action<Team, byte> OnSlotReadyOrStartPress;
     public Action<Team, byte> OnSlotReset;
     public Action OnAllSlotReset;
+
+    public Action OnLobbyLeft;
+
 
     private void Awake()
     {
@@ -60,35 +66,49 @@ public class LobbyUI : MonoBehaviour
     {
         if (confirm)
         {
-            PlayerInformation.Singleton.OnNewJoinedPlayer += OnNewJoinedPlayer;
-            PlayerInformation.Singleton.OnDisconnectedSlot += OnDisconnectedClient;
-            MainMenuUI.Singleton.OnLobbyLeft += OnLobbyLeft;
+            ClientInformation.Singleton.OnNewJoinedPlayer += OnNewJoinedPlayer;
+            ClientInformation.Singleton.OnDisconnectedClient += OnDisconnectedClient;
+            ClientInformation.Singleton.OnDeclareHost += OnDeclareHost;
 
-            Client.Singleton.OnServerShutDown += OnServerShutDown;
+            Client.Singleton.OnServerDisconnect += OnLeaveBtn;
         }
         else
         {
-            PlayerInformation.Singleton.OnNewJoinedPlayer -= OnNewJoinedPlayer;
-            PlayerInformation.Singleton.OnDisconnectedSlot -= OnDisconnectedClient;
-            MainMenuUI.Singleton.OnLobbyLeft -= OnLobbyLeft;
+            ClientInformation.Singleton.OnNewJoinedPlayer -= OnNewJoinedPlayer;
+            ClientInformation.Singleton.OnDisconnectedClient -= OnDisconnectedClient;
+            ClientInformation.Singleton.OnDeclareHost -= OnDeclareHost;
 
-            Client.Singleton.OnServerShutDown -= OnServerShutDown;
+            Client.Singleton.OnServerDisconnect += OnLeaveBtn;
         }
     }
 
-    private void OnLobbyLeft()
+    public void OnStartOrReadyBtn()
     {
+        this.OnSlotReadyOrStartPress?.Invoke(ClientInformation.Singleton.MyPlayerInformation.Team, ClientInformation.Singleton.MyPlayerInformation.SlotIndex);
+    }
+
+    public void OnLeaveBtn()
+    {
+        //backend
+        if (ClientInformation.Singleton.IsHost)
+            Server.Singleton.Shutdown();
+        else
+            Client.Singleton.Shutdown();
+
+        //frontend
+        this.OnLobbyLeft?.Invoke();
         this.OnAllSlotReset?.Invoke();
     }
 
-    private void OnServerShutDown()
+    private void OnDeclareHost(bool isHost)
     {
-        this.OnAllSlotReset?.Invoke();
+        TMP_Text readyOrStartBtnName = this.readyOrStartBtn.GetComponentInChildren<TMP_Text>();
+        readyOrStartBtnName.SetText(isHost ? "StartGame" : "Ready");
     }
 
-    private void OnDisconnectedClient(Team team, byte id)
+    private void OnDisconnectedClient(Player disconnectedPlayer)
     {
-        this.OnSlotReset?.Invoke(team, id);
+        this.OnPlayerExitedSlot?.Invoke(disconnectedPlayer);
     }
 
     private void OnNewJoinedPlayer(Player joinedPlayer)

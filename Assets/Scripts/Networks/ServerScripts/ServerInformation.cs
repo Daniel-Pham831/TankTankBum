@@ -2,31 +2,29 @@ using System;
 using System.Collections.Generic;
 using Unity.Networking.Transport;
 
-
 /*
-    This class is for storing players information
-
-    *Need to add a access prevention from client
-    *Only Server is allow to access the class
+    This class is for storing server information
+    playerList -> all of the players in server include the host
+    blueSlots -> current available blue slots
+    redSlots -> current available red slots
 */
 public class ServerInformation
 {
     public static ServerInformation Singleton;
+
     public List<Player> playerList;
-    private Queue<byte> blueSlots;
-    private Queue<byte> redSlots;
+    private SortedSet<byte> blueSlotSet;
+    private SortedSet<byte> redSlotSet;
 
     #region ClassInitMethods
     public ServerInformation()
     {
-        if (Singleton != null) return;
-
         if (Singleton == null)
             Singleton = this;
 
         this.playerList = new List<Player>();
-        this.blueSlots = new Queue<byte>();
-        this.redSlots = new Queue<byte>();
+        this.blueSlotSet = new SortedSet<byte>();
+        this.redSlotSet = new SortedSet<byte>();
 
         this.ResetServerInformation();
         this.registerToEvent(true);
@@ -42,41 +40,49 @@ public class ServerInformation
     {
         if (confirm)
         {
-            NetUtility.S_SEND_NAME += this.OnSendNameServer;
-            NetUtility.S_DISCONNECT += this.OnDisconnectedClientOnServer;
-            MainMenuUI.Singleton.OnLobbyLeft += this.ResetServerInformation;
+            NetUtility.S_SEND_NAME += this.OnServerReceivedSendNameMessage;
+            Server.Singleton.OnClientDisconnected += OnClientDisconnected;
+            Server.Singleton.OnServerDisconnect += OnServerDisconnect;
         }
         else
         {
-            NetUtility.S_SEND_NAME -= this.OnSendNameServer;
-            NetUtility.S_DISCONNECT -= this.OnDisconnectedClientOnServer;
-            MainMenuUI.Singleton.OnLobbyLeft -= this.ResetServerInformation;
+            NetUtility.S_SEND_NAME -= this.OnServerReceivedSendNameMessage;
+            Server.Singleton.OnClientDisconnected -= OnClientDisconnected;
+            Server.Singleton.OnServerDisconnect -= OnServerDisconnect;
         }
     }
 
-    private void OnDisconnectedClientOnServer(NetMessage message, NetworkConnection disconnectedClient)
+    private void OnServerDisconnect()
     {
-        NetDisconnect disconnectedMessage = message as NetDisconnect;
-        Server.Singleton.BroadCast(disconnectedMessage);
+        this.ResetServerInformation();
+    }
 
-        Player disconnectedPlayer = Player.FindPlayer(ref this.playerList, disconnectedMessage.DisconnectedClientId);
+    private void OnClientDisconnected(byte disconnectedClientId)
+    {
+        Player disconnectedPlayer = Player.FindPlayerWithID(ref this.playerList, disconnectedClientId);
 
         this.playerList.Remove(disconnectedPlayer);
         if (disconnectedPlayer.Team == Team.Blue)
-            this.blueSlots.Enqueue(disconnectedPlayer.SlotIndex);
+        {
+            this.blueSlotSet.Add(disconnectedPlayer.SlotIndex);
+        }
         else
-            this.redSlots.Enqueue(disconnectedPlayer.SlotIndex);
+        {
+            this.redSlotSet.Add(disconnectedPlayer.SlotIndex);
+        }
     }
 
-    public void ResetServerInformation()
+    private void ResetServerInformation()
     {
-        this.playerList.Clear();
-        this.blueSlots.Clear();
-        this.redSlots.Clear();
+        this.playerList?.Clear();
+
+        this.blueSlotSet?.Clear();
+        this.redSlotSet?.Clear();
+
         for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer / 2; i++)
         {
-            this.blueSlots.Enqueue(i);
-            this.redSlots.Enqueue(i);
+            this.blueSlotSet?.Add(i);
+            this.redSlotSet?.Add(i);
         }
     }
 
@@ -84,7 +90,7 @@ public class ServerInformation
 
 
     //Server
-    private void OnSendNameServer(NetMessage message, NetworkConnection connectedClient)
+    private void OnServerReceivedSendNameMessage(NetMessage message, NetworkConnection connectedClient)
     {
         /*  At this moment server just received a sendNameMessage from connectedClient which contains his name
             Server need to send a welcomeMessage back to him which contains
@@ -104,13 +110,31 @@ public class ServerInformation
 
     private Player GetNewPlayerInformation(byte id, string playerName)
     {
-        Team team = this.playerList.Count % 2 == 0 ? Team.Blue : Team.Red;
+        Team team = GetTeamForNewPlayer();
         byte lobbyIndex = this.GetSlotIndexForNewPlayer(team);
         return new Player(id, team, lobbyIndex, playerName);
     }
 
+    /*
+        Choose team which has more slots, if equals then Team.Blue
+    */
+    private Team GetTeamForNewPlayer()
+    {
+        return this.blueSlotSet.Count >= this.redSlotSet.Count ? Team.Blue : Team.Red;
+    }
+
     private byte GetSlotIndexForNewPlayer(Team team)
     {
-        return team == Team.Blue ? this.blueSlots.Dequeue() : this.redSlots.Dequeue();
+        byte slotIndex = team == Team.Blue ? this.blueSlotSet.Min : this.redSlotSet.Min;
+        if (team == Team.Blue)
+        {
+            this.blueSlotSet.Remove(slotIndex);
+        }
+        else
+        {
+            this.redSlotSet.Remove(slotIndex);
+        }
+
+        return slotIndex;
     }
 }
