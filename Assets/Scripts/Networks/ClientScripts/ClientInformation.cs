@@ -22,6 +22,7 @@ public class ClientInformation : MonoBehaviour
     public bool IsHost;
 
     public Action<Player> OnNewJoinedPlayer;
+    public Action<Player> OnDisconnectedClient;
     void Awake()
     {
         if (Singleton == null)
@@ -60,16 +61,33 @@ public class ClientInformation : MonoBehaviour
     {
         if (confirm)
         {
-            NetUtility.C_WELCOME += this.OnWelcomeClient;
-            NetUtility.C_JOIN += this.OnNewJoinClient;
+            NetUtility.C_WELCOME += this.OnClientReceivedWelcomeMessage;
+            NetUtility.C_JOIN += this.OnClientReceivedJoinMessage;
+            NetUtility.C_DISCONNECT += this.OnClientReceivedDisconnectedMessage;
+
             MainMenuUI.Singleton.OnHostOrJoinRoom += this.OnHostOrJoinRoom;
         }
         else
         {
-            NetUtility.C_WELCOME -= this.OnWelcomeClient;
-            NetUtility.C_JOIN -= this.OnNewJoinClient;
+            NetUtility.C_WELCOME -= this.OnClientReceivedWelcomeMessage;
+            NetUtility.C_JOIN -= this.OnClientReceivedJoinMessage;
+            NetUtility.C_DISCONNECT -= this.OnClientReceivedDisconnectedMessage;
+
             MainMenuUI.Singleton.OnHostOrJoinRoom -= this.OnHostOrJoinRoom;
         }
+    }
+
+    private void OnClientReceivedDisconnectedMessage(NetMessage message)
+    {
+        NetDisconnect disconnectMessage = message as NetDisconnect;
+
+        Player disconnectedPlayer = Player.FindPlayerWithID(ref this.PlayerList, disconnectMessage.DisconnectedClientId);
+
+        this.OnDisconnectedClient?.Invoke(disconnectedPlayer);
+
+        this.PlayerList.Remove(disconnectedPlayer);
+        this.IdList.Remove(disconnectedPlayer.Id);
+        this.NameList.Remove(disconnectedPlayer.Name);
     }
 
     private void OnHostOrJoinRoom(string inputName)
@@ -77,7 +95,7 @@ public class ClientInformation : MonoBehaviour
         this.MyPlayerInformation.Name = inputName;
     }
 
-    private void OnNewJoinClient(NetMessage message)
+    private void OnClientReceivedJoinMessage(NetMessage message)
     {
         NetJoin joinMessage = message as NetJoin;
 
@@ -91,7 +109,7 @@ public class ClientInformation : MonoBehaviour
         this.OnNewJoinedPlayer?.Invoke(joinMessage.JoinedPlayer);
     }
 
-    private void OnWelcomeClient(NetMessage message)
+    private void OnClientReceivedWelcomeMessage(NetMessage message)
     {
         NetWelcome welcomeMessage = message as NetWelcome;
 

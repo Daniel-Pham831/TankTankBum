@@ -20,7 +20,7 @@ public class Server : MonoBehaviour
     private float keepAliveTickRate = 20f;
     private float lastKeepAlive;
 
-    public Action connectionDropped;
+    public Action<byte> OnClientDisconnected;
 
     // Methods
     public void Init(ushort port, int maximumConnection)
@@ -121,9 +121,10 @@ public class Server : MonoBehaviour
 
                     case NetworkEvent.Type.Disconnect:
                         Debug.Log("Client disconnected from the server");
-                        this.connections[i] = default(NetworkConnection);
-                        this.connectionDropped?.Invoke();
+                        this.BroadCast(new NetDisconnect((byte)this.connections[i].InternalId));
+                        this.OnClientDisconnected?.Invoke((byte)this.connections[i].InternalId);
 
+                        this.connections[i] = default(NetworkConnection);
                         break;
                 }
             }

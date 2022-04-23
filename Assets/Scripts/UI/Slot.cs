@@ -111,6 +111,7 @@ public class Slot : MonoBehaviour
             LobbyUI.Singleton.OnAllSlotReset += OnAllSlotReset;
             LobbyUI.Singleton.OnSlotReset += OnSlotReset;
             LobbyUI.Singleton.OnSlotStateChanged += OnSlotStateChanged;
+            LobbyUI.Singleton.OnPlayerExitedSlot += OnPlayerExitedSlot;
         }
         else
         {
@@ -118,13 +119,18 @@ public class Slot : MonoBehaviour
             LobbyUI.Singleton.OnAllSlotReset -= OnAllSlotReset;
             LobbyUI.Singleton.OnSlotReset -= OnSlotReset;
             LobbyUI.Singleton.OnSlotStateChanged -= OnSlotStateChanged;
+            LobbyUI.Singleton.OnPlayerExitedSlot -= OnPlayerExitedSlot;
         }
     }
 
-    private void OnPlayerJoinedSlot(Player player)
+    private void OnPlayerExitedSlot(Player exitedPlayer)
     {
-        Debug.Log("OnPlayerJoinedSlot");
-        this.SetSlotInformationBasedOf(player);
+        this.ResetSlot(exitedPlayer.Team, exitedPlayer.SlotIndex);
+    }
+
+    private void OnPlayerJoinedSlot(Player joinedPlayer)
+    {
+        this.SetSlotInformationBasedOf(joinedPlayer);
     }
 
     private void OnAllSlotReset()

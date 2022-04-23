@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.Networking.Transport;
 
 public enum Team
@@ -47,5 +48,14 @@ public class Player
         string playerName = reader.ReadFixedString32().ToString();
 
         return new Player(playerId, playerTeam, playerSlotIndex, playerName);
+    }
+
+    public static Player FindPlayerWithID(ref List<Player> playerList, byte playerId)
+    {
+        foreach (Player player in playerList)
+        {
+            if (player.Id == playerId) return player;
+        }
+        return null;
     }
 }

@@ -11,9 +11,10 @@ using Unity.Networking.Transport;
 public class ServerInformation
 {
     public static ServerInformation Singleton;
+
     public List<Player> playerList;
-    private Queue<byte> blueSlots;
-    private Queue<byte> redSlots;
+    private SortedSet<byte> blueSlotSet;
+    private SortedSet<byte> redSlotSet;
 
     #region ClassInitMethods
     public ServerInformation()
@@ -22,8 +23,8 @@ public class ServerInformation
             Singleton = this;
 
         this.playerList = new List<Player>();
-        this.blueSlots = new Queue<byte>();
-        this.redSlots = new Queue<byte>();
+        this.blueSlotSet = new SortedSet<byte>();
+        this.redSlotSet = new SortedSet<byte>();
 
         this.ResetServerInformation();
         this.registerToEvent(true);
@@ -40,23 +41,41 @@ public class ServerInformation
         if (confirm)
         {
             NetUtility.S_SEND_NAME += this.OnSendNameServer;
+            Server.Singleton.OnClientDisconnected += OnClientDisconnected;
         }
         else
         {
             NetUtility.S_SEND_NAME -= this.OnSendNameServer;
+            Server.Singleton.OnClientDisconnected -= OnClientDisconnected;
+        }
+    }
+
+    private void OnClientDisconnected(byte disconnectedClientId)
+    {
+        Player disconnectedPlayer = Player.FindPlayerWithID(ref this.playerList, disconnectedClientId);
+
+        this.playerList.Remove(disconnectedPlayer);
+        if (disconnectedPlayer.Team == Team.Blue)
+        {
+            this.blueSlotSet.Add(disconnectedPlayer.SlotIndex);
+        }
+        else
+        {
+            this.redSlotSet.Add(disconnectedPlayer.SlotIndex);
         }
     }
 
     private void ResetServerInformation()
     {
         this.playerList?.Clear();
-        this.blueSlots?.Clear();
-        this.redSlots?.Clear();
+
+        this.blueSlotSet?.Clear();
+        this.redSlotSet?.Clear();
 
         for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer / 2; i++)
         {
-            this.blueSlots?.Enqueue(i);
-            this.redSlots?.Enqueue(i);
+            this.blueSlotSet?.Add(i);
+            this.redSlotSet?.Add(i);
         }
     }
 
@@ -89,5 +108,18 @@ public class ServerInformation
         return new Player(id, team, lobbyIndex, playerName);
     }
 
-    private byte GetSlotIndexForNewPlayer(Team team) => team == Team.Blue ? this.blueSlots.Dequeue() : this.redSlots.Dequeue();
+    private byte GetSlotIndexForNewPlayer(Team team)
+    {
+        byte slotIndex = team == Team.Blue ? this.blueSlotSet.Min : this.redSlotSet.Min;
+        if (team == Team.Blue)
+        {
+            this.blueSlotSet.Remove(slotIndex);
+        }
+        else
+        {
+            this.redSlotSet.Remove(slotIndex);
+        }
+
+        return slotIndex;
+    }
 }

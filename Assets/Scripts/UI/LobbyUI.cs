@@ -13,6 +13,7 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject slotPrefab;
 
     public Action<Player> OnPlayerJoinedSlot;
+    public Action<Player> OnPlayerExitedSlot;
     public Action<Team, byte, SlotState> OnSlotStateChanged;
     public Action<Team, byte> OnSlotReset;
     public Action OnAllSlotReset;
@@ -61,12 +62,14 @@ public class LobbyUI : MonoBehaviour
         if (confirm)
         {
             ClientInformation.Singleton.OnNewJoinedPlayer += OnNewJoinedPlayer;
+            ClientInformation.Singleton.OnDisconnectedClient += OnDisconnectedClient;
 
             MainMenuUI.Singleton.OnLobbyLeft += OnLobbyLeft;
         }
         else
         {
             ClientInformation.Singleton.OnNewJoinedPlayer -= OnNewJoinedPlayer;
+            ClientInformation.Singleton.OnDisconnectedClient -= OnDisconnectedClient;
 
             MainMenuUI.Singleton.OnLobbyLeft -= OnLobbyLeft;
         }
@@ -75,6 +78,11 @@ public class LobbyUI : MonoBehaviour
     private void OnLobbyLeft()
     {
         this.OnAllSlotReset?.Invoke();
+    }
+
+    private void OnDisconnectedClient(Player disconnectedPlayer)
+    {
+        this.OnPlayerExitedSlot?.Invoke(disconnectedPlayer);
     }
 
     private void OnNewJoinedPlayer(Player joinedPlayer)
