@@ -80,6 +80,7 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnLeaveBtn()
     {
+        //backend
         if (PlayerInformation.Singleton.MyPlayerInformation.Id == 0)
         {
             Debug.Log("Server");
@@ -91,6 +92,7 @@ public class MainMenuUI : MonoBehaviour
             client.Shutdown();
         }
 
+        //frondend
         this.OnLobbyLeft?.Invoke();
         this.mainMenuAnimator.SetTrigger("ToOnlineSettingMenu");
     }

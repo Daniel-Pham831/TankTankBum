@@ -24,6 +24,9 @@ public class ServerInformation
         if (Singleton == null)
             Singleton = this;
 
+        this.playerList = new List<Player>();
+        this.blueSlots = new Queue<byte>();
+        this.redSlots = new Queue<byte>();
 
         this.ResetServerInformation();
         this.registerToEvent(true);
@@ -41,13 +44,13 @@ public class ServerInformation
         {
             NetUtility.S_SEND_NAME += this.OnSendNameServer;
             NetUtility.S_DISCONNECT += this.OnDisconnectedClientOnServer;
-            MainMenuUI.Singleton.OnLobbyLeft += OnLobbyLeft;
+            MainMenuUI.Singleton.OnLobbyLeft += this.ResetServerInformation;
         }
         else
         {
             NetUtility.S_SEND_NAME -= this.OnSendNameServer;
             NetUtility.S_DISCONNECT -= this.OnDisconnectedClientOnServer;
-            MainMenuUI.Singleton.OnLobbyLeft -= OnLobbyLeft;
+            MainMenuUI.Singleton.OnLobbyLeft -= this.ResetServerInformation;
         }
     }
 
@@ -65,16 +68,11 @@ public class ServerInformation
             this.redSlots.Enqueue(disconnectedPlayer.SlotIndex);
     }
 
-    private void OnLobbyLeft()
+    public void ResetServerInformation()
     {
-        this.ResetServerInformation();
-    }
-
-    private void ResetServerInformation()
-    {
-        this.playerList = new List<Player>();
-        this.blueSlots = new Queue<byte>();
-        this.redSlots = new Queue<byte>();
+        this.playerList.Clear();
+        this.blueSlots.Clear();
+        this.redSlots.Clear();
         for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer / 2; i++)
         {
             this.blueSlots.Enqueue(i);

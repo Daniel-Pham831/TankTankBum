@@ -98,10 +98,10 @@ public class Slot : MonoBehaviour
         this.ResetSlot();
     }
 
-    private void OnDestroy()
-    {
-        this.registerToEvent(false);
-    }
+    // private void OnDestroy()
+    // {
+    //     this.registerToEvent(false);
+    // }
 
     private void registerToEvent(bool confirm)
     {

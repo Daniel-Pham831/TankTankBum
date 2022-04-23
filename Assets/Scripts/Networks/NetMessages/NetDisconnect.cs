@@ -6,13 +6,6 @@ using UnityEngine;
 public class NetDisconnect : NetMessage
 {
     public byte DisconnectedClientId { set; get; }
-    // public bool IsServerShutDown { set; get; }
-
-    // public NetDisconnect(bool isServerShutDown)
-    // {
-    //     this.Code = OpCode.DISCONNECT;
-    //     this.IsServerShutDown = isServerShutDown;
-    // }
 
     public NetDisconnect(byte disconnectedClientId)
     {
@@ -48,7 +41,6 @@ public class NetDisconnect : NetMessage
     public override void ReceivedOnServer(NetworkConnection cnn)
     {
         base.ReceivedOnServer(cnn);
-        Debug.Log("ReceivedOnServer Disconnect");
         NetUtility.S_DISCONNECT?.Invoke(this, cnn);
     }
 }

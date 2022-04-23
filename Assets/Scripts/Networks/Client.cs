@@ -44,6 +44,22 @@ public class Client : MonoBehaviour
         if (this.isActive)
         {
             this.SendToServer(new NetDisconnect(PlayerInformation.Singleton.MyPlayerInformation.Id));
+            // this.driver.Disconnect(this.connection);
+
+            //this.UnregisterToEvent();
+            // this.driver.Dispose();
+            this.isActive = false;
+            //  connection = default(NetworkConnection);
+        }
+    }
+    private void Disconnect()
+    {
+        if (this.isActive)
+        {
+            this.UnregisterToEvent();
+            this.driver.Dispose();
+            this.isActive = false;
+            connection = default(NetworkConnection);
         }
     }
 
@@ -92,7 +108,7 @@ public class Client : MonoBehaviour
                     Debug.Log("Server has been Shutdown");
                     this.connection = default(NetworkConnection);
                     this.OnServerShutDown?.Invoke();
-                    this.Shutdown();
+                    this.Disconnect();
                     break;
             }
         }
@@ -110,40 +126,27 @@ public class Client : MonoBehaviour
     private void RegisterToEvent()
     {
         NetUtility.C_KEEP_ALIVE += this.OnKeepAlive;
-        NetUtility.C_DISCONNECT += this.OnDisconnectedClient;
+        PlayerInformation.Singleton.OnSelfDisconnect += OnSelfDisconnect;
     }
 
     private void UnregisterToEvent()
     {
-        NetUtility.C_DISCONNECT -= this.OnDisconnectedClient;
         NetUtility.C_KEEP_ALIVE -= this.OnKeepAlive;
+        PlayerInformation.Singleton.OnSelfDisconnect -= OnSelfDisconnect;
     }
 
-    private void OnDisconnectedClient(NetMessage message)
+    private void OnSelfDisconnect()
     {
-        NetDisconnect disconnectedMessage = message as NetDisconnect;
+        this.OnServerShutDown?.Invoke();
+        this.Disconnect();
 
-        if (PlayerInformation.Singleton.MyPlayerInformation.Id == disconnectedMessage.DisconnectedClientId)
-        {
-            this.DisconnectWithServer();
-        }
-    }
-
-    private void DisconnectWithServer()
-    {
-        if (this.isActive)
-        {
-            this.UnregisterToEvent();
-            this.driver.Dispose();
-            this.isActive = false;
-            connection = default(NetworkConnection);
-        }
     }
 
     private void OnKeepAlive(NetMessage keepAliveMessage)
     {
         // Send it back, to keep both side alive
         this.SendToServer(keepAliveMessage);
+        Debug.Log(this.connection.InternalId);
     }
     #endregion
 

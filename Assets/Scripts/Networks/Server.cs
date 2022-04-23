@@ -44,13 +44,30 @@ public class Server : MonoBehaviour
         this.isActive = true;
 
         //Init server information
-        ServerInformation serverInfomation = new ServerInformation();
+        if (ServerInformation.Singleton == null)
+        {
+            ServerInformation serverInfomation = new ServerInformation();
+        }
+        else
+        {
+            ServerInformation.Singleton.ResetServerInformation();
+        }
     }
 
     public void Shutdown()
     {
         if (this.isActive)
         {
+            for (int i = 0; i < this.connections.Length; i++)
+            {
+                if (this.connections[i].IsCreated)
+                {
+                    Debug.Log($"Sending {OpCode.DISCONNECT} to: {this.connections[i].InternalId}");
+                    this.connections[i].Disconnect(this.driver);
+                    this.connections[i] = default(NetworkConnection);
+                }
+            }
+
             this.driver.Dispose();
             this.connections.Dispose();
             this.isActive = false;
@@ -115,6 +132,10 @@ public class Server : MonoBehaviour
             {
                 switch (cmd)
                 {
+                    case NetworkEvent.Type.Connect:
+                        Debug.Log("New client just connected");
+                        break;
+
                     case NetworkEvent.Type.Data:
                         NetUtility.OnData(ref streamReader, this.connections[i], this);
                         break;

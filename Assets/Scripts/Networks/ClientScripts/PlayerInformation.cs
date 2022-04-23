@@ -14,6 +14,7 @@ public class PlayerInformation : MonoBehaviour
 
     public Action<Player> OnNewJoinedPlayer;
     public Action<Team, byte> OnDisconnectedSlot;
+    public Action OnSelfDisconnect;
 
     void Awake()
     {
@@ -61,6 +62,8 @@ public class PlayerInformation : MonoBehaviour
     private void OnDisconnectedClient(NetMessage message)
     {
         NetDisconnect disconnectedMessage = message as NetDisconnect;
+        if (disconnectedMessage.DisconnectedClientId == this.MyPlayerInformation.Id)
+            this.OnSelfDisconnect?.Invoke();
 
         Player disconnectedPlayer = Player.FindPlayer(ref this.playerList, disconnectedMessage.DisconnectedClientId);
 
