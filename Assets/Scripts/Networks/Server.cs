@@ -122,7 +122,6 @@ public class Server : MonoBehaviour
                     case NetworkEvent.Type.Disconnect:
                         Debug.Log("Client disconnected from the server");
                         this.connections[i] = default(NetworkConnection);
-                        this.connections.RemoveAt(i);
                         this.connectionDropped?.Invoke();
 
                         break;

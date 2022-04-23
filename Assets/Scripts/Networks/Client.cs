@@ -25,6 +25,9 @@ public class Client : MonoBehaviour
     // Methods
     public void Init(string ip, ushort port, string playerName)
     {
+        if (this.isActive)
+            this.ClientReset();
+
         this.driver = NetworkDriver.Create();
         NetworkEndPoint endPoint = NetworkEndPoint.Parse(ip, port);
 
@@ -39,14 +42,20 @@ public class Client : MonoBehaviour
         this.playerName = playerName != "" ? playerName : "I forgot to name myself";
     }
 
+    private void ClientReset()
+    {
+        this.driver.Dispose();
+        this.connection = default(NetworkConnection);
+        this.isActive = false;
+        this.UnregisterToEvent();
+    }
+
     public void Shutdown()
     {
         if (this.isActive)
         {
-            this.UnregisterToEvent();
-            this.driver.Dispose();
-            this.isActive = false;
-            connection = default(NetworkConnection);
+            this.connection.Disconnect(this.driver);
+            this.connectionDropped?.Invoke();
         }
     }
 
@@ -93,8 +102,6 @@ public class Client : MonoBehaviour
 
                 case NetworkEvent.Type.Disconnect:
                     Debug.Log("Client Disconnected");
-                    this.connection = default(NetworkConnection);
-                    this.connectionDropped?.Invoke();
                     this.Shutdown();
                     break;
             }
