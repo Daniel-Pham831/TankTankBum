@@ -126,6 +126,7 @@ public class Slot : MonoBehaviour
             LobbyUI.Singleton.OnSlotStateChanged += OnSlotStateChanged;
             LobbyUI.Singleton.OnPlayerExitedSlot += OnPlayerExitedSlot;
             LobbyUI.Singleton.OnSlotReadyOrStartPress += OnSlotReadyOrStartPress;
+            LobbyUI.Singleton.OnSlotSwitchTeam += OnSlotSwitchTeam;
         }
         else
         {
@@ -135,6 +136,16 @@ public class Slot : MonoBehaviour
             LobbyUI.Singleton.OnSlotStateChanged -= OnSlotStateChanged;
             LobbyUI.Singleton.OnPlayerExitedSlot -= OnPlayerExitedSlot;
             LobbyUI.Singleton.OnSlotReadyOrStartPress -= OnSlotReadyOrStartPress;
+            LobbyUI.Singleton.OnSlotSwitchTeam -= OnSlotSwitchTeam;
+        }
+    }
+
+    private void OnSlotSwitchTeam(byte slotIndex)
+    {
+        if (this.IsThisSlot(slotIndex))
+        {
+            this.SlotTeam = Team.Blue == this.SlotTeam ? Team.Red : Team.Blue;
+            this.SetSlotTeamColor();
         }
     }
 

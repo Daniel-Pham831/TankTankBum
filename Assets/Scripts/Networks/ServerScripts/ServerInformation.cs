@@ -39,15 +39,35 @@ public class ServerInformation
         if (confirm)
         {
             NetUtility.S_SEND_NAME += this.OnServerReceivedSendNameMessage;
+            NetUtility.S_SWITCHTEAM += this.OnServerReceivedSwitchTeamMessage;
+
             Server.Singleton.OnClientDisconnected += OnClientDisconnected;
             Server.Singleton.OnServerDisconnect += OnServerDisconnect;
         }
         else
         {
             NetUtility.S_SEND_NAME -= this.OnServerReceivedSendNameMessage;
+            NetUtility.S_SWITCHTEAM -= this.OnServerReceivedSwitchTeamMessage;
+
             Server.Singleton.OnClientDisconnected -= OnClientDisconnected;
             Server.Singleton.OnServerDisconnect -= OnServerDisconnect;
         }
+    }
+
+    private void OnServerReceivedSwitchTeamMessage(NetMessage message, NetworkConnection sentClient)
+    {
+        NetSwitchTeam switchTeamMessage = message as NetSwitchTeam;
+
+        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref this.playerList, switchTeamMessage.Id);
+
+        //SwitchTeam
+        if (sentPlayer != null)
+        {
+            Player.SwitchTeamForPlayer(ref sentPlayer);
+            this.playerList.Add(sentPlayer);
+        }
+
+        Server.Singleton.BroadCastExcept(switchTeamMessage, sentClient);
     }
 
     private void OnServerDisconnect()
@@ -57,7 +77,7 @@ public class ServerInformation
 
     private void OnClientDisconnected(byte disconnectedClientId)
     {
-        Player disconnectedPlayer = Player.FindPlayerWithID(ref this.playerList, disconnectedClientId);
+        Player disconnectedPlayer = Player.FindPlayerWithID(this.playerList, disconnectedClientId);
         this.playerList.Remove(disconnectedPlayer);
 
         this.availableSlotSet.Add(disconnectedPlayer.SlotIndex);
@@ -75,7 +95,6 @@ public class ServerInformation
     }
 
     #endregion
-
 
     //Server
     private void OnServerReceivedSendNameMessage(NetMessage message, NetworkConnection connectedClient)

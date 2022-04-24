@@ -24,6 +24,7 @@ public class ClientInformation : MonoBehaviour
     public Action<Player> OnNewJoinedPlayer;
     public Action<Player> OnDisconnectedClient;
     public Action<bool> OnDeclareHost;
+    public Action<byte> OnPlayerSwitchTeam;
     void Awake()
     {
         if (Singleton == null)
@@ -46,6 +47,11 @@ public class ClientInformation : MonoBehaviour
         this.IsHost = false;
     }
 
+    public void SwitchMyTeam()
+    {
+        this.MyPlayerInformation.Team = this.MyPlayerInformation.Team == Team.Blue ? Team.Red : Team.Blue;
+    }
+
     private void Start()
     {
         this.registerToEvent(true);
@@ -65,6 +71,7 @@ public class ClientInformation : MonoBehaviour
             NetUtility.C_WELCOME += this.OnClientReceivedWelcomeMessage;
             NetUtility.C_JOIN += this.OnClientReceivedJoinMessage;
             NetUtility.C_DISCONNECT += this.OnClientReceivedDisconnectedMessage;
+            NetUtility.C_SWITCHTEAM += this.OnClientReceivedSwitchTeamMessage;
             Client.Singleton.OnClientDisconnect += this.OnClientDisconnect;
 
             MainMenuUI.Singleton.OnHostOrJoinRoom += this.OnHostOrJoinRoom;
@@ -74,10 +81,27 @@ public class ClientInformation : MonoBehaviour
             NetUtility.C_WELCOME -= this.OnClientReceivedWelcomeMessage;
             NetUtility.C_JOIN -= this.OnClientReceivedJoinMessage;
             NetUtility.C_DISCONNECT -= this.OnClientReceivedDisconnectedMessage;
+            NetUtility.C_SWITCHTEAM -= this.OnClientReceivedSwitchTeamMessage;
             Client.Singleton.OnClientDisconnect -= this.OnClientDisconnect;
 
             MainMenuUI.Singleton.OnHostOrJoinRoom -= this.OnHostOrJoinRoom;
         }
+    }
+
+    private void OnClientReceivedSwitchTeamMessage(NetMessage message)
+    {
+        NetSwitchTeam switchTeamMessage = message as NetSwitchTeam;
+
+        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref this.PlayerList, switchTeamMessage.Id);
+
+        //SwitchTeam
+        if (sentPlayer != null)
+        {
+            Player.SwitchTeamForPlayer(ref sentPlayer);
+            this.PlayerList.Add(sentPlayer);
+            this.OnPlayerSwitchTeam?.Invoke(sentPlayer.SlotIndex);
+        }
+        Debug.Log($"Received Switch Team for player {sentPlayer.Name}");
     }
 
     private void OnClientDisconnect()
@@ -89,7 +113,7 @@ public class ClientInformation : MonoBehaviour
     {
         NetDisconnect disconnectMessage = message as NetDisconnect;
 
-        Player disconnectedPlayer = Player.FindPlayerWithID(ref this.PlayerList, disconnectMessage.DisconnectedClientId);
+        Player disconnectedPlayer = Player.FindPlayerWithID(this.PlayerList, disconnectMessage.DisconnectedClientId);
 
         this.OnDisconnectedClient?.Invoke(disconnectedPlayer);
 

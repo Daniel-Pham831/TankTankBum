@@ -20,6 +20,7 @@ public class LobbyUI : MonoBehaviour
     public Action<byte, SlotState> OnSlotStateChanged;
     public Action<byte> OnSlotReadyOrStartPress;
     public Action<byte> OnSlotReset;
+    public Action<byte> OnSlotSwitchTeam;
     public Action OnAllSlotReset;
 
     public Action OnLobbyLeft;
@@ -51,6 +52,7 @@ public class LobbyUI : MonoBehaviour
             ClientInformation.Singleton.OnNewJoinedPlayer += OnNewJoinedPlayer;
             ClientInformation.Singleton.OnDisconnectedClient += OnDisconnectedClient;
             ClientInformation.Singleton.OnDeclareHost += OnDeclareHost;
+            ClientInformation.Singleton.OnPlayerSwitchTeam += OnPlayerSwitchTeam;
 
             Client.Singleton.OnServerDisconnect += OnLeaveBtn;
         }
@@ -59,11 +61,16 @@ public class LobbyUI : MonoBehaviour
             ClientInformation.Singleton.OnNewJoinedPlayer -= OnNewJoinedPlayer;
             ClientInformation.Singleton.OnDisconnectedClient -= OnDisconnectedClient;
             ClientInformation.Singleton.OnDeclareHost -= OnDeclareHost;
+            ClientInformation.Singleton.OnPlayerSwitchTeam -= OnPlayerSwitchTeam;
 
             Client.Singleton.OnServerDisconnect += OnLeaveBtn;
         }
     }
 
+    private void OnPlayerSwitchTeam(byte slotIndex)
+    {
+        this.OnSlotSwitchTeam?.Invoke(slotIndex);
+    }
 
     private void GenerateAllSlots()
     {
@@ -89,7 +96,13 @@ public class LobbyUI : MonoBehaviour
 
     public void OnSwitchTeamBtn()
     {
-        Client.Singleton.SendToServer(new NetSwitchTeam(ClientInformation.Singleton.MyPlayerInformation.Id));
+        Player MyPlayerInformation = ClientInformation.Singleton.MyPlayerInformation;
+
+        ClientInformation.Singleton.SwitchMyTeam();
+        this.SetSwitchTeamBtnColor(MyPlayerInformation.Team);
+        this.OnSlotSwitchTeam?.Invoke(MyPlayerInformation.SlotIndex);
+
+        Client.Singleton.SendToServer(new NetSwitchTeam(MyPlayerInformation.Id));
     }
 
     public void OnLeaveBtn()
@@ -119,7 +132,11 @@ public class LobbyUI : MonoBehaviour
     private void OnNewJoinedPlayer(Player joinedPlayer)
     {
         this.OnPlayerJoinedSlot?.Invoke(joinedPlayer);
-        this.SetSwitchTeamBtnColor(joinedPlayer.Team);
+
+        if (joinedPlayer.Id == ClientInformation.Singleton.MyPlayerInformation.Id)
+        {
+            this.SetSwitchTeamBtnColor(joinedPlayer.Team);
+        }
     }
 
     private void SetSwitchTeamBtnColor(Team team)

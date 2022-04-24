@@ -50,12 +50,30 @@ public class Player
         return new Player(playerId, playerTeam, playerSlotIndex, playerName);
     }
 
-    public static Player FindPlayerWithID(ref List<Player> playerList, byte playerId)
+    public static Player FindPlayerWithID(List<Player> playerList, byte playerId)
     {
         foreach (Player player in playerList)
         {
             if (player.Id == playerId) return player;
         }
         return null;
+    }
+
+    public static Player FindPlayerWithIDAndRemove(ref List<Player> playerList, byte playerId)
+    {
+        foreach (Player player in playerList)
+        {
+            if (player.Id == playerId)
+            {
+                playerList.Remove(player);
+                return player;
+            }
+        }
+        return null;
+    }
+
+    public static void SwitchTeamForPlayer(ref Player player)
+    {
+        player.Team = player.Team == Team.Blue ? Team.Red : Team.Blue;
     }
 }
