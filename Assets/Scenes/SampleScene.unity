@@ -4113,6 +4113,7 @@ MonoBehaviour:
   rightSlotRoot: {fileID: 1918097573}
   slotPrefab: {fileID: 7307596801642090936, guid: 4a419a5dcfced3c4ea78624fd1bbd041, type: 3}
   readyOrStartBtn: {fileID: 162433101}
+  switchTeamBtn: {fileID: 1819921098}
 --- !u!1 &1819921095
 GameObject:
   m_ObjectHideFlags: 0
@@ -4199,7 +4200,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1803509538}
         m_TargetAssemblyTypeName: LobbyUI, Assembly-CSharp
-        m_MethodName: 
+        m_MethodName: OnSwitchTeamBtn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4613,6 +4614,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MaxPlayer: 10
   HostId: 0
+  BlueTeamColor: {r: 0.36078432, g: 0.8156863, b: 0.8980392, a: 1}
+  RedTeamColor: {r: 0.972549, g: 0.40784314, b: 0.40784314, a: 1}
 --- !u!4 &2077898070
 Transform:
   m_ObjectHideFlags: 0

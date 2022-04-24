@@ -12,6 +12,8 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject rightSlotRoot;
     [SerializeField] private GameObject slotPrefab;
     [SerializeField] private GameObject readyOrStartBtn;
+    [SerializeField] private Image switchTeamBtn;
+
 
     public Action<Player> OnPlayerJoinedSlot;
     public Action<Player> OnPlayerExitedSlot;
@@ -34,23 +36,6 @@ public class LobbyUI : MonoBehaviour
         this.registerToEvent(true);
 
         this.GenerateAllSlots();
-    }
-
-    private void GenerateAllSlots()
-    {
-        for (int i = 0; i < GameInformation.Singleton.MaxPlayer; i++)
-        {
-            this.GenerateOneSlot((byte)i);
-            this.OnSlotStateChanged?.Invoke((byte)i, SlotState.Empty);
-        }
-    }
-
-    private void GenerateOneSlot(byte slotIndex)
-    {
-        GameObject newSlot = Instantiate(this.slotPrefab, slotIndex % 2 == 0 ? this.leftSlotRoot.transform : this.rightSlotRoot.transform);
-        newSlot.name = $"Slot: Index {slotIndex}";
-        Slot slotInfo = newSlot.GetComponent<Slot>();
-        slotInfo.SlotIndex = slotIndex;
     }
 
     private void OnDestroy()
@@ -79,9 +64,32 @@ public class LobbyUI : MonoBehaviour
         }
     }
 
+
+    private void GenerateAllSlots()
+    {
+        for (int i = 0; i < GameInformation.Singleton.MaxPlayer; i++)
+        {
+            this.GenerateOneSlot((byte)i);
+            this.OnSlotStateChanged?.Invoke((byte)i, SlotState.Empty);
+        }
+    }
+
+    private void GenerateOneSlot(byte slotIndex)
+    {
+        GameObject newSlot = Instantiate(this.slotPrefab, slotIndex % 2 == 0 ? this.leftSlotRoot.transform : this.rightSlotRoot.transform);
+        newSlot.name = $"Slot: Index {slotIndex}";
+        Slot slotInfo = newSlot.GetComponent<Slot>();
+        slotInfo.SlotIndex = slotIndex;
+    }
+
     public void OnStartOrReadyBtn()
     {
         this.OnSlotReadyOrStartPress?.Invoke(ClientInformation.Singleton.MyPlayerInformation.SlotIndex);
+    }
+
+    public void OnSwitchTeamBtn()
+    {
+        Client.Singleton.SendToServer(new NetSwitchTeam(ClientInformation.Singleton.MyPlayerInformation.Id));
     }
 
     public void OnLeaveBtn()
@@ -111,5 +119,12 @@ public class LobbyUI : MonoBehaviour
     private void OnNewJoinedPlayer(Player joinedPlayer)
     {
         this.OnPlayerJoinedSlot?.Invoke(joinedPlayer);
+        this.SetSwitchTeamBtnColor(joinedPlayer.Team);
+    }
+
+    private void SetSwitchTeamBtnColor(Team team)
+    {
+        GameInformation gameInformation = GameInformation.Singleton;
+        this.switchTeamBtn.color = team == Team.Blue ? gameInformation.BlueTeamColor : gameInformation.RedTeamColor;
     }
 }
