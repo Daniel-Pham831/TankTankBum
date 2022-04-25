@@ -18,7 +18,7 @@ public class LobbyUI : MonoBehaviour
     public Action<Player> OnPlayerJoinedSlot;
     public Action<Player> OnPlayerExitedSlot;
     public Action<byte, SlotState> OnSlotStateChanged;
-    public Action<byte> OnSlotReadyOrStartPress;
+    public Action<byte, ReadyState> OnSlotReadyOrStartPress;
     public Action<byte> OnSlotReset;
     public Action<byte> OnSlotSwitchTeam;
     public Action OnAllSlotReset;
@@ -53,6 +53,7 @@ public class LobbyUI : MonoBehaviour
             ClientInformation.Singleton.OnDisconnectedClient += OnDisconnectedClient;
             ClientInformation.Singleton.OnDeclareHost += OnDeclareHost;
             ClientInformation.Singleton.OnPlayerSwitchTeam += OnPlayerSwitchTeam;
+            ClientInformation.Singleton.OnPlayerSwitchReadyState += OnPlayerSwitchReadyState;
 
             Client.Singleton.OnServerDisconnect += OnLeaveBtn;
         }
@@ -62,9 +63,15 @@ public class LobbyUI : MonoBehaviour
             ClientInformation.Singleton.OnDisconnectedClient -= OnDisconnectedClient;
             ClientInformation.Singleton.OnDeclareHost -= OnDeclareHost;
             ClientInformation.Singleton.OnPlayerSwitchTeam -= OnPlayerSwitchTeam;
+            ClientInformation.Singleton.OnPlayerSwitchReadyState -= OnPlayerSwitchReadyState;
 
-            Client.Singleton.OnServerDisconnect += OnLeaveBtn;
+            Client.Singleton.OnServerDisconnect -= OnLeaveBtn;
         }
+    }
+
+    private void OnPlayerSwitchReadyState(byte slotIndex, ReadyState readyState)
+    {
+        this.OnSlotReadyOrStartPress?.Invoke(slotIndex, readyState);
     }
 
     private void OnPlayerSwitchTeam(byte slotIndex)
@@ -91,14 +98,18 @@ public class LobbyUI : MonoBehaviour
 
     public void OnStartOrReadyBtn()
     {
-        this.OnSlotReadyOrStartPress?.Invoke(ClientInformation.Singleton.MyPlayerInformation.SlotIndex);
+        Player MyPlayerInformation = ClientInformation.Singleton.MyPlayerInformation;
+        MyPlayerInformation.SwitchReadyState();
+        this.OnSlotReadyOrStartPress?.Invoke(MyPlayerInformation.SlotIndex, MyPlayerInformation.ReadyState);
+
+        Client.Singleton.SendToServer(new NetReady(MyPlayerInformation.Id));
     }
 
     public void OnSwitchTeamBtn()
     {
         Player MyPlayerInformation = ClientInformation.Singleton.MyPlayerInformation;
 
-        ClientInformation.Singleton.SwitchMyTeam();
+        MyPlayerInformation.SwitchTeam();
         this.SetSwitchTeamBtnColor(MyPlayerInformation.Team);
         this.OnSlotSwitchTeam?.Invoke(MyPlayerInformation.SlotIndex);
 

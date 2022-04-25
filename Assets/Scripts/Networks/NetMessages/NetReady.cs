@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class NetReady : NetMessage
 {
-    public Player Player { set; get; }
-    public NetReady(Player player)
+    public byte Id { set; get; }
+    public NetReady(byte playerId)
     {
         this.Code = OpCode.READY;
-        this.Player = player;
+        this.Id = playerId;
     }
 
     public NetReady(ref DataStreamReader reader)
@@ -22,12 +22,12 @@ public class NetReady : NetMessage
     {
         base.Serialize(ref writer);
 
-        Player.SerializePlayer(ref writer, this.Player);
+        writer.WriteByte(this.Id);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        this.Player = Player.DeserializePlayer(ref reader);
+        this.Id = reader.ReadByte();
     }
 
     public override void ReceivedOnClient()

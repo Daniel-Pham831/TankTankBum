@@ -25,6 +25,7 @@ public class ClientInformation : MonoBehaviour
     public Action<Player> OnDisconnectedClient;
     public Action<bool> OnDeclareHost;
     public Action<byte> OnPlayerSwitchTeam;
+    public Action<byte, ReadyState> OnPlayerSwitchReadyState;
     void Awake()
     {
         if (Singleton == null)
@@ -47,11 +48,6 @@ public class ClientInformation : MonoBehaviour
         this.IsHost = false;
     }
 
-    public void SwitchMyTeam()
-    {
-        this.MyPlayerInformation.Team = this.MyPlayerInformation.Team == Team.Blue ? Team.Red : Team.Blue;
-    }
-
     private void Start()
     {
         this.registerToEvent(true);
@@ -72,6 +68,7 @@ public class ClientInformation : MonoBehaviour
             NetUtility.C_JOIN += this.OnClientReceivedJoinMessage;
             NetUtility.C_DISCONNECT += this.OnClientReceivedDisconnectedMessage;
             NetUtility.C_SWITCHTEAM += this.OnClientReceivedSwitchTeamMessage;
+            NetUtility.C_READY += this.OnClientReceivedReadyMessage;
             Client.Singleton.OnClientDisconnect += this.OnClientDisconnect;
 
             MainMenuUI.Singleton.OnHostOrJoinRoom += this.OnHostOrJoinRoom;
@@ -82,9 +79,25 @@ public class ClientInformation : MonoBehaviour
             NetUtility.C_JOIN -= this.OnClientReceivedJoinMessage;
             NetUtility.C_DISCONNECT -= this.OnClientReceivedDisconnectedMessage;
             NetUtility.C_SWITCHTEAM -= this.OnClientReceivedSwitchTeamMessage;
+            NetUtility.C_READY += this.OnClientReceivedReadyMessage;
             Client.Singleton.OnClientDisconnect -= this.OnClientDisconnect;
 
             MainMenuUI.Singleton.OnHostOrJoinRoom -= this.OnHostOrJoinRoom;
+        }
+    }
+
+    private void OnClientReceivedReadyMessage(NetMessage message)
+    {
+        NetReady readyMessage = message as NetReady;
+
+        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref this.PlayerList, readyMessage.Id);
+
+        //Switch ReadyState
+        if (sentPlayer != null)
+        {
+            sentPlayer.SwitchReadyState();
+            this.PlayerList.Add(sentPlayer);
+            this.OnPlayerSwitchReadyState?.Invoke(sentPlayer.SlotIndex, sentPlayer.ReadyState);
         }
     }
 
@@ -155,6 +168,7 @@ public class ClientInformation : MonoBehaviour
             this.NameList.Add(player.Name);
             this.OnNewJoinedPlayer?.Invoke(player);
         }
+
         Debug.Log($"\nMy ID:{this.MyPlayerInformation.Id} My Name:{this.MyPlayerInformation.Name}");
 
         if (this.MyPlayerInformation.Id == GameInformation.Singleton.HostId)
