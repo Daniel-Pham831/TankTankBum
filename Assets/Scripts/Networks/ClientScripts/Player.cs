@@ -92,6 +92,22 @@ public class Player
         return true;
     }
 
+    public static bool Have2TeamsEqual(List<Player> players)
+    {
+        return MathF.Abs(CountTeamPlayer(players, Team.Blue) - CountTeamPlayer(players, Team.Red)) <= 1;
+    }
+
+    public static int CountTeamPlayer(List<Player> players, Team team)
+    {
+        int counter = 0;
+        foreach (Player player in players)
+        {
+            if (player.Team == team)
+                counter++;
+        }
+        return counter;
+    }
+
     public void SwitchTeam()
     {
         this.Team = this.Team == Team.Blue ? Team.Red : Team.Blue;

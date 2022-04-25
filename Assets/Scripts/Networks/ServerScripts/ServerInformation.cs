@@ -12,7 +12,7 @@ public class ServerInformation
 {
     public static ServerInformation Singleton;
 
-    public List<Player> playerList;
+    public List<Player> PlayerList;
     private SortedSet<byte> availableSlots;
     private List<ReadyState> readySlots;
 
@@ -22,7 +22,7 @@ public class ServerInformation
         if (Singleton == null)
             Singleton = this;
 
-        this.playerList = new List<Player>();
+        this.PlayerList = new List<Player>();
         this.availableSlots = new SortedSet<byte>();
         this.readySlots = new List<ReadyState>();
 
@@ -62,7 +62,7 @@ public class ServerInformation
     {
         NetReady readyMessage = message as NetReady;
 
-        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref this.playerList, readyMessage.Id);
+        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref this.PlayerList, readyMessage.Id);
 
         if (sentPlayer.IsHost)
         {
@@ -74,7 +74,7 @@ public class ServerInformation
         if (sentPlayer != null)
         {
             sentPlayer.SwitchReadyState();
-            this.playerList.Add(sentPlayer);
+            this.PlayerList.Add(sentPlayer);
         }
 
         Server.Singleton.BroadCastExcept(readyMessage, sentClient);
@@ -84,13 +84,13 @@ public class ServerInformation
     {
         NetSwitchTeam switchTeamMessage = message as NetSwitchTeam;
 
-        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref this.playerList, switchTeamMessage.Id);
+        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref this.PlayerList, switchTeamMessage.Id);
 
         //SwitchTeam
         if (sentPlayer != null)
         {
             sentPlayer.SwitchTeam();
-            this.playerList.Add(sentPlayer);
+            this.PlayerList.Add(sentPlayer);
         }
 
         Server.Singleton.BroadCastExcept(switchTeamMessage, sentClient);
@@ -103,15 +103,15 @@ public class ServerInformation
 
     private void OnClientDisconnected(byte disconnectedClientId)
     {
-        Player disconnectedPlayer = Player.FindPlayerWithID(this.playerList, disconnectedClientId);
-        this.playerList.Remove(disconnectedPlayer);
+        Player disconnectedPlayer = Player.FindPlayerWithID(this.PlayerList, disconnectedClientId);
+        this.PlayerList.Remove(disconnectedPlayer);
 
         this.availableSlots.Add(disconnectedPlayer.SlotIndex);
     }
 
     private void ResetServerInformation()
     {
-        this.playerList?.Clear();
+        this.PlayerList?.Clear();
         this.availableSlots?.Clear();
 
         for (byte i = 0; i < (byte)GameInformation.Singleton.MaxPlayer; i++)
@@ -134,12 +134,12 @@ public class ServerInformation
         */
         NetSendName sendNameMessage = message as NetSendName;
         Player connectedPlayer = this.GetNewPlayerInformation((byte)connectedClient.InternalId, sendNameMessage.Name);
-        Server.Singleton.SendToClient(connectedClient, new NetWelcome(connectedPlayer, (byte)this.playerList.Count, this.playerList));
+        Server.Singleton.SendToClient(connectedClient, new NetWelcome(connectedPlayer, (byte)this.PlayerList.Count, this.PlayerList));
 
         // BroadCast to all player that a new player just joined
         Server.Singleton.BroadCastExcept(new NetJoin(connectedPlayer), connectedClient);
 
-        this.playerList.Add(connectedPlayer);
+        this.PlayerList.Add(connectedPlayer);
     }
 
     private Player GetNewPlayerInformation(byte id, string playerName)
