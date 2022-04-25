@@ -13,7 +13,7 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private GameObject slotPrefab;
     [SerializeField] private GameObject readyOrStartBtn;
     [SerializeField] private Image switchTeamBtn;
-
+    [SerializeField] private Animator lobbyAnimator;
 
     public Action<Player> OnPlayerJoinedSlot;
     public Action<Player> OnPlayerExitedSlot;
@@ -42,7 +42,7 @@ public class LobbyUI : MonoBehaviour
     private void OnDestroy()
     {
         Singleton = null;
-        this.registerToEvent(false);
+        //   this.registerToEvent(false);
     }
 
     private void registerToEvent(bool confirm)
@@ -102,8 +102,10 @@ public class LobbyUI : MonoBehaviour
 
         if (MyPlayerInformation.IsHost && !Player.HaveAllPlayersReadied(ClientInformation.Singleton.PlayerList))
         {
+            // If the host press start btn
             // Pop up a message box indicating that can only start when all players are ready
             Debug.Log("There are still players who haven't readied yet");
+            this.lobbyAnimator.SetTrigger("IntoLobbyPopup");
             return;
         }
 
@@ -135,6 +137,11 @@ public class LobbyUI : MonoBehaviour
         //frontend
         this.OnLobbyLeft?.Invoke();
         this.OnAllSlotReset?.Invoke();
+    }
+
+    public void OnConfirmBtn()
+    {
+        this.lobbyAnimator.SetTrigger("IntoLobbyIdle");
     }
 
     private void OnDeclareHost(bool isHost)
