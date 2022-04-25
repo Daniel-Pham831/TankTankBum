@@ -63,7 +63,7 @@ public class ServerInformation
         //SwitchTeam
         if (sentPlayer != null)
         {
-            Player.SwitchTeamForPlayer(ref sentPlayer);
+            sentPlayer.SwitchTeam();
             this.playerList.Add(sentPlayer);
         }
 

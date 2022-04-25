@@ -72,8 +72,8 @@ public class Player
         return null;
     }
 
-    public static void SwitchTeamForPlayer(ref Player player)
+    public void SwitchTeam()
     {
-        player.Team = player.Team == Team.Blue ? Team.Red : Team.Blue;
+        this.Team = this.Team == Team.Blue ? Team.Red : Team.Blue;
     }
 }

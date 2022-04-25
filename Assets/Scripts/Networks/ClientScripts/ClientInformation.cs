@@ -97,7 +97,7 @@ public class ClientInformation : MonoBehaviour
         //SwitchTeam
         if (sentPlayer != null)
         {
-            Player.SwitchTeamForPlayer(ref sentPlayer);
+            sentPlayer.SwitchTeam();
             this.PlayerList.Add(sentPlayer);
             this.OnPlayerSwitchTeam?.Invoke(sentPlayer.SlotIndex);
         }
