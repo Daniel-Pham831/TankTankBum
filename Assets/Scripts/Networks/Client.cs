@@ -64,11 +64,11 @@ public class Client : MonoBehaviour
             this.OnClientDisconnect?.Invoke();
         }
     }
+    // public void OnDestroy()
+    // {
+    //     this.Shutdown();
+    // }
 
-    public void OnDestroy()
-    {
-        this.Shutdown();
-    }
 
     public void Update()
     {

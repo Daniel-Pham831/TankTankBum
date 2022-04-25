@@ -3,44 +3,39 @@ using System.Collections.Generic;
 using Unity.Networking.Transport;
 using UnityEngine;
 
-public class NetReady : NetMessage
+public class NetStartGame : NetMessage
 {
-    public byte Id { set; get; }
-    public NetReady(byte playerId)
+    public NetStartGame()
     {
-        this.Code = OpCode.READY;
-        this.Id = playerId;
+        this.Code = OpCode.START;
     }
 
-    public NetReady(ref DataStreamReader reader)
+    public NetStartGame(ref DataStreamReader reader)
     {
-        this.Code = OpCode.READY;
+        this.Code = OpCode.START;
         this.Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)
     {
         base.Serialize(ref writer);
-
-        writer.WriteByte(this.Id);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        this.Id = reader.ReadByte();
     }
 
     public override void ReceivedOnClient()
     {
         base.ReceivedOnClient();
 
-        NetUtility.C_READY?.Invoke(this);
+        NetUtility.C_START?.Invoke(this);
     }
 
     public override void ReceivedOnServer(NetworkConnection cnn)
     {
         base.ReceivedOnServer(cnn);
 
-        NetUtility.S_READY?.Invoke(this, cnn);
+        NetUtility.S_START?.Invoke(this, cnn);
     }
 }

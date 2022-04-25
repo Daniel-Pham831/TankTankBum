@@ -9,6 +9,7 @@ public class NetWelcome : NetMessage
     public byte TotalPlayer { set; get; }
     public List<Player> PlayerList { set; get; }
 
+
     public NetWelcome(Player player, byte totalPlayer, List<Player> playerList)
     {
         this.Code = OpCode.WELCOME;

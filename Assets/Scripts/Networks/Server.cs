@@ -78,10 +78,10 @@ public class Server : MonoBehaviour
         }
     }
 
-    public void OnDestroy()
-    {
-        this.Shutdown();
-    }
+    // public void OnDestroy()
+    // {
+    //     this.Shutdown();
+    // }
 
     public void Update()
     {

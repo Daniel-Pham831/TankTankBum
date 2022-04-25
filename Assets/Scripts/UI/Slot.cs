@@ -90,12 +90,18 @@ public class Slot : MonoBehaviour
             this.slotName.SetText(player.Name);
             this.SlotTeam = player.Team;
             this.SetSlotTeamColor();
+            this.SetSlotReadyState(player.ReadyState);
 
             if (this.IsOwnerSlot(player.SlotIndex))
                 this.SetSlotStage(SlotState.OwnerOccupied);
             else
                 this.SetSlotStage(SlotState.Occupied);
         }
+    }
+
+    private void SetSlotReadyState(ReadyState readyState)
+    {
+        this.slotReadyToggle.isOn = readyState == ReadyState.Ready ? true : false;
     }
 
     private void SetSlotTeamColor()
@@ -149,11 +155,11 @@ public class Slot : MonoBehaviour
         }
     }
 
-    private void OnSlotReadyOrStartPress(byte slotIndex)
+    private void OnSlotReadyOrStartPress(byte slotIndex, ReadyState readyState)
     {
         if (this.IsThisSlot(slotIndex))
         {
-            this.slotReadyToggle.isOn = !this.slotReadyToggle.isOn;
+            this.SetSlotReadyState(readyState);
         }
     }
 

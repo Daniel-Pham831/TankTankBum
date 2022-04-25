@@ -10,7 +10,8 @@ public enum OpCode
     DISCONNECT = 4,
     WELCOME = 5,
     READY = 6,
-    SWITCHTEAM = 7
+    SWITCHTEAM = 7,
+    START = 8
 }
 
 public static class NetUtility
@@ -23,6 +24,7 @@ public static class NetUtility
     public static Action<NetMessage> C_DISCONNECT;
     public static Action<NetMessage> C_READY;
     public static Action<NetMessage> C_SWITCHTEAM;
+    public static Action<NetMessage> C_START;
     public static Action<NetMessage, NetworkConnection> S_KEEP_ALIVE;
     public static Action<NetMessage, NetworkConnection> S_SEND_NAME;
     public static Action<NetMessage, NetworkConnection> S_JOIN;
@@ -30,6 +32,7 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_DISCONNECT;
     public static Action<NetMessage, NetworkConnection> S_READY;
     public static Action<NetMessage, NetworkConnection> S_SWITCHTEAM;
+    public static Action<NetMessage, NetworkConnection> S_START;
 
     public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
     {
@@ -63,6 +66,10 @@ public static class NetUtility
 
             case OpCode.SWITCHTEAM:
                 msg = new NetSwitchTeam(ref streamReader);
+                break;
+
+            case OpCode.START:
+                msg = new NetStartGame(ref streamReader);
                 break;
 
             default:
