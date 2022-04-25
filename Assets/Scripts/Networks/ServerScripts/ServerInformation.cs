@@ -64,6 +64,12 @@ public class ServerInformation
 
         Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref this.playerList, readyMessage.Id);
 
+        if (sentPlayer.IsHost)
+        {
+            Server.Singleton.BroadCast(new NetStartGame());
+            return;
+        }
+
         //Switch ReadyState
         if (sentPlayer != null)
         {

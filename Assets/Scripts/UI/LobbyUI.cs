@@ -99,6 +99,14 @@ public class LobbyUI : MonoBehaviour
     public void OnStartOrReadyBtn()
     {
         Player MyPlayerInformation = ClientInformation.Singleton.MyPlayerInformation;
+
+        if (MyPlayerInformation.IsHost && !Player.HaveAllPlayersReadied(ClientInformation.Singleton.PlayerList))
+        {
+            // Pop up a message box indicating that can only start when all players are ready
+            Debug.Log("There are still players who haven't readied yet");
+            return;
+        }
+
         MyPlayerInformation.SwitchReadyState();
         this.OnSlotReadyOrStartPress?.Invoke(MyPlayerInformation.SlotIndex, MyPlayerInformation.ReadyState);
 

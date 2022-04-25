@@ -69,6 +69,8 @@ public class ClientInformation : MonoBehaviour
             NetUtility.C_DISCONNECT += this.OnClientReceivedDisconnectedMessage;
             NetUtility.C_SWITCHTEAM += this.OnClientReceivedSwitchTeamMessage;
             NetUtility.C_READY += this.OnClientReceivedReadyMessage;
+            NetUtility.C_START += this.OnClientReceivedStartGameMessage;
+
             Client.Singleton.OnClientDisconnect += this.OnClientDisconnect;
 
             MainMenuUI.Singleton.OnHostOrJoinRoom += this.OnHostOrJoinRoom;
@@ -80,10 +82,17 @@ public class ClientInformation : MonoBehaviour
             NetUtility.C_DISCONNECT -= this.OnClientReceivedDisconnectedMessage;
             NetUtility.C_SWITCHTEAM -= this.OnClientReceivedSwitchTeamMessage;
             NetUtility.C_READY += this.OnClientReceivedReadyMessage;
+            NetUtility.C_START -= this.OnClientReceivedStartGameMessage;
+
             Client.Singleton.OnClientDisconnect -= this.OnClientDisconnect;
 
             MainMenuUI.Singleton.OnHostOrJoinRoom -= this.OnHostOrJoinRoom;
         }
+    }
+
+    private void OnClientReceivedStartGameMessage(NetMessage message)
+    {
+        Debug.Log("START GAME");
     }
 
     private void OnClientReceivedReadyMessage(NetMessage message)

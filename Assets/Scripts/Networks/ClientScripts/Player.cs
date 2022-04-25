@@ -82,6 +82,16 @@ public class Player
         return null;
     }
 
+    public static bool HaveAllPlayersReadied(List<Player> players)
+    {
+        foreach (Player player in players)
+        {
+            if (player.ReadyState == ReadyState.Unready)
+                return false;
+        }
+        return true;
+    }
+
     public void SwitchTeam()
     {
         this.Team = this.Team == Team.Blue ? Team.Red : Team.Blue;
@@ -91,4 +101,6 @@ public class Player
     {
         this.ReadyState = this.ReadyState == ReadyState.Ready ? ReadyState.Unready : ReadyState.Ready;
     }
+
+    public bool IsHost => this.Id == GameInformation.Singleton.HostId;
 }
