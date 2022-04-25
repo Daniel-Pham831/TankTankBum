@@ -26,6 +26,8 @@ public class ClientInformation : MonoBehaviour
     public Action<bool> OnDeclareHost;
     public Action<byte> OnPlayerSwitchTeam;
     public Action<byte, ReadyState> OnPlayerSwitchReadyState;
+
+    public Action StartGame;
     void Awake()
     {
         if (Singleton == null)
@@ -92,6 +94,7 @@ public class ClientInformation : MonoBehaviour
 
     private void OnClientReceivedStartGameMessage(NetMessage message)
     {
+        this.StartGame?.Invoke();
         Debug.Log("START GAME");
     }
 

@@ -40,11 +40,18 @@ public class MainMenuUI : MonoBehaviour
         if (confirm)
         {
             LobbyUI.Singleton.OnLobbyLeft += OnLobbyLeft;
+            ClientInformation.Singleton.StartGame += StartGame;
         }
         else
         {
             LobbyUI.Singleton.OnLobbyLeft -= OnLobbyLeft;
+            ClientInformation.Singleton.StartGame -= StartGame;
         }
+    }
+
+    private void StartGame()
+    {
+        this.mainMenuAnimator.SetTrigger("ToStartGame");
     }
 
     private void OnLobbyLeft()
