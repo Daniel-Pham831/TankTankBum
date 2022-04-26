@@ -83,7 +83,7 @@ public class ClientInformation : MonoBehaviour
             NetUtility.C_JOIN -= this.OnClientReceivedJoinMessage;
             NetUtility.C_DISCONNECT -= this.OnClientReceivedDisconnectedMessage;
             NetUtility.C_SWITCHTEAM -= this.OnClientReceivedSwitchTeamMessage;
-            NetUtility.C_READY += this.OnClientReceivedReadyMessage;
+            NetUtility.C_READY -= this.OnClientReceivedReadyMessage;
             NetUtility.C_START -= this.OnClientReceivedStartGameMessage;
 
             Client.Singleton.OnClientDisconnect -= this.OnClientDisconnect;

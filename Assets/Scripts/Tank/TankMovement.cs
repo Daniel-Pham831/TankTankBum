@@ -6,6 +6,7 @@ using UnityEngine;
 public class TankMovement : MonoBehaviour
 {
     private Rigidbody rb;
+    private TNetwork tNetWork;
     private float horizontalInput;
     private float verticalInput;
     [SerializeField] private float moveSpeed = 10f;
@@ -13,36 +14,45 @@ public class TankMovement : MonoBehaviour
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        this.rb = GetComponent<Rigidbody>();
+        this.tNetWork = GetComponent<TNetwork>();
     }
 
     void Update()
     {
-        this.PlayerInput();
+        if (this.tNetWork.IsOwner)
+            this.PlayerInput();
     }
 
     private void FixedUpdate()
     {
-        this.Move();
-
+        if (this.tNetWork.IsOwner)
+            this.Move();
     }
 
     private void Move()
     {
-        rb.MovePosition(transform.position + transform.forward * verticalInput * moveSpeed * Time.fixedDeltaTime);
-        rb.MoveRotation(transform.rotation * Quaternion.Euler(Vector3.up * horizontalInput * rotationSpeed * Time.fixedDeltaTime));
+        Vector3 prePosition = rb.position;
+
+        this.rb.MovePosition(transform.position + transform.forward * this.verticalInput * this.moveSpeed * Time.fixedDeltaTime);
+        this.rb.MoveRotation(transform.rotation * Quaternion.Euler(Vector3.up * this.horizontalInput * this.rotationSpeed * Time.fixedDeltaTime));
+
+        if (Vector3.Distance(prePosition, rb.position) >= 0.01f)
+            Client.Singleton.SendToServer(new NetTMove(this.tNetWork.ID, this.rb.position, this.rb.rotation));
     }
 
     private void PlayerInput()
     {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
-        verticalInput = Input.GetAxisRaw("Vertical");
+        this.horizontalInput = Input.GetAxis("Horizontal");
+        this.verticalInput = Input.GetAxis("Vertical");
 
-        if (verticalInput != 0)
+        // Should self-made a smooth input here
+
+        if (this.verticalInput != 0)
         {
-            if (verticalInput < 0)
+            if (this.verticalInput < 0)
             {
-                horizontalInput *= -1;
+                this.horizontalInput *= -1;
             }
         }
     }

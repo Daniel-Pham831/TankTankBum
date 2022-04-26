@@ -11,12 +11,13 @@ public enum OpCode
     WELCOME = 5,
     READY = 6,
     SWITCHTEAM = 7,
-    START = 8
+    START = 8,
+    TMOVE = 9
 }
 
 public static class NetUtility
 {
-    // Net messages
+    // Net Lobby messages
     public static Action<NetMessage> C_KEEP_ALIVE;
     public static Action<NetMessage> C_SEND_NAME;
     public static Action<NetMessage> C_JOIN;
@@ -34,6 +35,11 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_SWITCHTEAM;
     public static Action<NetMessage, NetworkConnection> S_START;
 
+    // Net InGame messages
+    public static Action<NetMessage> C_TMOVE;
+    public static Action<NetMessage, NetworkConnection> S_TMOVE;
+
+
     public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
     {
         NetMessage msg = null;
@@ -44,6 +50,7 @@ public static class NetUtility
                 msg = new NetKeepAlive(ref streamReader);
                 break;
 
+            //Lobby
             case OpCode.SEND_NAME:
                 msg = new NetSendName(ref streamReader);
                 break;
@@ -70,6 +77,11 @@ public static class NetUtility
 
             case OpCode.START:
                 msg = new NetStartGame(ref streamReader);
+                break;
+
+            //InGame
+            case OpCode.TMOVE:
+                msg = new NetTMove(ref streamReader);
                 break;
 
             default:
