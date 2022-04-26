@@ -6,9 +6,10 @@ using UnityEngine;
 public class TankMovement : MonoBehaviour
 {
     private Rigidbody rb;
-    private Vector3 upDownDirection;
-    private float moveSpeed = 10f;
-    private float gravityValue = -9.81f;
+    private float horizontalInput;
+    private float verticalInput;
+    [SerializeField] private float moveSpeed = 10f;
+    [SerializeField] private float rotationSpeed = 90f;
 
     private void Awake()
     {
@@ -18,18 +19,31 @@ public class TankMovement : MonoBehaviour
     void Update()
     {
         this.PlayerInput();
+    }
+
+    private void FixedUpdate()
+    {
         this.Move();
+
     }
 
     private void Move()
     {
-
+        rb.MovePosition(transform.position + transform.forward * verticalInput * moveSpeed * Time.fixedDeltaTime);
+        rb.MoveRotation(transform.rotation * Quaternion.Euler(Vector3.up * horizontalInput * rotationSpeed * Time.fixedDeltaTime));
     }
 
     private void PlayerInput()
     {
-        float x = Input.GetAxisRaw("Horizontal");
-        float z = Input.GetAxisRaw("Vertical");
-        upDownDirection = new Vector3(0, 0, z);
+        horizontalInput = Input.GetAxisRaw("Horizontal");
+        verticalInput = Input.GetAxisRaw("Vertical");
+
+        if (verticalInput != 0)
+        {
+            if (verticalInput < 0)
+            {
+                horizontalInput *= -1;
+            }
+        }
     }
 }
