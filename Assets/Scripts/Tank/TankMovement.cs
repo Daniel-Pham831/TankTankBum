@@ -16,6 +16,10 @@ public class TankMovement : MonoBehaviour
     [SerializeField] private float moveSpeed = 10f;
     [SerializeField] private float rotationSpeed = 90f;
 
+
+    private float timeBetweenEachSend = 0.1f;
+    private float nextSendTime;
+
     private void Awake()
     {
         this.rb = GetComponent<Rigidbody>();
@@ -25,7 +29,19 @@ public class TankMovement : MonoBehaviour
     private void Start()
     {
         this.registerToEvent(true);
+        this.nextSendTime = Time.time + this.timeBetweenEachSend;
+
     }
+
+    private void Update()
+    {
+        if (Time.time >= this.nextSendTime)
+        {
+            this.nextSendTime = Time.time + this.timeBetweenEachSend;
+            Client.Singleton.SendToServer(new NetTTransform(localTankInfo.ID, rb.position, rb.rotation));
+        }
+    }
+
 
     void FixedUpdate()
     {

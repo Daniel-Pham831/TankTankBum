@@ -18,6 +18,7 @@ public class TankManager : MonoBehaviour
     public Dictionary<byte, GameObject> TankObjects { get; set; }
     public Dictionary<byte, Rigidbody> TankRigidbodies { get; set; }
 
+
     private void Awake()
     {
         Singleton = this;
@@ -30,6 +31,7 @@ public class TankManager : MonoBehaviour
     {
         this.registerToEvent(true);
     }
+
 
     #region Networking Functions
 
