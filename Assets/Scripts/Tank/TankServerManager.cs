@@ -14,12 +14,14 @@ public class TankServerManager : MonoBehaviour
 
     [SerializeField] private float tankMoveSpeed;
     [SerializeField] private float tankRotateSpeed;
+    public Dictionary<byte, Rigidbody> TankRigidbodies;
 
     private void Awake()
     {
         if (Singleton == null)
             Singleton = this;
 
+        this.TankRigidbodies = new Dictionary<byte, Rigidbody>();
         DontDestroyOnLoad(this.gameObject);
     }
 
@@ -32,6 +34,7 @@ public class TankServerManager : MonoBehaviour
     {
         this.registerToEvent(false);
     }
+
     #endregion
 
     #region Server Events Handling Functions
@@ -57,7 +60,7 @@ public class TankServerManager : MonoBehaviour
             Server needs to calculate the sentPlayer position,rotation and send it back to all players
         */
 
-        Rigidbody sentPlayerRigidbody = TankManager.Singleton.TankObjects[tankInputMessage.ID].GetComponent<Rigidbody>();
+        Rigidbody sentPlayerRigidbody = this.TankRigidbodies[tankInputMessage.ID].GetComponent<Rigidbody>();
 
         this.CalculateTankRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
 
@@ -80,5 +83,4 @@ public class TankServerManager : MonoBehaviour
     }
 
     #endregion
-
 }

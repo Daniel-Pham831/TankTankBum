@@ -16,11 +16,13 @@ public class TankManager : MonoBehaviour
 
     [HideInInspector]
     public Dictionary<byte, GameObject> TankObjects { get; set; }
+    public Dictionary<byte, Rigidbody> TankRigidbodies { get; set; }
 
     private void Awake()
     {
         Singleton = this;
         this.TankObjects = new Dictionary<byte, GameObject>();
+        this.TankRigidbodies = new Dictionary<byte, Rigidbody>();
         DontDestroyOnLoad(this.gameObject);
     }
     // Start is called before the first frame update
@@ -57,11 +59,17 @@ public class TankManager : MonoBehaviour
 
             this.SpawnTank(player.Id, player.Team, false, clientInformation.IsHost);
         }
+
+        if (clientInformation.IsHost)
+        {
+            TankServerManager.Singleton.TankRigidbodies = this.TankRigidbodies;
+        }
     }
 
     private void SpawnTank(byte id, Team team, bool isOwner, bool isHost)
     {
         GameObject tank = Instantiate(this.tankPrefab, this.spawnPositions[id].transform.position, Quaternion.identity);
+        Rigidbody tankRigid = tank.GetComponent<Rigidbody>();
         TankInformation tNetwork = tank.GetComponent<TankInformation>();
         tNetwork.ID = id;
         tNetwork.Team = team;
@@ -69,7 +77,10 @@ public class TankManager : MonoBehaviour
         tNetwork.IsHost = isHost;
         Debug.Log($"Tank spawned with ID:{tNetwork.ID}");
 
+
+
         this.TankObjects.Add(tNetwork.ID, tank);
+        this.TankRigidbodies.Add(tNetwork.ID, tankRigid);
     }
     #endregion
 }

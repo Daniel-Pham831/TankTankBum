@@ -27,21 +27,10 @@ public class TankMovement : MonoBehaviour
         this.registerToEvent(true);
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (this.localTankInfo.IsLocalPlayer)
             this.PlayerInput();
-    }
-
-    private void Move()
-    {
-        Vector3 prePosition = rb.position;
-
-        this.rb.MovePosition(transform.position + transform.forward * this.verticalInput * this.moveSpeed * Time.fixedDeltaTime);
-        this.rb.MoveRotation(transform.rotation * Quaternion.Euler(Vector3.up * this.horizontalInput * this.rotationSpeed * Time.fixedDeltaTime));
-
-        if (Vector3.Distance(prePosition, rb.position) >= 0.01f)
-            Client.Singleton.SendToServer(new NetTTransform(this.localTankInfo.ID, this.rb.position, this.rb.rotation));
     }
 
     private void PlayerInput()
@@ -85,10 +74,10 @@ public class TankMovement : MonoBehaviour
         this.Move(tMoveMessage.Position, tMoveMessage.Rotation);
     }
 
-    private void Move(Vector3 position, Quaternion Rotaion)
+    private void Move(Vector3 position, Quaternion rotation)
     {
-        transform.position = position;
-        transform.rotation = Rotaion;
+        this.rb.MovePosition(position);
+        this.rb.MoveRotation(rotation);
     }
 
 }
