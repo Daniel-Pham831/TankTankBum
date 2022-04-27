@@ -3,10 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+/*
+    This class is for handling tank movement
+*/
 public class TankMovement : MonoBehaviour
 {
     private Rigidbody rb;
-    private TNetwork tNetWork;
+    private TankInformation localTankInfo;
     private float horizontalInput;
     private float verticalInput;
     [SerializeField] private float moveSpeed = 10f;
@@ -15,19 +19,18 @@ public class TankMovement : MonoBehaviour
     private void Awake()
     {
         this.rb = GetComponent<Rigidbody>();
-        this.tNetWork = GetComponent<TNetwork>();
+        this.localTankInfo = GetComponent<TankInformation>();
+    }
+
+    private void Start()
+    {
+        this.registerToEvent(true);
     }
 
     void Update()
     {
-        if (this.tNetWork.IsOwner)
+        if (this.localTankInfo.IsLocalPlayer)
             this.PlayerInput();
-    }
-
-    private void FixedUpdate()
-    {
-        if (this.tNetWork.IsOwner)
-            this.Move();
     }
 
     private void Move()
@@ -38,7 +41,7 @@ public class TankMovement : MonoBehaviour
         this.rb.MoveRotation(transform.rotation * Quaternion.Euler(Vector3.up * this.horizontalInput * this.rotationSpeed * Time.fixedDeltaTime));
 
         if (Vector3.Distance(prePosition, rb.position) >= 0.01f)
-            Client.Singleton.SendToServer(new NetTMove(this.tNetWork.ID, this.rb.position, this.rb.rotation));
+            Client.Singleton.SendToServer(new NetTTransform(this.localTankInfo.ID, this.rb.position, this.rb.rotation));
     }
 
     private void PlayerInput()
@@ -55,5 +58,37 @@ public class TankMovement : MonoBehaviour
                 this.horizontalInput *= -1;
             }
         }
+
+        if (new Vector2(this.horizontalInput, this.verticalInput) != Vector2.zero)
+            Client.Singleton.SendToServer(new NetTInput(this.localTankInfo.ID, this.horizontalInput, this.verticalInput));
     }
+
+
+    private void registerToEvent(bool confirm)
+    {
+        if (confirm)
+        {
+            NetUtility.C_T_TRANSFORM += OnClientReceivedTMoveMessage;
+        }
+        else
+        {
+            NetUtility.C_T_TRANSFORM -= OnClientReceivedTMoveMessage;
+        }
+    }
+
+    private void OnClientReceivedTMoveMessage(NetMessage message)
+    {
+        NetTTransform tMoveMessage = message as NetTTransform;
+
+        if (localTankInfo.ID != tMoveMessage.ID) return;
+
+        this.Move(tMoveMessage.Position, tMoveMessage.Rotation);
+    }
+
+    private void Move(Vector3 position, Quaternion Rotaion)
+    {
+        transform.position = position;
+        transform.rotation = Rotaion;
+    }
+
 }

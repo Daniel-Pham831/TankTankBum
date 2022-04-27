@@ -4,16 +4,23 @@ using System.Collections.Generic;
 using Unity.Networking.Transport;
 using UnityEngine;
 
+
+/*
+    This class is for spawning and assign tank for each players in the game
+*/
 public class TankManager : MonoBehaviour
 {
     public static TankManager Singleton { get; private set; }
     [SerializeField] private GameObject tankPrefab;
     [SerializeField] private GameObject[] spawnPositions;
 
+    [HideInInspector]
+    public Dictionary<byte, GameObject> TankObjects { get; set; }
+
     private void Awake()
     {
         Singleton = this;
-
+        this.TankObjects = new Dictionary<byte, GameObject>();
         DontDestroyOnLoad(this.gameObject);
     }
     // Start is called before the first frame update
@@ -22,25 +29,18 @@ public class TankManager : MonoBehaviour
         this.registerToEvent(true);
     }
 
+    #region Networking Functions
+
     private void registerToEvent(bool confirm)
     {
         if (confirm)
         {
             ClientInformation.Singleton.StartGame += OnStartGame;
-
-            NetUtility.S_TMOVE += OnServerReceivedTMoveMessage;
         }
         else
         {
             ClientInformation.Singleton.StartGame -= OnStartGame;
-
-            NetUtility.S_TMOVE += OnServerReceivedTMoveMessage;
         }
-    }
-
-    private void OnServerReceivedTMoveMessage(NetMessage message, NetworkConnection sentPlayer)
-    {
-        Server.Singleton.BroadCastExcept(message, sentPlayer);
     }
 
     private void OnStartGame()
@@ -53,6 +53,8 @@ public class TankManager : MonoBehaviour
 
         foreach (Player player in otherPlayers)
         {
+            Debug.Log(player.Id);
+
             this.SpawnTank(player.Id, player.Team, false, clientInformation.IsHost);
         }
     }
@@ -60,10 +62,14 @@ public class TankManager : MonoBehaviour
     private void SpawnTank(byte id, Team team, bool isOwner, bool isHost)
     {
         GameObject tank = Instantiate(this.tankPrefab, this.spawnPositions[id].transform.position, Quaternion.identity);
-        TNetwork tNetwork = tank.GetComponent<TNetwork>();
+        TankInformation tNetwork = tank.GetComponent<TankInformation>();
         tNetwork.ID = id;
         tNetwork.Team = team;
-        tNetwork.IsOwner = isOwner;
+        tNetwork.IsLocalPlayer = isOwner;
         tNetwork.IsHost = isHost;
+        Debug.Log($"Tank spawned with ID:{tNetwork.ID}");
+
+        this.TankObjects.Add(tNetwork.ID, tank);
     }
+    #endregion
 }

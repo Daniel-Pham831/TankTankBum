@@ -12,7 +12,8 @@ public enum OpCode
     READY = 6,
     SWITCHTEAM = 7,
     START = 8,
-    TMOVE = 9
+    T_TRANSFORM = 9,
+    T_INPUT = 10
 }
 
 public static class NetUtility
@@ -36,8 +37,10 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_START;
 
     // Net InGame messages
-    public static Action<NetMessage> C_TMOVE;
-    public static Action<NetMessage, NetworkConnection> S_TMOVE;
+    public static Action<NetMessage> C_T_TRANSFORM;
+    public static Action<NetMessage> C_T_INPUT;
+    public static Action<NetMessage, NetworkConnection> S_T_TRANSFORM;
+    public static Action<NetMessage, NetworkConnection> S_T_INPUT;
 
 
     public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
@@ -80,8 +83,12 @@ public static class NetUtility
                 break;
 
             //InGame
-            case OpCode.TMOVE:
-                msg = new NetTMove(ref streamReader);
+            case OpCode.T_TRANSFORM:
+                msg = new NetTTransform(ref streamReader);
+                break;
+
+            case OpCode.T_INPUT:
+                msg = new NetTInput(ref streamReader);
                 break;
 
             default:

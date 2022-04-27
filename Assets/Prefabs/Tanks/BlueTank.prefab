@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3866152051523033756}
   - component: {fileID: 3925242709430383693}
   - component: {fileID: 1721853753}
-  - component: {fileID: 1721853754}
+  - component: {fileID: 4795330701480630357}
   m_Layer: 0
   m_Name: BlueTank
   m_TagString: Untagged
@@ -79,7 +79,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 10
   rotationSpeed: 90
---- !u!114 &1721853754
+--- !u!114 &4795330701480630357
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -88,12 +88,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 3866152051523033758}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87a6094b72307dd4abba9a6e36207110, type: 3}
+  m_Script: {fileID: 11500000, guid: 9ece068148eb48c47affed7d132c9133, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   ID: 0
-  team: 0
-  IsOwner: 1
+  Team: 0
+  IsLocalPlayer: 0
   IsHost: 0
 --- !u!1001 &3866152051897120747
 PrefabInstance:

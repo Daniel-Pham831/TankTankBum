@@ -3,23 +3,23 @@ using System.Collections.Generic;
 using Unity.Networking.Transport;
 using UnityEngine;
 
-public class NetTMove : NetMessage
+public class NetTTransform : NetMessage
 {
     public byte ID { get; set; }
     public Vector3 Position { get; set; }
     public Quaternion Rotation { get; set; }
 
-    public NetTMove(byte id, Vector3 position, Quaternion rotation)
+    public NetTTransform(byte id, Vector3 position, Quaternion rotation)
     {
-        this.Code = OpCode.TMOVE;
+        this.Code = OpCode.T_TRANSFORM;
         this.ID = id;
         this.Position = position;
         this.Rotation = rotation;
     }
 
-    public NetTMove(ref DataStreamReader reader)
+    public NetTTransform(ref DataStreamReader reader)
     {
-        this.Code = OpCode.TMOVE;
+        this.Code = OpCode.T_TRANSFORM;
         this.Deserialize(ref reader);
     }
 
@@ -57,13 +57,13 @@ public class NetTMove : NetMessage
     {
         base.ReceivedOnClient();
 
-        NetUtility.C_TMOVE?.Invoke(this);
+        NetUtility.C_T_TRANSFORM?.Invoke(this);
     }
 
     public override void ReceivedOnServer(NetworkConnection cnn)
     {
         base.ReceivedOnServer(cnn);
 
-        NetUtility.S_TMOVE?.Invoke(this, cnn);
+        NetUtility.S_T_TRANSFORM?.Invoke(this, cnn);
     }
 }
