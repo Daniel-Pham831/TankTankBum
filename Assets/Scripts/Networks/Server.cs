@@ -6,6 +6,10 @@ using UnityEngine;
 public class Server : MonoBehaviour
 {
     private readonly float keepAliveTickRate = 20f;
+    private NativeList<NetworkConnection> connections;
+    private bool isActive;
+    private bool isServerShutDown;
+    private float lastKeepAlive;
 
     public static Server Singleton { get; private set; }
 
@@ -14,11 +18,6 @@ public class Server : MonoBehaviour
     public Action OnServerDisconnect { get; set; }
 
     public NetworkDriver Driver { get; set; }
-
-    private NativeList<NetworkConnection> connections;
-    private bool isActive;
-    private bool isServerShutDown;
-    private float lastKeepAlive;
 
     private void Awake()
     {
@@ -57,7 +56,7 @@ public class Server : MonoBehaviour
         // Init server information
         if (ServerInformation.Singleton == null)
         {
-            ServerInformation serverInfomation = new();
+            _ = new ServerInformation();
         }
     }
 
@@ -128,7 +127,7 @@ public class Server : MonoBehaviour
     private void AcceptNewConnections()
     {
         NetworkConnection c;
-        while ((c = Driver.Accept()) != default(NetworkConnection))
+        while ((c = Driver.Accept()) != default)
         {
             connections.Add(c);
         }
@@ -152,7 +151,7 @@ public class Server : MonoBehaviour
                         BroadCast(new NetDisconnect((byte)connections[i].InternalId));
                         OnClientDisconnected?.Invoke((byte)connections[i].InternalId);
 
-                        connections[i] = default(NetworkConnection);
+                        connections[i] = default;
                         break;
                 }
             }
