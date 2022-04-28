@@ -84,7 +84,7 @@ public class TankServerManager : MonoBehaviour
 
         Rigidbody sentPlayerRigidbody = TankRigidbodies[tankInputMessage.ID].GetComponent<Rigidbody>();
 
-        CalculateTankRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
+        MoveSentPlayerRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
 
         Server.Singleton.BroadCast(new NetTTransform(tankInputMessage.ID, sentPlayerRigidbody.position, sentPlayerRigidbody.rotation));
     }
@@ -92,8 +92,9 @@ public class TankServerManager : MonoBehaviour
     #endregion
 
     #region Calculating Functions
-    private void CalculateTankRigidBodyBasedOnInput(ref Rigidbody rb, float horizontalInput, float verticalInput)
+    private void MoveSentPlayerRigidBodyBasedOnInput(ref Rigidbody rb, float horizontalInput, float verticalInput)
     {
+        // should refactor this MovePosition and MoveRotation into rb.AddForce
         rb.MovePosition(rb.transform.position + rb.transform.forward * verticalInput * tankMoveSpeed * Time.fixedDeltaTime);
         rb.MoveRotation(rb.transform.rotation * Quaternion.Euler(Vector3.up * horizontalInput * tankRotateSpeed * Time.fixedDeltaTime));
     }
