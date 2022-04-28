@@ -172,7 +172,7 @@ public class Server : MonoBehaviour
         {
             if (connections[i].IsCreated)
             {
-                Debug.Log($"Sending {msg.Code} to: {connections[i].InternalId}");
+                Debug.Log($"Server sent {msg.Code} to: {connections[i].InternalId}");
                 SendToClient(connections[i], msg);
             }
         }
@@ -184,7 +184,7 @@ public class Server : MonoBehaviour
         {
             if (connections[i].IsCreated && connections[i] != exceptClient)
             {
-                Debug.Log($"Sending {msg.Code} to: {connections[i].InternalId}");
+                Debug.Log($"Server sent {msg.Code} to: {connections[i].InternalId}");
                 SendToClient(connections[i], msg);
             }
         }

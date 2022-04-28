@@ -16,6 +16,10 @@ public class TankServerManager : MonoBehaviour
     [SerializeField] private float tankRotateSpeed;
     public Dictionary<byte, Rigidbody> TankRigidbodies;
 
+    private float timeBetweenEachSend = 0.1f;
+    private float nextSendTime;
+
+
     private void Awake()
     {
         if (Singleton == null)
@@ -30,9 +34,29 @@ public class TankServerManager : MonoBehaviour
         registerToEvent(true);
     }
 
-    private void OnDestroy()
+    private void Update()
     {
-        registerToEvent(false);
+        if (IsSendable())
+            SendTransformToAll();
+    }
+
+    private bool IsSendable()
+    {
+        if (Time.time >= nextSendTime)
+        {
+            nextSendTime = Time.time + timeBetweenEachSend;
+            return true;
+        }
+
+        return false;
+    }
+
+    private void SendTransformToAll()
+    {
+        foreach (byte id in TankRigidbodies.Keys)
+        {
+            Server.Singleton.BroadCast(new NetTTransform(id, TankRigidbodies[id].position, TankRigidbodies[id].rotation));
+        }
     }
 
     #endregion
@@ -43,12 +67,10 @@ public class TankServerManager : MonoBehaviour
         if (confirm)
         {
             NetUtility.S_T_INPUT += OnServerReceivedTInputMessage;
-            NetUtility.S_T_TRANSFORM += OnServerReceivedTMoveMessage;
         }
         else
         {
             NetUtility.S_T_INPUT -= OnServerReceivedTInputMessage;
-            NetUtility.S_T_TRANSFORM -= OnServerReceivedTMoveMessage;
         }
     }
 
@@ -66,12 +88,6 @@ public class TankServerManager : MonoBehaviour
 
         Server.Singleton.BroadCast(new NetTTransform(tankInputMessage.ID, sentPlayerRigidbody.position, sentPlayerRigidbody.rotation));
     }
-
-    private void OnServerReceivedTMoveMessage(NetMessage message, NetworkConnection sentPlayer)
-    {
-        Server.Singleton.BroadCastExcept(message, sentPlayer);
-    }
-
 
     #endregion
 

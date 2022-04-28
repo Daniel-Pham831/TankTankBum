@@ -57,8 +57,6 @@ public class TankManager : MonoBehaviour
 
         foreach (Player player in otherPlayers)
         {
-            Debug.Log(player.Id);
-
             SpawnTank(player.Id, player.Team, false, clientInformation.IsHost);
         }
 
@@ -78,7 +76,6 @@ public class TankManager : MonoBehaviour
         tNetwork.IsLocalPlayer = isOwner;
         tNetwork.IsHost = isHost;
         Debug.Log($"Tank spawned with ID:{tNetwork.ID}");
-
 
 
         TankObjects.Add(tNetwork.ID, tank);

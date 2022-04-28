@@ -30,11 +30,6 @@ public class MainMenuUI : MonoBehaviour
         registerToEvent(true);
     }
 
-    private void OnDestroy()
-    {
-        registerToEvent(false);
-    }
-
     private void registerToEvent(bool confirm)
     {
         if (confirm)

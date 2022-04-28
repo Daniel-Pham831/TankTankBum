@@ -9,39 +9,20 @@ using UnityEngine;
 */
 public class TankMovement : MonoBehaviour
 {
-    private Rigidbody rb;
+    private Rigidbody localRb;
     private TankInformation localTankInfo;
-    private float horizontalInput;
-    private float verticalInput;
-    [SerializeField] private float moveSpeed = 10f;
-    [SerializeField] private float rotationSpeed = 90f;
-
-
-    private float timeBetweenEachSend = 0.1f;
-    private float nextSendTime;
 
     private void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        localRb = GetComponent<Rigidbody>();
         localTankInfo = GetComponent<TankInformation>();
     }
 
     private void Start()
     {
         registerToEvent(true);
-        nextSendTime = Time.time + timeBetweenEachSend;
 
     }
-
-    private void Update()
-    {
-        if (Time.time >= nextSendTime)
-        {
-            nextSendTime = Time.time + timeBetweenEachSend;
-            Client.Singleton.SendToServer(new NetTTransform(localTankInfo.ID, rb.position, rb.rotation));
-        }
-    }
-
 
     void FixedUpdate()
     {
@@ -51,10 +32,8 @@ public class TankMovement : MonoBehaviour
 
     private void PlayerInput()
     {
-        horizontalInput = Input.GetAxis("Horizontal");
-        verticalInput = Input.GetAxis("Vertical");
-
-        // Should self-made a smooth input here
+        float horizontalInput = Input.GetAxis("Horizontal");
+        float verticalInput = Input.GetAxis("Vertical");
 
         if (verticalInput != 0)
         {
@@ -83,17 +62,17 @@ public class TankMovement : MonoBehaviour
 
     private void OnClientReceivedTMoveMessage(NetMessage message)
     {
-        NetTTransform tMoveMessage = message as NetTTransform;
+        NetTTransform tTransformMessage = message as NetTTransform;
 
-        if (localTankInfo.ID != tMoveMessage.ID) return;
+        if (localTankInfo.ID != tTransformMessage.ID) return;
 
-        Move(tMoveMessage.Position, tMoveMessage.Rotation);
+        Debug.Log("Client received nettransform");
+        Move(tTransformMessage.Position, tTransformMessage.Rotation);
     }
 
     private void Move(Vector3 position, Quaternion rotation)
     {
-        rb.MovePosition(position);
-        rb.MoveRotation(rotation);
+        localRb.MovePosition(position);
+        localRb.MoveRotation(rotation);
     }
-
 }

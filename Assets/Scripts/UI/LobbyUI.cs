@@ -39,12 +39,6 @@ public class LobbyUI : MonoBehaviour
         GenerateAllSlots();
     }
 
-    private void OnDestroy()
-    {
-        Singleton = null;
-        //   registerToEvent(false);
-    }
-
     private void registerToEvent(bool confirm)
     {
         if (confirm)
@@ -106,18 +100,13 @@ public class LobbyUI : MonoBehaviour
             if (!Player.HaveAllPlayersReadied(ClientInformation.Singleton.PlayerList))
             {
                 // Pop up a READY error box indicating that can only start when all players are ready
-                Debug.Log("There are still players who haven't readied yet");
                 lobbyAnimator.SetTrigger("IntoLobbyReadyError");
                 return;
             }
 
-            Debug.Log($"Blue:{Player.CountTeamPlayer(ServerInformation.Singleton.PlayerList, Team.Blue)}");
-            Debug.Log($"Red:{Player.CountTeamPlayer(ServerInformation.Singleton.PlayerList, Team.Red)}");
-
             if (!Player.Have2TeamsEqual(ServerInformation.Singleton.PlayerList))
             {
                 // Pop up a TEAM error box indicating that can only start when all players are ready
-                Debug.Log("2 teams are not equal");
                 lobbyAnimator.SetTrigger("IntoLobbyTeamError");
                 return;
             }

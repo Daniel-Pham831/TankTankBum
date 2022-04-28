@@ -55,13 +55,6 @@ public class ClientInformation : MonoBehaviour
         registerToEvent(true);
     }
 
-    private void OnDestroy()
-    {
-        Singleton = null;
-        registerToEvent(false);
-
-    }
-
     private void registerToEvent(bool confirm)
     {
         if (confirm)
@@ -126,7 +119,6 @@ public class ClientInformation : MonoBehaviour
             PlayerList.Add(sentPlayer);
             OnPlayerSwitchTeam?.Invoke(sentPlayer.SlotIndex);
         }
-        Debug.Log($"Received Switch Team for player {sentPlayer.Name}");
     }
 
     private void OnClientDisconnect()

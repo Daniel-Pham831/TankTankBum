@@ -117,11 +117,6 @@ public class Slot : MonoBehaviour
         ResetSlot();
     }
 
-    private void OnDestroy()
-    {
-        //  registerToEvent(false);
-    }
-
     private void registerToEvent(bool confirm)
     {
         if (confirm)
