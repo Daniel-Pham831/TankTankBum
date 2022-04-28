@@ -13,6 +13,12 @@ public class TankMovement : MonoBehaviour
     private Rigidbody localRb;
     private TankInformation localTankInfo;
 
+    private Vector2 currentInputVector;
+    private Vector2 smoothInputVelocity;
+
+    [SerializeField] private float smoothInputSpeed = .1f;
+
+
     private void Awake()
     {
         localRb = GetComponent<Rigidbody>();
@@ -35,26 +41,24 @@ public class TankMovement : MonoBehaviour
     private void TankInput()
     {
         Vector2 inputVector = inputsystem.Tank.Movement.ReadValue<Vector2>();
-        float horizontalInput = inputVector.x;
-        float verticalInput = inputVector.y;
 
-        //need to smooth here
-
-        if (verticalInput != 0)
+        if (inputVector.y != 0)
         {
-            if (verticalInput < 0)
+            if (inputVector.y < 0)
             {
-                horizontalInput *= -1;
+                inputVector.x *= -1;
             }
         }
         else
         {
             // If the player is NOT pressing down on the verticalInputs(W,S) then that means no rotation for the player
-            horizontalInput = 0;
+            inputVector.x = 0;
         }
 
-        if (new Vector2(horizontalInput, verticalInput) != Vector2.zero)
-            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, horizontalInput, verticalInput));
+        currentInputVector = Vector2.SmoothDamp(currentInputVector, inputVector, ref smoothInputVelocity, smoothInputSpeed);
+
+        if (currentInputVector != Vector2.zero)
+            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentInputVector.x, currentInputVector.y));
     }
 
 

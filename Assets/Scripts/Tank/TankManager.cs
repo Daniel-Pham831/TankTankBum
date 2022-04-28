@@ -16,7 +16,6 @@ public class TankManager : MonoBehaviour
     [SerializeField] private Material redTankMaterial;
     [SerializeField] private GameObject[] spawnPositions;
 
-    [HideInInspector]
     public Dictionary<byte, GameObject> TankObjects { get; set; }
     public Dictionary<byte, Rigidbody> TankRigidbodies { get; set; }
 
@@ -26,6 +25,7 @@ public class TankManager : MonoBehaviour
         Singleton = this;
         TankObjects = new Dictionary<byte, GameObject>();
         TankRigidbodies = new Dictionary<byte, Rigidbody>();
+
         DontDestroyOnLoad(gameObject);
     }
     // Start is called before the first frame update

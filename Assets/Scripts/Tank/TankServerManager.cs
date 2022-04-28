@@ -14,11 +14,11 @@ public class TankServerManager : MonoBehaviour
 
     [SerializeField] private float tankMoveSpeed;
     [SerializeField] private float tankRotateSpeed;
-    public Dictionary<byte, Rigidbody> TankRigidbodies;
 
     private float timeBetweenEachSend = 0.1f;
     private float nextSendTime;
 
+    public Dictionary<byte, Rigidbody> TankRigidbodies;
 
     private void Awake()
     {
