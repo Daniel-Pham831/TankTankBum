@@ -42,6 +42,11 @@ public class TankMovement : MonoBehaviour
                 horizontalInput *= -1;
             }
         }
+        else
+        {
+            // If the player is NOT pressing down on the verticalInputs(W,S) then that means no rotation for the player
+            horizontalInput = 0;
+        }
 
         if (new Vector2(horizontalInput, verticalInput) != Vector2.zero)
             Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, horizontalInput, verticalInput));
