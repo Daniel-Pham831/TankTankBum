@@ -12,6 +12,8 @@ public class TankManager : MonoBehaviour
 {
     public static TankManager Singleton { get; private set; }
     [SerializeField] private GameObject tankPrefab;
+    [SerializeField] private Material blueTankMaterial;
+    [SerializeField] private Material redTankMaterial;
     [SerializeField] private GameObject[] spawnPositions;
 
     [HideInInspector]
@@ -69,6 +71,7 @@ public class TankManager : MonoBehaviour
     private void SpawnTank(byte id, Team team, bool isOwner, bool isHost)
     {
         GameObject tank = Instantiate(tankPrefab, spawnPositions[id].transform.position, Quaternion.identity);
+        SetTankColorBasedOnTeam(tank, team);
         Rigidbody tankRigid = tank.GetComponent<Rigidbody>();
         TankInformation tNetwork = tank.GetComponent<TankInformation>();
         tNetwork.ID = id;
@@ -80,6 +83,15 @@ public class TankManager : MonoBehaviour
 
         TankObjects.Add(tNetwork.ID, tank);
         TankRigidbodies.Add(tNetwork.ID, tankRigid);
+    }
+
+    private void SetTankColorBasedOnTeam(GameObject tank, Team team)
+    {
+        MeshRenderer[] meshRenderers = tank.GetComponentsInChildren<MeshRenderer>();
+        foreach (MeshRenderer meshRenderer in meshRenderers)
+        {
+            meshRenderer.material = team == Team.Blue ? blueTankMaterial : redTankMaterial;
+        }
     }
     #endregion
 }

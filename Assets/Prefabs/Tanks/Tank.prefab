@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1721853753}
   - component: {fileID: 4795330701480630357}
   m_Layer: 0
-  m_Name: BlueTank
+  m_Name: Tank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -100,6 +100,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 3866152051523033755}
     m_Modifications:
+    - target: {fileID: 242027601945640022, guid: a30540c41d7d5ed4281d72b4916afb5e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 20864b7111161e8448cc8fecd46791dc, type: 2}
+    - target: {fileID: 527779649955167570, guid: a30540c41d7d5ed4281d72b4916afb5e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 20864b7111161e8448cc8fecd46791dc, type: 2}
     - target: {fileID: 672221882971161554, guid: a30540c41d7d5ed4281d72b4916afb5e, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -168,6 +176,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5065426722072556278, guid: a30540c41d7d5ed4281d72b4916afb5e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 20864b7111161e8448cc8fecd46791dc, type: 2}
+    - target: {fileID: 5870523217571369618, guid: a30540c41d7d5ed4281d72b4916afb5e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 20864b7111161e8448cc8fecd46791dc, type: 2}
+    - target: {fileID: 7479840771013675249, guid: a30540c41d7d5ed4281d72b4916afb5e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 20864b7111161e8448cc8fecd46791dc, type: 2}
+    - target: {fileID: 8808128122493214712, guid: a30540c41d7d5ed4281d72b4916afb5e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 20864b7111161e8448cc8fecd46791dc, type: 2}
+    - target: {fileID: 9063836892173350887, guid: a30540c41d7d5ed4281d72b4916afb5e, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 20864b7111161e8448cc8fecd46791dc, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a30540c41d7d5ed4281d72b4916afb5e, type: 3}
 --- !u!4 &4391962857504519225 stripped
