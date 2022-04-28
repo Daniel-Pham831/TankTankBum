@@ -9,6 +9,7 @@ using UnityEngine;
 */
 public class TankMovement : MonoBehaviour
 {
+    private InputSystem inputsystem;
     private Rigidbody localRb;
     private TankInformation localTankInfo;
 
@@ -16,24 +17,28 @@ public class TankMovement : MonoBehaviour
     {
         localRb = GetComponent<Rigidbody>();
         localTankInfo = GetComponent<TankInformation>();
+        inputsystem = new InputSystem();
+        inputsystem.Tank.Enable();
     }
 
     private void Start()
     {
         registerToEvent(true);
-
     }
 
     void FixedUpdate()
     {
         if (localTankInfo.IsLocalPlayer)
-            PlayerInput();
+            TankInput();
     }
 
-    private void PlayerInput()
+    private void TankInput()
     {
-        float horizontalInput = Input.GetAxis("Horizontal");
-        float verticalInput = Input.GetAxis("Vertical");
+        Vector2 inputVector = inputsystem.Tank.Movement.ReadValue<Vector2>();
+        float horizontalInput = inputVector.x;
+        float verticalInput = inputVector.y;
+
+        //need to smooth here
 
         if (verticalInput != 0)
         {

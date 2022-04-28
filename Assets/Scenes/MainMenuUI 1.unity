@@ -6361,4 +6361,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tankMoveSpeed: 10
-  tankRotateSpeed: 90
+  tankRotateSpeed: 135
