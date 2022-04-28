@@ -43,7 +43,7 @@ public class Client : MonoBehaviour
 
         RegisterToEvent();
 
-        playerName = playerName != "" ? playerName : "I forgot to name myself";
+        this.playerName = playerName != "" ? playerName : "I forgot to name myself";
     }
 
     private void ClientReset()
@@ -118,8 +118,7 @@ public class Client : MonoBehaviour
 
     public void SendToServer(NetMessage msg)
     {
-        DataStreamWriter writer;
-        driver.BeginSend(connection, out writer);
+        driver.BeginSend(connection, out DataStreamWriter writer);
         msg.Serialize(ref writer);
         driver.EndSend(writer);
     }
