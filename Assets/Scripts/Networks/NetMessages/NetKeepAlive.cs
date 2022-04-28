@@ -4,13 +4,13 @@ public class NetKeepAlive : NetMessage
 {
     public NetKeepAlive()
     {
-        this.Code = OpCode.KEEP_ALIVE;
+        Code = OpCode.KEEP_ALIVE;
     }
 
     public NetKeepAlive(ref DataStreamReader reader)
     {
-        this.Code = OpCode.KEEP_ALIVE;
-        this.Deserialize(ref reader);
+        Code = OpCode.KEEP_ALIVE;
+        Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)

@@ -21,18 +21,18 @@ public class TankServerManager : MonoBehaviour
         if (Singleton == null)
             Singleton = this;
 
-        this.TankRigidbodies = new Dictionary<byte, Rigidbody>();
-        DontDestroyOnLoad(this.gameObject);
+        TankRigidbodies = new Dictionary<byte, Rigidbody>();
+        DontDestroyOnLoad(gameObject);
     }
 
     void Start()
     {
-        this.registerToEvent(true);
+        registerToEvent(true);
     }
 
     private void OnDestroy()
     {
-        this.registerToEvent(false);
+        registerToEvent(false);
     }
 
     #endregion
@@ -42,13 +42,13 @@ public class TankServerManager : MonoBehaviour
     {
         if (confirm)
         {
-            NetUtility.S_T_INPUT += this.OnServerReceivedTInputMessage;
-            NetUtility.S_T_TRANSFORM += this.OnServerReceivedTMoveMessage;
+            NetUtility.S_T_INPUT += OnServerReceivedTInputMessage;
+            NetUtility.S_T_TRANSFORM += OnServerReceivedTMoveMessage;
         }
         else
         {
-            NetUtility.S_T_INPUT -= this.OnServerReceivedTInputMessage;
-            NetUtility.S_T_TRANSFORM -= this.OnServerReceivedTMoveMessage;
+            NetUtility.S_T_INPUT -= OnServerReceivedTInputMessage;
+            NetUtility.S_T_TRANSFORM -= OnServerReceivedTMoveMessage;
         }
     }
 
@@ -60,9 +60,9 @@ public class TankServerManager : MonoBehaviour
             Server needs to calculate the sentPlayer position,rotation and send it back to all players
         */
 
-        Rigidbody sentPlayerRigidbody = this.TankRigidbodies[tankInputMessage.ID].GetComponent<Rigidbody>();
+        Rigidbody sentPlayerRigidbody = TankRigidbodies[tankInputMessage.ID].GetComponent<Rigidbody>();
 
-        this.CalculateTankRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
+        CalculateTankRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
 
         Server.Singleton.BroadCast(new NetTTransform(tankInputMessage.ID, sentPlayerRigidbody.position, sentPlayerRigidbody.rotation));
     }

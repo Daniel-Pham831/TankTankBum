@@ -22,22 +22,22 @@ public class TankMovement : MonoBehaviour
 
     private void Awake()
     {
-        this.rb = GetComponent<Rigidbody>();
-        this.localTankInfo = GetComponent<TankInformation>();
+        rb = GetComponent<Rigidbody>();
+        localTankInfo = GetComponent<TankInformation>();
     }
 
     private void Start()
     {
-        this.registerToEvent(true);
-        this.nextSendTime = Time.time + this.timeBetweenEachSend;
+        registerToEvent(true);
+        nextSendTime = Time.time + timeBetweenEachSend;
 
     }
 
     private void Update()
     {
-        if (Time.time >= this.nextSendTime)
+        if (Time.time >= nextSendTime)
         {
-            this.nextSendTime = Time.time + this.timeBetweenEachSend;
+            nextSendTime = Time.time + timeBetweenEachSend;
             Client.Singleton.SendToServer(new NetTTransform(localTankInfo.ID, rb.position, rb.rotation));
         }
     }
@@ -45,27 +45,27 @@ public class TankMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (this.localTankInfo.IsLocalPlayer)
-            this.PlayerInput();
+        if (localTankInfo.IsLocalPlayer)
+            PlayerInput();
     }
 
     private void PlayerInput()
     {
-        this.horizontalInput = Input.GetAxis("Horizontal");
-        this.verticalInput = Input.GetAxis("Vertical");
+        horizontalInput = Input.GetAxis("Horizontal");
+        verticalInput = Input.GetAxis("Vertical");
 
         // Should self-made a smooth input here
 
-        if (this.verticalInput != 0)
+        if (verticalInput != 0)
         {
-            if (this.verticalInput < 0)
+            if (verticalInput < 0)
             {
-                this.horizontalInput *= -1;
+                horizontalInput *= -1;
             }
         }
 
-        if (new Vector2(this.horizontalInput, this.verticalInput) != Vector2.zero)
-            Client.Singleton.SendToServer(new NetTInput(this.localTankInfo.ID, this.horizontalInput, this.verticalInput));
+        if (new Vector2(horizontalInput, verticalInput) != Vector2.zero)
+            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, horizontalInput, verticalInput));
     }
 
 
@@ -87,13 +87,13 @@ public class TankMovement : MonoBehaviour
 
         if (localTankInfo.ID != tMoveMessage.ID) return;
 
-        this.Move(tMoveMessage.Position, tMoveMessage.Rotation);
+        Move(tMoveMessage.Position, tMoveMessage.Rotation);
     }
 
     private void Move(Vector3 position, Quaternion rotation)
     {
-        this.rb.MovePosition(position);
-        this.rb.MoveRotation(rotation);
+        rb.MovePosition(position);
+        rb.MoveRotation(rotation);
     }
 
 }

@@ -25,14 +25,14 @@ public class MainMenuUI : MonoBehaviour
 
     private void Start()
     {
-        this.mainMenuAnimator = GetComponent<Animator>();
+        mainMenuAnimator = GetComponent<Animator>();
 
-        this.registerToEvent(true);
+        registerToEvent(true);
     }
 
     private void OnDestroy()
     {
-        this.registerToEvent(false);
+        registerToEvent(false);
     }
 
     private void registerToEvent(bool confirm)
@@ -51,17 +51,17 @@ public class MainMenuUI : MonoBehaviour
 
     private void StartGame()
     {
-        this.mainMenuAnimator.SetTrigger("ToStartGame");
+        mainMenuAnimator.SetTrigger("ToStartGame");
     }
 
     private void OnLobbyLeft()
     {
-        this.mainMenuAnimator.SetTrigger("ToOnlineSettingMenu");
+        mainMenuAnimator.SetTrigger("ToOnlineSettingMenu");
     }
 
     public void OnOnlineBtn()
     {
-        this.mainMenuAnimator.SetTrigger("ToHostJoinMenu");
+        mainMenuAnimator.SetTrigger("ToHostJoinMenu");
     }
 
     public void OnSettingBtn()
@@ -76,24 +76,24 @@ public class MainMenuUI : MonoBehaviour
     public void OnHostBtn()
     {
         server.Init(8007, 10); //This need to change (Stop hard-coded)
-        client.Init("127.0.0.1", 8007, this.GetPlayerName);
+        client.Init("127.0.0.1", 8007, GetPlayerName);
 
-        this.OnHostOrJoinRoom?.Invoke(this.GetPlayerName);
-        this.mainMenuAnimator.SetTrigger("ToLobbyMenu");
+        OnHostOrJoinRoom?.Invoke(GetPlayerName);
+        mainMenuAnimator.SetTrigger("ToLobbyMenu");
     }
 
     public void OnJoinBtn()
     {
-        this.mainMenuAnimator.SetTrigger("ToConnectMenu");
+        mainMenuAnimator.SetTrigger("ToConnectMenu");
     }
 
     public void OnConnectBtn()
     {
-        client.Init("127.0.0.1", 8007, this.GetPlayerName);
-        this.OnHostOrJoinRoom?.Invoke(this.GetPlayerName);
+        client.Init("127.0.0.1", 8007, GetPlayerName);
+        OnHostOrJoinRoom?.Invoke(GetPlayerName);
 
-        this.mainMenuAnimator.SetTrigger("ToLobbyMenu");
+        mainMenuAnimator.SetTrigger("ToLobbyMenu");
     }
 
-    private string GetPlayerName => this.nameInputField.text != "" ? this.nameInputField.text : "I forgot to name myself";
+    private string GetPlayerName => nameInputField.text != "" ? nameInputField.text : "I forgot to name myself";
 }

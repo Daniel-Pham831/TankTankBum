@@ -22,14 +22,14 @@ public class TankManager : MonoBehaviour
     private void Awake()
     {
         Singleton = this;
-        this.TankObjects = new Dictionary<byte, GameObject>();
-        this.TankRigidbodies = new Dictionary<byte, Rigidbody>();
-        DontDestroyOnLoad(this.gameObject);
+        TankObjects = new Dictionary<byte, GameObject>();
+        TankRigidbodies = new Dictionary<byte, Rigidbody>();
+        DontDestroyOnLoad(gameObject);
     }
     // Start is called before the first frame update
     void Start()
     {
-        this.registerToEvent(true);
+        registerToEvent(true);
     }
 
 
@@ -53,24 +53,24 @@ public class TankManager : MonoBehaviour
         Player myPlayer = clientInformation.MyPlayerInformation;
         List<Player> otherPlayers = clientInformation.PlayerList;
 
-        this.SpawnTank(myPlayer.Id, myPlayer.Team, true, clientInformation.IsHost);
+        SpawnTank(myPlayer.Id, myPlayer.Team, true, clientInformation.IsHost);
 
         foreach (Player player in otherPlayers)
         {
             Debug.Log(player.Id);
 
-            this.SpawnTank(player.Id, player.Team, false, clientInformation.IsHost);
+            SpawnTank(player.Id, player.Team, false, clientInformation.IsHost);
         }
 
         if (clientInformation.IsHost)
         {
-            TankServerManager.Singleton.TankRigidbodies = this.TankRigidbodies;
+            TankServerManager.Singleton.TankRigidbodies = TankRigidbodies;
         }
     }
 
     private void SpawnTank(byte id, Team team, bool isOwner, bool isHost)
     {
-        GameObject tank = Instantiate(this.tankPrefab, this.spawnPositions[id].transform.position, Quaternion.identity);
+        GameObject tank = Instantiate(tankPrefab, spawnPositions[id].transform.position, Quaternion.identity);
         Rigidbody tankRigid = tank.GetComponent<Rigidbody>();
         TankInformation tNetwork = tank.GetComponent<TankInformation>();
         tNetwork.ID = id;
@@ -81,8 +81,8 @@ public class TankManager : MonoBehaviour
 
 
 
-        this.TankObjects.Add(tNetwork.ID, tank);
-        this.TankRigidbodies.Add(tNetwork.ID, tankRigid);
+        TankObjects.Add(tNetwork.ID, tank);
+        TankRigidbodies.Add(tNetwork.ID, tankRigid);
     }
     #endregion
 }

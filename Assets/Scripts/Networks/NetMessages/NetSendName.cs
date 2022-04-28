@@ -6,26 +6,26 @@ public class NetSendName : NetMessage
 
     public NetSendName(string name)
     {
-        this.Code = OpCode.SEND_NAME;
-        this.Name = name;
+        Code = OpCode.SEND_NAME;
+        Name = name;
     }
 
     public NetSendName(ref DataStreamReader reader)
     {
-        this.Code = OpCode.SEND_NAME;
-        this.Deserialize(ref reader);
+        Code = OpCode.SEND_NAME;
+        Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)
     {
         base.Serialize(ref writer);
 
-        writer.WriteFixedString32(this.Name);
+        writer.WriteFixedString32(Name);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        this.Name = reader.ReadFixedString32().ToString();
+        Name = reader.ReadFixedString32().ToString();
     }
 
     public override void ReceivedOnClient()

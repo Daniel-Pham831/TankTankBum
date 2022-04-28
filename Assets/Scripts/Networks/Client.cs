@@ -12,7 +12,7 @@ public class Client : MonoBehaviour
     {
         Singleton = this;
 
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 
     public NetworkDriver driver;
@@ -27,67 +27,67 @@ public class Client : MonoBehaviour
     // Methods
     public void Init(string ip, ushort port, string playerName)
     {
-        if (this.isActive)
+        if (isActive)
         {
-            this.ClientReset();
+            ClientReset();
         }
 
-        this.driver = NetworkDriver.Create();
+        driver = NetworkDriver.Create();
         NetworkEndPoint endPoint = NetworkEndPoint.Parse(ip, port);
 
-        this.connection = this.driver.Connect(endPoint);
+        connection = driver.Connect(endPoint);
 
         Debug.Log($"Attemping to connect to Server on {endPoint.Address}");
 
-        this.isActive = true;
-        this.isClientShutDown = false;
+        isActive = true;
+        isClientShutDown = false;
 
-        this.RegisterToEvent();
+        RegisterToEvent();
 
-        this.playerName = playerName != "" ? playerName : "I forgot to name myself";
+        playerName = playerName != "" ? playerName : "I forgot to name myself";
     }
 
     private void ClientReset()
     {
-        this.driver.Dispose();
-        this.connection = default(NetworkConnection);
-        this.isActive = false;
-        this.UnregisterToEvent();
-        this.isClientShutDown = true;
+        driver.Dispose();
+        connection = default(NetworkConnection);
+        isActive = false;
+        UnregisterToEvent();
+        isClientShutDown = true;
     }
 
     public void Shutdown()
     {
-        if (this.isActive)
+        if (isActive)
         {
-            this.connection.Disconnect(this.driver);
-            this.OnClientDisconnect?.Invoke();
+            connection.Disconnect(driver);
+            OnClientDisconnect?.Invoke();
         }
     }
     // public void OnDestroy()
     // {
-    //     this.Shutdown();
+    //     Shutdown();
     // }
 
 
     public void Update()
     {
-        if (!this.isActive) return;
+        if (!isActive) return;
 
-        this.driver.ScheduleUpdate().Complete();
-        this.CheckAlive();
-        this.UpdateMessagePump();
+        driver.ScheduleUpdate().Complete();
+        CheckAlive();
+        UpdateMessagePump();
 
-        if (this.isClientShutDown)
-            this.ClientReset();
+        if (isClientShutDown)
+            ClientReset();
     }
 
     private void CheckAlive()
     {
-        if (!this.connection.IsCreated && this.isActive)
+        if (!connection.IsCreated && isActive)
         {
             Debug.Log("Something went wrong, lost connection to server!");
-            this.Shutdown();
+            Shutdown();
         }
     }
 
@@ -96,12 +96,12 @@ public class Client : MonoBehaviour
         DataStreamReader streamReader;
         NetworkEvent.Type cmd;
 
-        while ((cmd = this.connection.PopEvent(this.driver, out streamReader)) != NetworkEvent.Type.Empty)
+        while ((cmd = connection.PopEvent(driver, out streamReader)) != NetworkEvent.Type.Empty)
         {
             switch (cmd)
             {
                 case NetworkEvent.Type.Connect:
-                    this.SendToServer(new NetSendName(this.playerName));
+                    SendToServer(new NetSendName(playerName));
                     break;
 
                 case NetworkEvent.Type.Data:
@@ -110,8 +110,8 @@ public class Client : MonoBehaviour
 
                 case NetworkEvent.Type.Disconnect:
                     Debug.Log("Server has been shutdown!!");
-                    this.OnServerDisconnect?.Invoke();
-                    this.Shutdown();
+                    OnServerDisconnect?.Invoke();
+                    Shutdown();
                     break;
             }
         }
@@ -120,26 +120,26 @@ public class Client : MonoBehaviour
     public void SendToServer(NetMessage msg)
     {
         DataStreamWriter writer;
-        this.driver.BeginSend(this.connection, out writer);
+        driver.BeginSend(connection, out writer);
         msg.Serialize(ref writer);
-        this.driver.EndSend(writer);
+        driver.EndSend(writer);
     }
 
     #region Network Received
     private void RegisterToEvent()
     {
-        NetUtility.C_KEEP_ALIVE += this.OnClientReceivedKeepAliveMessage;
+        NetUtility.C_KEEP_ALIVE += OnClientReceivedKeepAliveMessage;
     }
 
     private void UnregisterToEvent()
     {
-        NetUtility.C_KEEP_ALIVE -= this.OnClientReceivedKeepAliveMessage;
+        NetUtility.C_KEEP_ALIVE -= OnClientReceivedKeepAliveMessage;
     }
 
     private void OnClientReceivedKeepAliveMessage(NetMessage keepAliveMessage)
     {
         // Send it back, to keep both side alive
-        this.SendToServer(keepAliveMessage);
+        SendToServer(keepAliveMessage);
     }
     #endregion
 

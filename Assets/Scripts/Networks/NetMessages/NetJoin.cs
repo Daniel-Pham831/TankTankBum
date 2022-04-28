@@ -9,26 +9,26 @@ public class NetJoin : NetMessage
 
     public NetJoin(Player joinedPlayer)
     {
-        this.Code = OpCode.JOIN;
-        this.JoinedPlayer = joinedPlayer;
+        Code = OpCode.JOIN;
+        JoinedPlayer = joinedPlayer;
     }
 
     public NetJoin(ref DataStreamReader reader)
     {
-        this.Code = OpCode.JOIN;
-        this.Deserialize(ref reader);
+        Code = OpCode.JOIN;
+        Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)
     {
         base.Serialize(ref writer);
 
-        Player.SerializePlayer(ref writer, this.JoinedPlayer);
+        Player.SerializePlayer(ref writer, JoinedPlayer);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        this.JoinedPlayer = Player.DeserializePlayer(ref reader);
+        JoinedPlayer = Player.DeserializePlayer(ref reader);
     }
 
     public override void ReceivedOnClient()

@@ -7,7 +7,7 @@ public class NetMessage
 
     public virtual void Serialize(ref DataStreamWriter writer)
     {
-        writer.WriteByte((byte)this.Code);
+        writer.WriteByte((byte)Code);
     }
     public virtual void Deserialize(ref DataStreamReader reader) { }
     public virtual void ReceivedOnClient() { }

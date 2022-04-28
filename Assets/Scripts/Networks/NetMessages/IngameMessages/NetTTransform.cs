@@ -11,46 +11,46 @@ public class NetTTransform : NetMessage
 
     public NetTTransform(byte id, Vector3 position, Quaternion rotation)
     {
-        this.Code = OpCode.T_TRANSFORM;
-        this.ID = id;
-        this.Position = position;
-        this.Rotation = rotation;
+        Code = OpCode.T_TRANSFORM;
+        ID = id;
+        Position = position;
+        Rotation = rotation;
     }
 
     public NetTTransform(ref DataStreamReader reader)
     {
-        this.Code = OpCode.T_TRANSFORM;
-        this.Deserialize(ref reader);
+        Code = OpCode.T_TRANSFORM;
+        Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)
     {
         base.Serialize(ref writer);
 
-        writer.WriteByte(this.ID);
-        writer.WriteFloat(this.Position.x);
-        writer.WriteFloat(this.Position.y);
-        writer.WriteFloat(this.Position.z);
+        writer.WriteByte(ID);
+        writer.WriteFloat(Position.x);
+        writer.WriteFloat(Position.y);
+        writer.WriteFloat(Position.z);
 
-        writer.WriteFloat(this.Rotation.x);
-        writer.WriteFloat(this.Rotation.y);
-        writer.WriteFloat(this.Rotation.z);
-        writer.WriteFloat(this.Rotation.w);
+        writer.WriteFloat(Rotation.x);
+        writer.WriteFloat(Rotation.y);
+        writer.WriteFloat(Rotation.z);
+        writer.WriteFloat(Rotation.w);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        this.ID = reader.ReadByte();
+        ID = reader.ReadByte();
         float x = reader.ReadFloat();
         float y = reader.ReadFloat();
         float z = reader.ReadFloat();
-        this.Position = new Vector3(x, y, z);
+        Position = new Vector3(x, y, z);
 
         x = reader.ReadFloat();
         y = reader.ReadFloat();
         z = reader.ReadFloat();
         float w = reader.ReadFloat();
-        this.Rotation = new Quaternion(x, y, z, w);
+        Rotation = new Quaternion(x, y, z, w);
     }
 
     public override void ReceivedOnClient()
