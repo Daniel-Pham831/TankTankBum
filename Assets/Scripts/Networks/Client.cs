@@ -24,7 +24,7 @@ public class Client : MonoBehaviour
     }
 
     // Methods
-    public void Init(string ip, ushort port, string playerName)
+    public void Init(string ip, ushort port, string inputName)
     {
         if (isActive)
         {
@@ -43,7 +43,7 @@ public class Client : MonoBehaviour
 
         RegisterToEvent();
 
-        this.playerName = playerName != "" ? playerName : "I forgot to name myself";
+        playerName = inputName != "" ? inputName : "I forgot to name myself";
     }
 
     private void ClientReset()
@@ -92,10 +92,9 @@ public class Client : MonoBehaviour
 
     private void UpdateMessagePump()
     {
-        DataStreamReader streamReader;
         NetworkEvent.Type cmd;
 
-        while ((cmd = connection.PopEvent(driver, out streamReader)) != NetworkEvent.Type.Empty)
+        while ((cmd = connection.PopEvent(driver, out DataStreamReader streamReader)) != NetworkEvent.Type.Empty)
         {
             switch (cmd)
             {
