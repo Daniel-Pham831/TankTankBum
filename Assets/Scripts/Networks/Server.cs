@@ -6,6 +6,7 @@ using UnityEngine;
 public class Server : MonoBehaviour
 {
     private readonly float keepAliveTickRate = 20f;
+    private NetworkDriver driver { get; set; }
     private NativeList<NetworkConnection> connections;
     private bool isActive;
     private bool isServerShutDown;
@@ -17,7 +18,6 @@ public class Server : MonoBehaviour
 
     public Action OnServerDisconnect { get; set; }
 
-    public NetworkDriver Driver { get; set; }
 
     private void Awake()
     {
@@ -34,18 +34,18 @@ public class Server : MonoBehaviour
             ServerReset();
         }
 
-        Driver = NetworkDriver.Create();
+        driver = NetworkDriver.Create();
         NetworkEndPoint endPoint = NetworkEndPoint.AnyIpv4;
         endPoint.Port = port;
 
-        if (Driver.Bind(endPoint) != 0)
+        if (driver.Bind(endPoint) != 0)
         {
             Debug.Log($"Unable to bind to port {endPoint.Port}");
             return;
         }
         else
         {
-            Driver.Listen();
+            driver.Listen();
             Debug.Log($"Currently listening on port {endPoint.Port}");
         }
 
@@ -62,7 +62,7 @@ public class Server : MonoBehaviour
 
     private void ServerReset()
     {
-        Driver.Dispose();
+        driver.Dispose();
         connections.Dispose();
         isActive = false;
         isServerShutDown = false;
@@ -74,7 +74,7 @@ public class Server : MonoBehaviour
         {
             foreach (NetworkConnection connection in connections)
             {
-                Driver.Disconnect(connection);
+                driver.Disconnect(connection);
             }
 
             OnServerDisconnect?.Invoke();
@@ -91,7 +91,7 @@ public class Server : MonoBehaviour
 
         KeepAlive();
 
-        Driver.ScheduleUpdate().Complete();
+        driver.ScheduleUpdate().Complete();
 
         CleanupConnections();
         AcceptNewConnections();
@@ -127,7 +127,7 @@ public class Server : MonoBehaviour
     private void AcceptNewConnections()
     {
         NetworkConnection c;
-        while ((c = Driver.Accept()) != default)
+        while ((c = driver.Accept()) != default)
         {
             connections.Add(c);
         }
@@ -138,7 +138,7 @@ public class Server : MonoBehaviour
         for (int i = 0; i < connections.Length; i++)
         {
             NetworkEvent.Type cmd;
-            while ((cmd = Driver.PopEventForConnection(connections[i], out DataStreamReader streamReader)) != NetworkEvent.Type.Empty)
+            while ((cmd = driver.PopEventForConnection(connections[i], out DataStreamReader streamReader)) != NetworkEvent.Type.Empty)
             {
                 switch (cmd)
                 {
@@ -161,9 +161,9 @@ public class Server : MonoBehaviour
     // Server specific
     public void SendToClient(NetworkConnection connection, NetMessage msg)
     {
-        Driver.BeginSend(connection, out DataStreamWriter writer);
+        driver.BeginSend(connection, out DataStreamWriter writer);
         msg.Serialize(ref writer);
-        Driver.EndSend(writer);
+        driver.EndSend(writer);
     }
 
     public void BroadCast(NetMessage msg)

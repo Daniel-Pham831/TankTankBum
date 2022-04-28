@@ -4,9 +4,17 @@ using UnityEngine;
 
 public class Client : MonoBehaviour
 {
+    private NetworkDriver driver;
+    private NetworkConnection connection;
+
+    private bool isActive = false;
+    private bool isClientShutDown = false;
+    private string playerName;
+
     public static Client Singleton { get; private set; }
 
-    private string playerName;
+    public Action OnClientDisconnect;
+    public Action OnServerDisconnect;
 
     private void Awake()
     {
@@ -14,15 +22,6 @@ public class Client : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
     }
-
-    public NetworkDriver driver;
-    private NetworkConnection connection;
-
-    private bool isActive = false;
-    private bool isClientShutDown = false;
-
-    public Action OnClientDisconnect;
-    public Action OnServerDisconnect;
 
     // Methods
     public void Init(string ip, ushort port, string playerName)
