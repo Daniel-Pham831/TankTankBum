@@ -82,6 +82,11 @@ public class Server : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        ServerReset();
+    }
+
     private void ServerReset()
     {
         driver.Dispose();

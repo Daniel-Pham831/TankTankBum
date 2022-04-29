@@ -80,7 +80,6 @@ public class TankMovement : MonoBehaviour
         }
 
         currentMovementInputVector = Vector2.SmoothDamp(currentMovementInputVector, inputVector, ref smoothInputVelocity, smoothInputSpeed);
-        Debug.Log(currentMovementInputVector);
         if (currentMovementInputVector != Vector2.zero)
             Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentMovementInputVector.x, currentMovementInputVector.y));
     }
