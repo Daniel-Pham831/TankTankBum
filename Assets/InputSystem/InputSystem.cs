@@ -35,6 +35,15 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""CameraRotation"",
+                    ""type"": ""Value"",
+                    ""id"": ""e3cccc73-be46-4d0e-891c-f81a0904df4b"",
+                    ""expectedControlType"": ""Analog"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": true
                 }
             ],
             ""bindings"": [
@@ -92,6 +101,39 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""1D Axis"",
+                    ""id"": ""2d99f1a1-8342-4414-b631-85374d4f9cdf"",
+                    ""path"": ""1DAxis"",
+                    ""interactions"": """",
+                    ""processors"": ""Normalize(min=-1,max=1)"",
+                    ""groups"": """",
+                    ""action"": ""CameraRotation"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Negative"",
+                    ""id"": ""fa36fbbd-cf2a-4a63-8a1e-564d5e62f249"",
+                    ""path"": ""<Keyboard>/leftArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""Positive"",
+                    ""id"": ""33aa5e3d-8aa0-4d60-bb9d-f3bf127f5498"",
+                    ""path"": ""<Keyboard>/rightArrow"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""CameraRotation"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
                 }
             ]
         }
@@ -101,6 +143,7 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
         // Tank
         m_Tank = asset.FindActionMap("Tank", throwIfNotFound: true);
         m_Tank_Movement = m_Tank.FindAction("Movement", throwIfNotFound: true);
+        m_Tank_CameraRotation = m_Tank.FindAction("CameraRotation", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -161,11 +204,13 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Tank;
     private ITankActions m_TankActionsCallbackInterface;
     private readonly InputAction m_Tank_Movement;
+    private readonly InputAction m_Tank_CameraRotation;
     public struct TankActions
     {
         private @InputSystem m_Wrapper;
         public TankActions(@InputSystem wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_Tank_Movement;
+        public InputAction @CameraRotation => m_Wrapper.m_Tank_CameraRotation;
         public InputActionMap Get() { return m_Wrapper.m_Tank; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -178,6 +223,9 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                 @Movement.started -= m_Wrapper.m_TankActionsCallbackInterface.OnMovement;
                 @Movement.performed -= m_Wrapper.m_TankActionsCallbackInterface.OnMovement;
                 @Movement.canceled -= m_Wrapper.m_TankActionsCallbackInterface.OnMovement;
+                @CameraRotation.started -= m_Wrapper.m_TankActionsCallbackInterface.OnCameraRotation;
+                @CameraRotation.performed -= m_Wrapper.m_TankActionsCallbackInterface.OnCameraRotation;
+                @CameraRotation.canceled -= m_Wrapper.m_TankActionsCallbackInterface.OnCameraRotation;
             }
             m_Wrapper.m_TankActionsCallbackInterface = instance;
             if (instance != null)
@@ -185,6 +233,9 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                 @Movement.started += instance.OnMovement;
                 @Movement.performed += instance.OnMovement;
                 @Movement.canceled += instance.OnMovement;
+                @CameraRotation.started += instance.OnCameraRotation;
+                @CameraRotation.performed += instance.OnCameraRotation;
+                @CameraRotation.canceled += instance.OnCameraRotation;
             }
         }
     }
@@ -192,5 +243,6 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
     public interface ITankActions
     {
         void OnMovement(InputAction.CallbackContext context);
+        void OnCameraRotation(InputAction.CallbackContext context);
     }
 }

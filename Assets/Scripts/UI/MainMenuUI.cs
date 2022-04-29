@@ -8,6 +8,9 @@ public class MainMenuUI : MonoBehaviour
 {
     public static MainMenuUI Singleton { get; private set; }
     [SerializeField] private TMP_InputField nameInputField;
+    [SerializeField] private TMP_InputField ipv4AddressInputField;
+    [SerializeField] private ushort port;
+
     public Server server;
     public Client client;
 
@@ -70,8 +73,8 @@ public class MainMenuUI : MonoBehaviour
     */
     public void OnHostBtn()
     {
-        server.Init(8007, 10); //This need to change (Stop hard-coded)
-        client.Init("127.0.0.1", 8007, GetPlayerName);
+        server.Init(port, 10); //This need to change (Stop hard-coded)
+        client.Init("127.0.0.1", port, GetPlayerName);
 
         OnHostOrJoinRoom?.Invoke(GetPlayerName);
         mainMenuAnimator.SetTrigger("ToLobbyMenu");
@@ -84,7 +87,8 @@ public class MainMenuUI : MonoBehaviour
 
     public void OnConnectBtn()
     {
-        client.Init("127.0.0.1", 8007, GetPlayerName);
+        string ipInput = ipv4AddressInputField.text != "" ? ipv4AddressInputField.text : "127.0.0.1";
+        client.Init(ipInput, port, GetPlayerName);
         OnHostOrJoinRoom?.Invoke(GetPlayerName);
 
         mainMenuAnimator.SetTrigger("ToLobbyMenu");

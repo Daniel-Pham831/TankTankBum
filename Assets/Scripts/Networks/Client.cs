@@ -12,7 +12,7 @@ public class Client : MonoBehaviour
     private bool isActive = false;
     private bool isClientShutDown = false;
     private string playerName;
-    private float timeBetweenEachPingSend = .2f;
+    private float timeBetweenEachPingSend = .5f;
     private float nextPingSend;
     private float preSendPingTime;
     private float currentPingTime;
@@ -50,6 +50,7 @@ public class Client : MonoBehaviour
         RegisterToEvent();
 
         playerName = inputName != "" ? inputName : "I forgot to name myself";
+        nextPingSend = Time.time + timeBetweenEachPingSend;
     }
 
     private void ClientReset()
@@ -85,9 +86,12 @@ public class Client : MonoBehaviour
 
     private void SendClientPing()
     {
-
-        preSendPingTime = Time.time;
-        SendToServer(new NetPing());
+        if (Time.time >= nextPingSend)
+        {
+            nextPingSend = Time.time + timeBetweenEachPingSend;
+            preSendPingTime = Time.time;
+            SendToServer(new NetPing());
+        }
     }
 
     private void CheckAlive()
@@ -146,7 +150,8 @@ public class Client : MonoBehaviour
 
     private void OnClientReceivedPingMessage(NetMessage message)
     {
-        currentPingTime = Time.time - preSendPingTime;
+        currentPingTime = (Time.time - preSendPingTime) * 1000;
+        currentPingTime = Mathf.Round(currentPingTime);
         pingCounterText.SetText($"Ping: {currentPingTime}ms");
     }
 
@@ -156,5 +161,4 @@ public class Client : MonoBehaviour
         SendToServer(keepAliveMessage);
     }
     #endregion
-
 }

@@ -17,14 +17,16 @@ public class TankMovement : MonoBehaviour
     private Vector2 smoothInputVelocity;
 
     [SerializeField] private float smoothInputSpeed = .1f;
+    [SerializeField] private float cameraRotationalSpeed;
+    [SerializeField] private GameObject tankTower;
+    [SerializeField] private Camera Camera;
 
 
     private void Awake()
     {
         localRb = GetComponent<Rigidbody>();
         localTankInfo = GetComponent<TankInformation>();
-        inputsystem = new InputSystem();
-        inputsystem.Tank.Enable();
+        inputsystem = InputEventManager.Singleton.Inputsystem;
     }
 
     private void Start()
@@ -35,10 +37,19 @@ public class TankMovement : MonoBehaviour
     void FixedUpdate()
     {
         if (localTankInfo.IsLocalPlayer)
-            TankInput();
+        {
+            TankMovementInput();
+            TankCameraInput();
+        }
     }
 
-    private void TankInput()
+    private void TankCameraInput()
+    {
+        float rotationValue = inputsystem.Tank.CameraRotation.ReadValue<float>();
+        tankTower.transform.Rotate(Vector3.up * rotationValue * cameraRotationalSpeed * Time.deltaTime);
+    }
+
+    private void TankMovementInput()
     {
         Vector2 inputVector = inputsystem.Tank.Movement.ReadValue<Vector2>();
 
@@ -56,7 +67,6 @@ public class TankMovement : MonoBehaviour
         }
 
         currentInputVector = Vector2.SmoothDamp(currentInputVector, inputVector, ref smoothInputVelocity, smoothInputSpeed);
-
         if (currentInputVector != Vector2.zero)
             Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentInputVector.x, currentInputVector.y));
     }
@@ -80,7 +90,6 @@ public class TankMovement : MonoBehaviour
 
         if (localTankInfo.ID != tTransformMessage.ID) return;
 
-        Debug.Log("Client received nettransform");
         Move(tTransformMessage.Position, tTransformMessage.Rotation);
     }
 
