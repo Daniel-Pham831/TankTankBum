@@ -24,20 +24,20 @@ public class Player
 
     public Player()
     {
-        this.Id = 0;
-        this.Team = 0;
-        this.SlotIndex = 0;
-        this.Name = "";
-        this.ReadyState = ReadyState.Unready;
+        Id = 0;
+        Team = 0;
+        SlotIndex = 0;
+        Name = "";
+        ReadyState = ReadyState.Unready;
     }
 
     public Player(byte id, Team team, byte slotIndex, string name, ReadyState readyState)
     {
-        this.Id = id;
-        this.Team = team;
-        this.SlotIndex = slotIndex;
-        this.Name = name;
-        this.ReadyState = readyState;
+        Id = id;
+        Team = team;
+        SlotIndex = slotIndex;
+        Name = name;
+        ReadyState = readyState;
     }
 
     public static void SerializePlayer(ref DataStreamWriter writer, Player player)
@@ -110,13 +110,13 @@ public class Player
 
     public void SwitchTeam()
     {
-        this.Team = this.Team == Team.Blue ? Team.Red : Team.Blue;
+        Team = Team == Team.Blue ? Team.Red : Team.Blue;
     }
 
     public void SwitchReadyState()
     {
-        this.ReadyState = this.ReadyState == ReadyState.Ready ? ReadyState.Unready : ReadyState.Ready;
+        ReadyState = ReadyState == ReadyState.Ready ? ReadyState.Unready : ReadyState.Ready;
     }
 
-    public bool IsHost => this.Id == GameInformation.Singleton.HostId;
+    public bool IsHost => Id == GameInformation.Singleton.HostId;
 }

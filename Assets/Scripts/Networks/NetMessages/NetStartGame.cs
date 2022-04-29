@@ -7,13 +7,13 @@ public class NetStartGame : NetMessage
 {
     public NetStartGame()
     {
-        this.Code = OpCode.START;
+        Code = OpCode.START;
     }
 
     public NetStartGame(ref DataStreamReader reader)
     {
-        this.Code = OpCode.START;
-        this.Deserialize(ref reader);
+        Code = OpCode.START;
+        Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)

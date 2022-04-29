@@ -14,6 +14,6 @@ public class GameInformation : MonoBehaviour
         if (Singleton == null)
             Singleton = this;
 
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 }

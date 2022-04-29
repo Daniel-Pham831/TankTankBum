@@ -12,28 +12,28 @@ public class NetWelcome : NetMessage
 
     public NetWelcome(Player player, byte totalPlayer, List<Player> playerList)
     {
-        this.Code = OpCode.WELCOME;
+        Code = OpCode.WELCOME;
 
-        this.MyPlayerInformation = player;
+        MyPlayerInformation = player;
 
-        this.TotalPlayer = totalPlayer;
-        this.PlayerList = playerList;
+        TotalPlayer = totalPlayer;
+        PlayerList = playerList;
     }
 
     public NetWelcome(ref DataStreamReader reader)
     {
-        this.Code = OpCode.WELCOME;
-        this.Deserialize(ref reader);
+        Code = OpCode.WELCOME;
+        Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)
     {
         base.Serialize(ref writer);
 
-        Player.SerializePlayer(ref writer, this.MyPlayerInformation);
+        Player.SerializePlayer(ref writer, MyPlayerInformation);
 
-        writer.WriteByte(this.TotalPlayer);
-        foreach (Player player in this.PlayerList)
+        writer.WriteByte(TotalPlayer);
+        foreach (Player player in PlayerList)
         {
             Player.SerializePlayer(ref writer, player);
         }
@@ -41,13 +41,13 @@ public class NetWelcome : NetMessage
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        this.MyPlayerInformation = Player.DeserializePlayer(ref reader);
+        MyPlayerInformation = Player.DeserializePlayer(ref reader);
 
-        this.TotalPlayer = reader.ReadByte();
-        this.PlayerList = new List<Player>();
-        for (int i = 0; i < this.TotalPlayer; i++)
+        TotalPlayer = reader.ReadByte();
+        PlayerList = new List<Player>();
+        for (int i = 0; i < TotalPlayer; i++)
         {
-            this.PlayerList.Add(Player.DeserializePlayer(ref reader));
+            PlayerList.Add(Player.DeserializePlayer(ref reader));
         }
     }
 

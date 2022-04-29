@@ -33,68 +33,61 @@ public class ClientInformation : MonoBehaviour
         if (Singleton == null)
             Singleton = this;
 
-        this.MyPlayerInformation = new Player();
-        this.IdList = new List<byte>();
-        this.NameList = new List<string>();
+        MyPlayerInformation = new Player();
+        IdList = new List<byte>();
+        NameList = new List<string>();
 
-        this.ResetClientInformation();
+        ResetClientInformation();
 
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 
     private void ResetClientInformation()
     {
-        this.PlayerList?.Clear();
-        this.IdList?.Clear();
-        this.NameList?.Clear();
-        this.IsHost = false;
+        PlayerList?.Clear();
+        IdList?.Clear();
+        NameList?.Clear();
+        IsHost = false;
     }
 
     private void Start()
     {
-        this.registerToEvent(true);
-    }
-
-    private void OnDestroy()
-    {
-        Singleton = null;
-        this.registerToEvent(false);
-
+        registerToEvent(true);
     }
 
     private void registerToEvent(bool confirm)
     {
         if (confirm)
         {
-            NetUtility.C_WELCOME += this.OnClientReceivedWelcomeMessage;
-            NetUtility.C_JOIN += this.OnClientReceivedJoinMessage;
-            NetUtility.C_DISCONNECT += this.OnClientReceivedDisconnectedMessage;
-            NetUtility.C_SWITCHTEAM += this.OnClientReceivedSwitchTeamMessage;
-            NetUtility.C_READY += this.OnClientReceivedReadyMessage;
-            NetUtility.C_START += this.OnClientReceivedStartGameMessage;
+            NetUtility.C_WELCOME += OnClientReceivedWelcomeMessage;
+            NetUtility.C_JOIN += OnClientReceivedJoinMessage;
+            NetUtility.C_DISCONNECT += OnClientReceivedDisconnectedMessage;
+            NetUtility.C_SWITCHTEAM += OnClientReceivedSwitchTeamMessage;
+            NetUtility.C_READY += OnClientReceivedReadyMessage;
+            NetUtility.C_START += OnClientReceivedStartGameMessage;
 
-            Client.Singleton.OnClientDisconnect += this.OnClientDisconnect;
+            Client.Singleton.OnClientDisconnect += OnClientDisconnect;
 
-            MainMenuUI.Singleton.OnHostOrJoinRoom += this.OnHostOrJoinRoom;
+            MainMenuUI.Singleton.OnHostOrJoinRoom += OnHostOrJoinRoom;
         }
         else
         {
-            NetUtility.C_WELCOME -= this.OnClientReceivedWelcomeMessage;
-            NetUtility.C_JOIN -= this.OnClientReceivedJoinMessage;
-            NetUtility.C_DISCONNECT -= this.OnClientReceivedDisconnectedMessage;
-            NetUtility.C_SWITCHTEAM -= this.OnClientReceivedSwitchTeamMessage;
-            NetUtility.C_READY -= this.OnClientReceivedReadyMessage;
-            NetUtility.C_START -= this.OnClientReceivedStartGameMessage;
+            NetUtility.C_WELCOME -= OnClientReceivedWelcomeMessage;
+            NetUtility.C_JOIN -= OnClientReceivedJoinMessage;
+            NetUtility.C_DISCONNECT -= OnClientReceivedDisconnectedMessage;
+            NetUtility.C_SWITCHTEAM -= OnClientReceivedSwitchTeamMessage;
+            NetUtility.C_READY -= OnClientReceivedReadyMessage;
+            NetUtility.C_START -= OnClientReceivedStartGameMessage;
 
-            Client.Singleton.OnClientDisconnect -= this.OnClientDisconnect;
+            Client.Singleton.OnClientDisconnect -= OnClientDisconnect;
 
-            MainMenuUI.Singleton.OnHostOrJoinRoom -= this.OnHostOrJoinRoom;
+            MainMenuUI.Singleton.OnHostOrJoinRoom -= OnHostOrJoinRoom;
         }
     }
 
     private void OnClientReceivedStartGameMessage(NetMessage message)
     {
-        this.StartGame?.Invoke();
+        StartGame?.Invoke();
         Debug.Log("START GAME");
     }
 
@@ -102,14 +95,14 @@ public class ClientInformation : MonoBehaviour
     {
         NetReady readyMessage = message as NetReady;
 
-        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref this.PlayerList, readyMessage.Id);
+        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref PlayerList, readyMessage.Id);
 
         //Switch ReadyState
         if (sentPlayer != null)
         {
             sentPlayer.SwitchReadyState();
-            this.PlayerList.Add(sentPlayer);
-            this.OnPlayerSwitchReadyState?.Invoke(sentPlayer.SlotIndex, sentPlayer.ReadyState);
+            PlayerList.Add(sentPlayer);
+            OnPlayerSwitchReadyState?.Invoke(sentPlayer.SlotIndex, sentPlayer.ReadyState);
         }
     }
 
@@ -117,84 +110,83 @@ public class ClientInformation : MonoBehaviour
     {
         NetSwitchTeam switchTeamMessage = message as NetSwitchTeam;
 
-        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref this.PlayerList, switchTeamMessage.Id);
+        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref PlayerList, switchTeamMessage.Id);
 
         //SwitchTeam
         if (sentPlayer != null)
         {
             sentPlayer.SwitchTeam();
-            this.PlayerList.Add(sentPlayer);
-            this.OnPlayerSwitchTeam?.Invoke(sentPlayer.SlotIndex);
+            PlayerList.Add(sentPlayer);
+            OnPlayerSwitchTeam?.Invoke(sentPlayer.SlotIndex);
         }
-        Debug.Log($"Received Switch Team for player {sentPlayer.Name}");
     }
 
     private void OnClientDisconnect()
     {
-        this.ResetClientInformation();
+        ResetClientInformation();
     }
 
     private void OnClientReceivedDisconnectedMessage(NetMessage message)
     {
         NetDisconnect disconnectMessage = message as NetDisconnect;
 
-        Player disconnectedPlayer = Player.FindPlayerWithID(this.PlayerList, disconnectMessage.DisconnectedClientId);
+        Player disconnectedPlayer = Player.FindPlayerWithID(PlayerList, disconnectMessage.DisconnectedClientId);
 
-        this.OnDisconnectedClient?.Invoke(disconnectedPlayer);
+        OnDisconnectedClient?.Invoke(disconnectedPlayer);
 
-        this.PlayerList.Remove(disconnectedPlayer);
-        this.IdList.Remove(disconnectedPlayer.Id);
-        this.NameList.Remove(disconnectedPlayer.Name);
+        PlayerList.Remove(disconnectedPlayer);
+        IdList.Remove(disconnectedPlayer.Id);
+        NameList.Remove(disconnectedPlayer.Name);
     }
 
     private void OnHostOrJoinRoom(string inputName)
     {
-        this.MyPlayerInformation.Name = inputName;
+        MyPlayerInformation.Name = inputName;
     }
 
     private void OnClientReceivedJoinMessage(NetMessage message)
     {
         NetJoin joinMessage = message as NetJoin;
 
-        this.PlayerList.Add(joinMessage.JoinedPlayer);
+        PlayerList.Add(joinMessage.JoinedPlayer);
 
         Debug.Log($"{joinMessage.JoinedPlayer.Name} just joined");
 
-        this.IdList.Add(joinMessage.JoinedPlayer.Id);
-        this.NameList.Add(joinMessage.JoinedPlayer.Name);
+        IdList.Add(joinMessage.JoinedPlayer.Id);
+        NameList.Add(joinMessage.JoinedPlayer.Name);
 
-        this.OnNewJoinedPlayer?.Invoke(joinMessage.JoinedPlayer);
+        OnNewJoinedPlayer?.Invoke(joinMessage.JoinedPlayer);
     }
 
     private void OnClientReceivedWelcomeMessage(NetMessage message)
     {
         NetWelcome welcomeMessage = message as NetWelcome;
 
-        this.MyPlayerInformation = welcomeMessage.MyPlayerInformation;
+        MyPlayerInformation = welcomeMessage.MyPlayerInformation;
 
-        this.PlayerList = welcomeMessage.PlayerList;
+        PlayerList = welcomeMessage.PlayerList;
 
-        foreach (Player player in this.PlayerList)
+        foreach (Player player in PlayerList)
         {
-            this.IdList.Add(player.Id);
-            this.NameList.Add(player.Name);
-            this.OnNewJoinedPlayer?.Invoke(player);
+            IdList.Add(player.Id);
+            NameList.Add(player.Name);
+            OnNewJoinedPlayer?.Invoke(player);
         }
 
-        Debug.Log($"\nMy ID:{this.MyPlayerInformation.Id} My Name:{this.MyPlayerInformation.Name}");
+        Debug.Log($"\nMy ID:{MyPlayerInformation.Id} My Name:{MyPlayerInformation.Name}");
 
-        if (this.MyPlayerInformation.Id == GameInformation.Singleton.HostId)
+        if (MyPlayerInformation.Id == GameInformation.Singleton.HostId)
         {
             Debug.Log("I'm the host");
-            this.IsHost = true;
+            IsHost = true;
         }
         else
         {
             Debug.Log("I'm a client");
-            this.IsHost = false;
+            IsHost = false;
         }
 
-        this.OnDeclareHost?.Invoke(this.IsHost);
-        this.OnNewJoinedPlayer?.Invoke(this.MyPlayerInformation);
+        OnDeclareHost?.Invoke(IsHost);
+        OnNewJoinedPlayer?.Invoke(MyPlayerInformation);
     }
 }

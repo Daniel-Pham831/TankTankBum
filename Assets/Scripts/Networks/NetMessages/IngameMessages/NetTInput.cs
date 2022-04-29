@@ -11,32 +11,32 @@ public class NetTInput : NetMessage
 
     public NetTInput(byte id, float horizontalInput, float verticalInput)
     {
-        this.Code = OpCode.T_INPUT;
-        this.ID = id;
-        this.HorizontalInput = horizontalInput;
-        this.VerticalInput = verticalInput;
+        Code = OpCode.T_INPUT;
+        ID = id;
+        HorizontalInput = horizontalInput;
+        VerticalInput = verticalInput;
     }
 
     public NetTInput(ref DataStreamReader reader)
     {
-        this.Code = OpCode.T_INPUT;
-        this.Deserialize(ref reader);
+        Code = OpCode.T_INPUT;
+        Deserialize(ref reader);
     }
 
     public override void Serialize(ref DataStreamWriter writer)
     {
         base.Serialize(ref writer);
 
-        writer.WriteByte(this.ID);
-        writer.WriteFloat(this.HorizontalInput);
-        writer.WriteFloat(this.VerticalInput);
+        writer.WriteByte(ID);
+        writer.WriteFloat(HorizontalInput);
+        writer.WriteFloat(VerticalInput);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        this.ID = reader.ReadByte();
-        this.HorizontalInput = reader.ReadFloat();
-        this.VerticalInput = reader.ReadFloat();
+        ID = reader.ReadByte();
+        HorizontalInput = reader.ReadFloat();
+        VerticalInput = reader.ReadFloat();
     }
 
     public override void ReceivedOnClient()

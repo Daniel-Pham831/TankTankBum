@@ -15,23 +15,50 @@ public class TankServerManager : MonoBehaviour
     [SerializeField] private float tankMoveSpeed;
     [SerializeField] private float tankRotateSpeed;
 
+    private float timeBetweenEachSend = 0.1f;
+    private float nextSendTime;
+
+    public Dictionary<byte, Rigidbody> TankRigidbodies;
+
     private void Awake()
     {
         if (Singleton == null)
             Singleton = this;
 
-        DontDestroyOnLoad(this.gameObject);
+        TankRigidbodies = new Dictionary<byte, Rigidbody>();
+        DontDestroyOnLoad(gameObject);
     }
 
     void Start()
     {
-        this.registerToEvent(true);
+        registerToEvent(true);
     }
 
-    private void OnDestroy()
+    private void Update()
     {
-        this.registerToEvent(false);
+        if (IsSendable())
+            SendTransformToAll();
     }
+
+    private bool IsSendable()
+    {
+        if (Time.time >= nextSendTime)
+        {
+            nextSendTime = Time.time + timeBetweenEachSend;
+            return true;
+        }
+
+        return false;
+    }
+
+    private void SendTransformToAll()
+    {
+        foreach (byte id in TankRigidbodies.Keys)
+        {
+            Server.Singleton.BroadCast(new NetTTransform(id, TankRigidbodies[id].position, TankRigidbodies[id].rotation));
+        }
+    }
+
     #endregion
 
     #region Server Events Handling Functions
@@ -39,13 +66,11 @@ public class TankServerManager : MonoBehaviour
     {
         if (confirm)
         {
-            NetUtility.S_T_INPUT += this.OnServerReceivedTInputMessage;
-            NetUtility.S_T_TRANSFORM += this.OnServerReceivedTMoveMessage;
+            NetUtility.S_T_INPUT += OnServerReceivedTInputMessage;
         }
         else
         {
-            NetUtility.S_T_INPUT -= this.OnServerReceivedTInputMessage;
-            NetUtility.S_T_TRANSFORM -= this.OnServerReceivedTMoveMessage;
+            NetUtility.S_T_INPUT -= OnServerReceivedTInputMessage;
         }
     }
 
@@ -57,28 +82,22 @@ public class TankServerManager : MonoBehaviour
             Server needs to calculate the sentPlayer position,rotation and send it back to all players
         */
 
-        Rigidbody sentPlayerRigidbody = TankManager.Singleton.TankObjects[tankInputMessage.ID].GetComponent<Rigidbody>();
+        Rigidbody sentPlayerRigidbody = TankRigidbodies[tankInputMessage.ID].GetComponent<Rigidbody>();
 
-        this.CalculateTankRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
+        MoveSentPlayerRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
 
         Server.Singleton.BroadCast(new NetTTransform(tankInputMessage.ID, sentPlayerRigidbody.position, sentPlayerRigidbody.rotation));
     }
 
-    private void OnServerReceivedTMoveMessage(NetMessage message, NetworkConnection sentPlayer)
-    {
-        Server.Singleton.BroadCastExcept(message, sentPlayer);
-    }
-
-
     #endregion
 
     #region Calculating Functions
-    private void CalculateTankRigidBodyBasedOnInput(ref Rigidbody rb, float horizontalInput, float verticalInput)
+    private void MoveSentPlayerRigidBodyBasedOnInput(ref Rigidbody rb, float horizontalInput, float verticalInput)
     {
+        // should refactor this MovePosition and MoveRotation into rb.AddForce
         rb.MovePosition(rb.transform.position + rb.transform.forward * verticalInput * tankMoveSpeed * Time.fixedDeltaTime);
         rb.MoveRotation(rb.transform.rotation * Quaternion.Euler(Vector3.up * horizontalInput * tankRotateSpeed * Time.fixedDeltaTime));
     }
 
     #endregion
-
 }

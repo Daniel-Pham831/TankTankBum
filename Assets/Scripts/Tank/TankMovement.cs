@@ -9,58 +9,66 @@ using UnityEngine;
 */
 public class TankMovement : MonoBehaviour
 {
-    private Rigidbody rb;
+    private InputSystem inputsystem;
+    private Rigidbody localRb;
     private TankInformation localTankInfo;
-    private float horizontalInput;
-    private float verticalInput;
-    [SerializeField] private float moveSpeed = 10f;
-    [SerializeField] private float rotationSpeed = 90f;
+
+    private Vector2 currentInputVector;
+    private Vector2 smoothInputVelocity;
+
+    [SerializeField] private float smoothInputSpeed = .1f;
+    [SerializeField] private float cameraRotationalSpeed;
+    [SerializeField] private GameObject tankTower;
+    [SerializeField] private Camera Camera;
+
 
     private void Awake()
     {
-        this.rb = GetComponent<Rigidbody>();
-        this.localTankInfo = GetComponent<TankInformation>();
+        localRb = GetComponent<Rigidbody>();
+        localTankInfo = GetComponent<TankInformation>();
+        inputsystem = InputEventManager.Singleton.Inputsystem;
     }
 
     private void Start()
     {
-        this.registerToEvent(true);
+        registerToEvent(true);
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        if (this.localTankInfo.IsLocalPlayer)
-            this.PlayerInput();
-    }
-
-    private void Move()
-    {
-        Vector3 prePosition = rb.position;
-
-        this.rb.MovePosition(transform.position + transform.forward * this.verticalInput * this.moveSpeed * Time.fixedDeltaTime);
-        this.rb.MoveRotation(transform.rotation * Quaternion.Euler(Vector3.up * this.horizontalInput * this.rotationSpeed * Time.fixedDeltaTime));
-
-        if (Vector3.Distance(prePosition, rb.position) >= 0.01f)
-            Client.Singleton.SendToServer(new NetTTransform(this.localTankInfo.ID, this.rb.position, this.rb.rotation));
-    }
-
-    private void PlayerInput()
-    {
-        this.horizontalInput = Input.GetAxis("Horizontal");
-        this.verticalInput = Input.GetAxis("Vertical");
-
-        // Should self-made a smooth input here
-
-        if (this.verticalInput != 0)
+        if (localTankInfo.IsLocalPlayer)
         {
-            if (this.verticalInput < 0)
+            TankMovementInput();
+            TankCameraInput();
+        }
+    }
+
+    private void TankCameraInput()
+    {
+        float rotationValue = inputsystem.Tank.CameraRotation.ReadValue<float>();
+        tankTower.transform.Rotate(Vector3.up * rotationValue * cameraRotationalSpeed * Time.deltaTime);
+    }
+
+    private void TankMovementInput()
+    {
+        Vector2 inputVector = inputsystem.Tank.Movement.ReadValue<Vector2>();
+
+        if (inputVector.y != 0)
+        {
+            if (inputVector.y < 0)
             {
-                this.horizontalInput *= -1;
+                inputVector.x *= -1;
             }
         }
+        else
+        {
+            // If the player is NOT pressing down on the verticalInputs(W,S) then that means no rotation for the player
+            inputVector.x = 0;
+        }
 
-        if (new Vector2(this.horizontalInput, this.verticalInput) != Vector2.zero)
-            Client.Singleton.SendToServer(new NetTInput(this.localTankInfo.ID, this.horizontalInput, this.verticalInput));
+        currentInputVector = Vector2.SmoothDamp(currentInputVector, inputVector, ref smoothInputVelocity, smoothInputSpeed);
+        if (currentInputVector != Vector2.zero)
+            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentInputVector.x, currentInputVector.y));
     }
 
 
@@ -78,17 +86,16 @@ public class TankMovement : MonoBehaviour
 
     private void OnClientReceivedTMoveMessage(NetMessage message)
     {
-        NetTTransform tMoveMessage = message as NetTTransform;
+        NetTTransform tTransformMessage = message as NetTTransform;
 
-        if (localTankInfo.ID != tMoveMessage.ID) return;
+        if (localTankInfo.ID != tTransformMessage.ID) return;
 
-        this.Move(tMoveMessage.Position, tMoveMessage.Rotation);
+        Move(tTransformMessage.Position, tTransformMessage.Rotation);
     }
 
-    private void Move(Vector3 position, Quaternion Rotaion)
+    private void Move(Vector3 position, Quaternion rotation)
     {
-        transform.position = position;
-        transform.rotation = Rotaion;
+        localRb.MovePosition(position);
+        localRb.MoveRotation(rotation);
     }
-
 }

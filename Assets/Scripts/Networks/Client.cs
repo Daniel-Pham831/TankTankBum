@@ -1,107 +1,118 @@
 using System;
+using TMPro;
 using Unity.Networking.Transport;
 using UnityEngine;
 
 public class Client : MonoBehaviour
 {
+    [SerializeField] private TMP_Text pingCounterText;
+    private NetworkDriver driver;
+    private NetworkConnection connection;
+
+    private bool isActive = false;
+    private bool isClientShutDown = false;
+    private string playerName;
+    private float timeBetweenEachPingSend = .5f;
+    private float nextPingSend;
+    private float preSendPingTime;
+    private float currentPingTime;
+
     public static Client Singleton { get; private set; }
 
-    private string playerName;
+    public Action OnClientDisconnect;
+    public Action OnServerDisconnect;
 
     private void Awake()
     {
         Singleton = this;
 
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 
-    public NetworkDriver driver;
-    private NetworkConnection connection;
-
-    private bool isActive = false;
-    private bool isClientShutDown = false;
-
-    public Action OnClientDisconnect;
-    public Action OnServerDisconnect;
-
     // Methods
-    public void Init(string ip, ushort port, string playerName)
+    public void Init(string ip, ushort port, string inputName)
     {
-        if (this.isActive)
+        if (isActive)
         {
-            this.ClientReset();
+            ClientReset();
         }
 
-        this.driver = NetworkDriver.Create();
+        driver = NetworkDriver.Create();
         NetworkEndPoint endPoint = NetworkEndPoint.Parse(ip, port);
 
-        this.connection = this.driver.Connect(endPoint);
+        connection = driver.Connect(endPoint);
 
         Debug.Log($"Attemping to connect to Server on {endPoint.Address}");
 
-        this.isActive = true;
-        this.isClientShutDown = false;
+        isActive = true;
+        isClientShutDown = false;
 
-        this.RegisterToEvent();
+        RegisterToEvent();
 
-        this.playerName = playerName != "" ? playerName : "I forgot to name myself";
+        playerName = inputName != "" ? inputName : "I forgot to name myself";
+        nextPingSend = Time.time + timeBetweenEachPingSend;
     }
 
     private void ClientReset()
     {
-        this.driver.Dispose();
-        this.connection = default(NetworkConnection);
-        this.isActive = false;
-        this.UnregisterToEvent();
-        this.isClientShutDown = true;
+        driver.Dispose();
+        connection = default(NetworkConnection);
+        isActive = false;
+        UnregisterToEvent();
+        isClientShutDown = true;
     }
 
     public void Shutdown()
     {
-        if (this.isActive)
+        if (isActive)
         {
-            this.connection.Disconnect(this.driver);
-            this.OnClientDisconnect?.Invoke();
+            connection.Disconnect(driver);
+            OnClientDisconnect?.Invoke();
         }
     }
-    // public void OnDestroy()
-    // {
-    //     this.Shutdown();
-    // }
-
 
     public void Update()
     {
-        if (!this.isActive) return;
+        if (!isActive) return;
 
-        this.driver.ScheduleUpdate().Complete();
-        this.CheckAlive();
-        this.UpdateMessagePump();
+        driver.ScheduleUpdate().Complete();
+        CheckAlive();
+        SendClientPing();
+        UpdateMessagePump();
 
-        if (this.isClientShutDown)
-            this.ClientReset();
+        if (isClientShutDown)
+            ClientReset();
+    }
+
+    private void SendClientPing()
+    {
+        if (Time.time >= nextPingSend)
+        {
+            nextPingSend = Time.time + timeBetweenEachPingSend;
+            preSendPingTime = Time.time;
+            SendToServer(new NetPing());
+        }
     }
 
     private void CheckAlive()
     {
-        if (!this.connection.IsCreated && this.isActive)
+        if (!connection.IsCreated && isActive)
         {
             Debug.Log("Something went wrong, lost connection to server!");
-            this.Shutdown();
+            Shutdown();
         }
     }
 
     private void UpdateMessagePump()
     {
-        DataStreamReader streamReader;
         NetworkEvent.Type cmd;
 
-        while ((cmd = this.connection.PopEvent(this.driver, out streamReader)) != NetworkEvent.Type.Empty)
+        while ((cmd = connection.PopEvent(driver, out DataStreamReader streamReader)) != NetworkEvent.Type.Empty)
         {
             switch (cmd)
             {
                 case NetworkEvent.Type.Connect:
-                    this.SendToServer(new NetSendName(this.playerName));
+                    SendToServer(new NetSendName(playerName));
                     break;
 
                 case NetworkEvent.Type.Data:
@@ -110,8 +121,8 @@ public class Client : MonoBehaviour
 
                 case NetworkEvent.Type.Disconnect:
                     Debug.Log("Server has been shutdown!!");
-                    this.OnServerDisconnect?.Invoke();
-                    this.Shutdown();
+                    OnServerDisconnect?.Invoke();
+                    Shutdown();
                     break;
             }
         }
@@ -119,28 +130,35 @@ public class Client : MonoBehaviour
 
     public void SendToServer(NetMessage msg)
     {
-        DataStreamWriter writer;
-        this.driver.BeginSend(this.connection, out writer);
+        driver.BeginSend(connection, out DataStreamWriter writer);
         msg.Serialize(ref writer);
-        this.driver.EndSend(writer);
+        driver.EndSend(writer);
     }
 
     #region Network Received
     private void RegisterToEvent()
     {
-        NetUtility.C_KEEP_ALIVE += this.OnClientReceivedKeepAliveMessage;
+        NetUtility.C_KEEP_ALIVE += OnClientReceivedKeepAliveMessage;
+        NetUtility.C_PING += OnClientReceivedPingMessage;
     }
 
     private void UnregisterToEvent()
     {
-        NetUtility.C_KEEP_ALIVE -= this.OnClientReceivedKeepAliveMessage;
+        NetUtility.C_KEEP_ALIVE -= OnClientReceivedKeepAliveMessage;
+        NetUtility.C_PING -= OnClientReceivedPingMessage;
+    }
+
+    private void OnClientReceivedPingMessage(NetMessage message)
+    {
+        currentPingTime = (Time.time - preSendPingTime) * 1000;
+        currentPingTime = Mathf.Round(currentPingTime);
+        pingCounterText.SetText($"Ping: {currentPingTime}ms");
     }
 
     private void OnClientReceivedKeepAliveMessage(NetMessage keepAliveMessage)
     {
         // Send it back, to keep both side alive
-        this.SendToServer(keepAliveMessage);
+        SendToServer(keepAliveMessage);
     }
     #endregion
-
 }

@@ -35,7 +35,7 @@ public class Slot : MonoBehaviour
 
     private bool IsThisSlot(byte slotIndex)
     {
-        return this.SlotIndex == slotIndex;
+        return SlotIndex == slotIndex;
     }
 
     private bool IsOwnerSlot(byte slotIndex)
@@ -47,79 +47,74 @@ public class Slot : MonoBehaviour
 
     private void ResetSlot(byte slotIndex)
     {
-        if (this.IsThisSlot(slotIndex))
+        if (IsThisSlot(slotIndex))
         {
-            this.ResetSlot();
+            ResetSlot();
         }
     }
     private void ResetSlot()
     {
-        this.slotReadyToggle.isOn = false;
-        this.SetSlotStage(SlotState.Empty);
-        this.slotBackgroundColor.color = emptyBackground;
-        this.slotName.SetText("");
+        slotReadyToggle.isOn = false;
+        SetSlotStage(SlotState.Empty);
+        slotBackgroundColor.color = emptyBackground;
+        slotName.SetText("");
     }
 
     private void SetSlotStage(SlotState state)
     {
-        this.slotState = state;
+        slotState = state;
 
-        Color color = this.emptySlotColor;
+        Color color = emptySlotColor;
         switch (state)
         {
             case SlotState.Empty:
-                color = this.emptySlotColor;
+                color = emptySlotColor;
                 break;
 
             case SlotState.Occupied:
-                color = this.occupiedSlotColor;
+                color = occupiedSlotColor;
                 break;
 
             case SlotState.OwnerOccupied:
-                color = this.ownerOccupiedSlotColor;
+                color = ownerOccupiedSlotColor;
                 break;
         }
 
-        this.nameBackgroundColor.color = color;
+        nameBackgroundColor.color = color;
     }
 
     private void SetSlotInformationBasedOf(Player player)
     {
-        if (this.IsThisSlot(player.SlotIndex))
+        if (IsThisSlot(player.SlotIndex))
         {
-            this.slotName.SetText(player.Name);
-            this.SlotTeam = player.Team;
-            this.SetSlotTeamColor();
-            this.SetSlotReadyState(player.ReadyState);
+            slotName.SetText(player.Name);
+            SlotTeam = player.Team;
+            SetSlotTeamColor();
+            SetSlotReadyState(player.ReadyState);
 
-            if (this.IsOwnerSlot(player.SlotIndex))
-                this.SetSlotStage(SlotState.OwnerOccupied);
+            if (IsOwnerSlot(player.SlotIndex))
+                SetSlotStage(SlotState.OwnerOccupied);
             else
-                this.SetSlotStage(SlotState.Occupied);
+                SetSlotStage(SlotState.Occupied);
         }
     }
 
     private void SetSlotReadyState(ReadyState readyState)
     {
-        this.slotReadyToggle.isOn = readyState == ReadyState.Ready ? true : false;
+        slotReadyToggle.isOn = readyState == ReadyState.Ready ? true : false;
     }
 
     private void SetSlotTeamColor()
     {
-        this.slotBackgroundColor.color = this.SlotTeam == Team.Blue ? this.blueBackground : this.redBackground;
+        slotBackgroundColor.color = SlotTeam == Team.Blue ? blueBackground : redBackground;
     }
 
     #region EventMethods
     private void Start()
     {
-        this.registerToEvent(true);
+        registerToEvent(true);
 
-        this.ResetSlot();
-    }
-
-    private void OnDestroy()
-    {
-        //  this.registerToEvent(false);
+        ResetSlot();
     }
 
     private void registerToEvent(bool confirm)
@@ -148,46 +143,46 @@ public class Slot : MonoBehaviour
 
     private void OnSlotSwitchTeam(byte slotIndex)
     {
-        if (this.IsThisSlot(slotIndex))
+        if (IsThisSlot(slotIndex))
         {
-            this.SlotTeam = Team.Blue == this.SlotTeam ? Team.Red : Team.Blue;
-            this.SetSlotTeamColor();
+            SlotTeam = Team.Blue == SlotTeam ? Team.Red : Team.Blue;
+            SetSlotTeamColor();
         }
     }
 
     private void OnSlotReadyOrStartPress(byte slotIndex, ReadyState readyState)
     {
-        if (this.IsThisSlot(slotIndex))
+        if (IsThisSlot(slotIndex))
         {
-            this.SetSlotReadyState(readyState);
+            SetSlotReadyState(readyState);
         }
     }
 
     private void OnPlayerExitedSlot(Player exitedPlayer)
     {
-        this.ResetSlot(exitedPlayer.SlotIndex);
+        ResetSlot(exitedPlayer.SlotIndex);
     }
 
     private void OnPlayerJoinedSlot(Player joinedPlayer)
     {
-        this.SetSlotInformationBasedOf(joinedPlayer);
+        SetSlotInformationBasedOf(joinedPlayer);
     }
 
     private void OnAllSlotReset()
     {
-        this.ResetSlot(this.SlotIndex);
+        ResetSlot(SlotIndex);
     }
 
     private void OnSlotReset(byte slotIndex)
     {
-        this.ResetSlot(slotIndex);
+        ResetSlot(slotIndex);
     }
 
     private void OnSlotStateChanged(byte slotIndex, SlotState slotState)
     {
-        if (this.IsThisSlot(slotIndex))
+        if (IsThisSlot(slotIndex))
         {
-            this.SetSlotStage(slotState);
+            SetSlotStage(slotState);
         }
     }
     #endregion

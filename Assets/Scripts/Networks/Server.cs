@@ -5,118 +5,142 @@ using UnityEngine;
 
 public class Server : MonoBehaviour
 {
+    private readonly float keepAliveTickRate = 20f;
+    private NetworkDriver driver { get; set; }
+    private NativeList<NetworkConnection> connections;
+    private bool isActive;
+    private bool isServerShutDown;
+    private float lastKeepAlive;
+
     public static Server Singleton { get; private set; }
+
+    public Action<byte> OnClientDisconnected { get; set; }
+
+    public Action OnServerDisconnect { get; set; }
+
+
     private void Awake()
     {
         Singleton = this;
 
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
     }
 
-    public NetworkDriver driver;
-    private NativeList<NetworkConnection> connections;
+    private void Start()
+    {
+        registerToEvent(true);
+    }
 
-    private bool isActive = false;
-    private bool isServerShutDown = false;
-    private float keepAliveTickRate = 20f;
-    private float lastKeepAlive;
+    private void registerToEvent(bool confirm)
+    {
+        if (confirm)
+        {
+            NetUtility.S_PING += OnServerReceivedPingMessage;
+        }
+        else
+        {
+            NetUtility.S_PING -= OnServerReceivedPingMessage;
+        }
+    }
 
-    public Action<byte> OnClientDisconnected;
-    public Action OnServerDisconnect;
+    private void OnServerReceivedPingMessage(NetMessage message, NetworkConnection sentClient)
+    {
+        SendToClient(sentClient, message);
+    }
 
     // Methods
     public void Init(ushort port, int maximumConnection)
     {
-        if (this.isActive)
-            this.ServerReset();
+        if (isActive)
+        {
+            ServerReset();
+        }
 
-        this.driver = NetworkDriver.Create();
+        driver = NetworkDriver.Create();
         NetworkEndPoint endPoint = NetworkEndPoint.AnyIpv4;
         endPoint.Port = port;
 
-        if (this.driver.Bind(endPoint) != 0)
+        if (driver.Bind(endPoint) != 0)
         {
             Debug.Log($"Unable to bind to port {endPoint.Port}");
             return;
         }
         else
         {
-            this.driver.Listen();
+            driver.Listen();
             Debug.Log($"Currently listening on port {endPoint.Port}");
         }
 
-        this.connections = new NativeList<NetworkConnection>(maximumConnection, Allocator.Persistent);
-        this.isActive = true;
-        this.isServerShutDown = false;
+        connections = new NativeList<NetworkConnection>(maximumConnection, Allocator.Persistent);
+        isActive = true;
+        isServerShutDown = false;
 
-        //Init server information
+        // Init server information
         if (ServerInformation.Singleton == null)
         {
-            ServerInformation serverInfomation = new ServerInformation();
+            _ = new ServerInformation();
         }
     }
 
     private void ServerReset()
     {
-        this.driver.Dispose();
-        this.connections.Dispose();
-        this.isActive = false;
-        this.isServerShutDown = false;
+        driver.Dispose();
+        connections.Dispose();
+        isActive = false;
+        isServerShutDown = false;
     }
 
     public void Shutdown()
     {
-        if (this.isActive)
+        if (isActive)
         {
-            foreach (NetworkConnection connection in this.connections)
+            foreach (NetworkConnection connection in connections)
             {
-                this.driver.Disconnect(connection);
+                driver.Disconnect(connection);
             }
 
-            this.OnServerDisconnect?.Invoke();
-            this.isServerShutDown = true;
+            OnServerDisconnect?.Invoke();
+            isServerShutDown = true;
         }
     }
 
-    // public void OnDestroy()
-    // {
-    //     this.Shutdown();
-    // }
-
     public void Update()
     {
-        if (!this.isActive) return;
+        if (!isActive)
+        {
+            return;
+        }
 
-        this.KeepAlive();
+        KeepAlive();
 
-        this.driver.ScheduleUpdate().Complete();
+        driver.ScheduleUpdate().Complete();
 
-        this.CleanupConnections();
-        this.AcceptNewConnections();
-        this.UpdateMessagePump();
+        CleanupConnections();
+        AcceptNewConnections();
+        UpdateMessagePump();
 
         if (isServerShutDown)
         {
-            this.ServerReset();
+            ServerReset();
         }
     }
 
     private void KeepAlive()
     {
-        if (Time.time - this.lastKeepAlive > this.keepAliveTickRate)
+        if (Time.time - lastKeepAlive > keepAliveTickRate)
         {
-            this.lastKeepAlive = Time.time;
-            this.BroadCast(new NetKeepAlive());
+            lastKeepAlive = Time.time;
+            BroadCast(new NetKeepAlive());
         }
     }
 
     private void CleanupConnections()
     {
-        for (int i = 0; i < this.connections.Length; i++)
+        for (int i = 0; i < connections.Length; i++)
         {
-            if (!this.connections[i].IsCreated)
+            if (!connections[i].IsCreated)
             {
-                this.connections.RemoveAtSwapBack(i);
+                connections.RemoveAtSwapBack(i);
                 --i;
             }
         }
@@ -125,32 +149,31 @@ public class Server : MonoBehaviour
     private void AcceptNewConnections()
     {
         NetworkConnection c;
-        while ((c = this.driver.Accept()) != default(NetworkConnection))
+        while ((c = driver.Accept()) != default)
         {
-            this.connections.Add(c);
+            connections.Add(c);
         }
     }
 
     private void UpdateMessagePump()
     {
-        DataStreamReader streamReader;
-        for (int i = 0; i < this.connections.Length; i++)
+        for (int i = 0; i < connections.Length; i++)
         {
             NetworkEvent.Type cmd;
-            while ((cmd = this.driver.PopEventForConnection(this.connections[i], out streamReader)) != NetworkEvent.Type.Empty)
+            while ((cmd = driver.PopEventForConnection(connections[i], out DataStreamReader streamReader)) != NetworkEvent.Type.Empty)
             {
                 switch (cmd)
                 {
                     case NetworkEvent.Type.Data:
-                        NetUtility.OnData(ref streamReader, this.connections[i], this);
+                        NetUtility.OnData(ref streamReader, connections[i], this);
                         break;
 
                     case NetworkEvent.Type.Disconnect:
                         Debug.Log("Client disconnected from the server");
-                        this.BroadCast(new NetDisconnect((byte)this.connections[i].InternalId));
-                        this.OnClientDisconnected?.Invoke((byte)this.connections[i].InternalId);
+                        BroadCast(new NetDisconnect((byte)connections[i].InternalId));
+                        OnClientDisconnected?.Invoke((byte)connections[i].InternalId);
 
-                        this.connections[i] = default(NetworkConnection);
+                        connections[i] = default;
                         break;
                 }
             }
@@ -160,32 +183,31 @@ public class Server : MonoBehaviour
     // Server specific
     public void SendToClient(NetworkConnection connection, NetMessage msg)
     {
-        DataStreamWriter writer;
-        this.driver.BeginSend(connection, out writer);
+        driver.BeginSend(connection, out DataStreamWriter writer);
         msg.Serialize(ref writer);
-        this.driver.EndSend(writer);
+        driver.EndSend(writer);
     }
 
     public void BroadCast(NetMessage msg)
     {
-        for (int i = 0; i < this.connections.Length; i++)
+        for (int i = 0; i < connections.Length; i++)
         {
-            if (this.connections[i].IsCreated)
+            if (connections[i].IsCreated)
             {
-                Debug.Log($"Sending {msg.Code} to: {this.connections[i].InternalId}");
-                this.SendToClient(this.connections[i], msg);
+                Debug.Log($"Server sent {msg.Code} to: {connections[i].InternalId}");
+                SendToClient(connections[i], msg);
             }
         }
     }
 
     public void BroadCastExcept(NetMessage msg, NetworkConnection exceptClient)
     {
-        for (int i = 0; i < this.connections.Length; i++)
+        for (int i = 0; i < connections.Length; i++)
         {
-            if (this.connections[i].IsCreated && this.connections[i] != exceptClient)
+            if (connections[i].IsCreated && connections[i] != exceptClient)
             {
-                Debug.Log($"Sending {msg.Code} to: {this.connections[i].InternalId}");
-                this.SendToClient(this.connections[i], msg);
+                Debug.Log($"Server sent {msg.Code} to: {connections[i].InternalId}");
+                SendToClient(connections[i], msg);
             }
         }
     }

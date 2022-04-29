@@ -34,15 +34,9 @@ public class LobbyUI : MonoBehaviour
 
     private void Start()
     {
-        this.registerToEvent(true);
+        registerToEvent(true);
 
-        this.GenerateAllSlots();
-    }
-
-    private void OnDestroy()
-    {
-        Singleton = null;
-        //   this.registerToEvent(false);
+        GenerateAllSlots();
     }
 
     private void registerToEvent(bool confirm)
@@ -71,26 +65,26 @@ public class LobbyUI : MonoBehaviour
 
     private void OnPlayerSwitchReadyState(byte slotIndex, ReadyState readyState)
     {
-        this.OnSlotReadyOrStartPress?.Invoke(slotIndex, readyState);
+        OnSlotReadyOrStartPress?.Invoke(slotIndex, readyState);
     }
 
     private void OnPlayerSwitchTeam(byte slotIndex)
     {
-        this.OnSlotSwitchTeam?.Invoke(slotIndex);
+        OnSlotSwitchTeam?.Invoke(slotIndex);
     }
 
     private void GenerateAllSlots()
     {
         for (int i = 0; i < GameInformation.Singleton.MaxPlayer; i++)
         {
-            this.GenerateOneSlot((byte)i);
-            this.OnSlotStateChanged?.Invoke((byte)i, SlotState.Empty);
+            GenerateOneSlot((byte)i);
+            OnSlotStateChanged?.Invoke((byte)i, SlotState.Empty);
         }
     }
 
     private void GenerateOneSlot(byte slotIndex)
     {
-        GameObject newSlot = Instantiate(this.slotPrefab, slotIndex % 2 == 0 ? this.leftSlotRoot.transform : this.rightSlotRoot.transform);
+        GameObject newSlot = Instantiate(slotPrefab, slotIndex % 2 == 0 ? leftSlotRoot.transform : rightSlotRoot.transform);
         newSlot.name = $"Slot: Index {slotIndex}";
         Slot slotInfo = newSlot.GetComponent<Slot>();
         slotInfo.SlotIndex = slotIndex;
@@ -106,25 +100,20 @@ public class LobbyUI : MonoBehaviour
             if (!Player.HaveAllPlayersReadied(ClientInformation.Singleton.PlayerList))
             {
                 // Pop up a READY error box indicating that can only start when all players are ready
-                Debug.Log("There are still players who haven't readied yet");
-                this.lobbyAnimator.SetTrigger("IntoLobbyReadyError");
+                lobbyAnimator.SetTrigger("IntoLobbyReadyError");
                 return;
             }
-
-            Debug.Log($"Blue:{Player.CountTeamPlayer(ServerInformation.Singleton.PlayerList, Team.Blue)}");
-            Debug.Log($"Red:{Player.CountTeamPlayer(ServerInformation.Singleton.PlayerList, Team.Red)}");
 
             if (!Player.Have2TeamsEqual(ServerInformation.Singleton.PlayerList))
             {
                 // Pop up a TEAM error box indicating that can only start when all players are ready
-                Debug.Log("2 teams are not equal");
-                this.lobbyAnimator.SetTrigger("IntoLobbyTeamError");
+                lobbyAnimator.SetTrigger("IntoLobbyTeamError");
                 return;
             }
         }
 
         MyPlayerInformation.SwitchReadyState();
-        this.OnSlotReadyOrStartPress?.Invoke(MyPlayerInformation.SlotIndex, MyPlayerInformation.ReadyState);
+        OnSlotReadyOrStartPress?.Invoke(MyPlayerInformation.SlotIndex, MyPlayerInformation.ReadyState);
 
         Client.Singleton.SendToServer(new NetReady(MyPlayerInformation.Id));
     }
@@ -134,8 +123,8 @@ public class LobbyUI : MonoBehaviour
         Player MyPlayerInformation = ClientInformation.Singleton.MyPlayerInformation;
 
         MyPlayerInformation.SwitchTeam();
-        this.SetSwitchTeamBtnColor(MyPlayerInformation.Team);
-        this.OnSlotSwitchTeam?.Invoke(MyPlayerInformation.SlotIndex);
+        SetSwitchTeamBtnColor(MyPlayerInformation.Team);
+        OnSlotSwitchTeam?.Invoke(MyPlayerInformation.SlotIndex);
 
         Client.Singleton.SendToServer(new NetSwitchTeam(MyPlayerInformation.Id));
     }
@@ -149,39 +138,39 @@ public class LobbyUI : MonoBehaviour
             Client.Singleton.Shutdown();
 
         //frontend
-        this.OnLobbyLeft?.Invoke();
-        this.OnAllSlotReset?.Invoke();
+        OnLobbyLeft?.Invoke();
+        OnAllSlotReset?.Invoke();
     }
 
     public void OnConfirmBtn()
     {
-        this.lobbyAnimator.SetTrigger("IntoLobbyIdle");
+        lobbyAnimator.SetTrigger("IntoLobbyIdle");
     }
 
     private void OnDeclareHost(bool isHost)
     {
-        TMP_Text readyOrStartBtnName = this.readyOrStartBtn.GetComponentInChildren<TMP_Text>();
+        TMP_Text readyOrStartBtnName = readyOrStartBtn.GetComponentInChildren<TMP_Text>();
         readyOrStartBtnName.SetText(isHost ? "StartGame" : "Ready");
     }
 
     private void OnDisconnectedClient(Player disconnectedPlayer)
     {
-        this.OnPlayerExitedSlot?.Invoke(disconnectedPlayer);
+        OnPlayerExitedSlot?.Invoke(disconnectedPlayer);
     }
 
     private void OnNewJoinedPlayer(Player joinedPlayer)
     {
-        this.OnPlayerJoinedSlot?.Invoke(joinedPlayer);
+        OnPlayerJoinedSlot?.Invoke(joinedPlayer);
 
         if (joinedPlayer.Id == ClientInformation.Singleton.MyPlayerInformation.Id)
         {
-            this.SetSwitchTeamBtnColor(joinedPlayer.Team);
+            SetSwitchTeamBtnColor(joinedPlayer.Team);
         }
     }
 
     private void SetSwitchTeamBtnColor(Team team)
     {
         GameInformation gameInformation = GameInformation.Singleton;
-        this.switchTeamBtn.color = team == Team.Blue ? gameInformation.BlueTeamColor : gameInformation.RedTeamColor;
+        switchTeamBtn.color = team == Team.Blue ? gameInformation.BlueTeamColor : gameInformation.RedTeamColor;
     }
 }
