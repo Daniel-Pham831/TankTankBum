@@ -1,15 +1,21 @@
 using System;
+using TMPro;
 using Unity.Networking.Transport;
 using UnityEngine;
 
 public class Client : MonoBehaviour
 {
+    [SerializeField] private TMP_Text pingCounterText;
     private NetworkDriver driver;
     private NetworkConnection connection;
 
     private bool isActive = false;
     private bool isClientShutDown = false;
     private string playerName;
+    private float timeBetweenEachPingSend = .2f;
+    private float nextPingSend;
+    private float preSendPingTime;
+    private float currentPingTime;
 
     public static Client Singleton { get; private set; }
 
@@ -70,10 +76,18 @@ public class Client : MonoBehaviour
 
         driver.ScheduleUpdate().Complete();
         CheckAlive();
+        SendClientPing();
         UpdateMessagePump();
 
         if (isClientShutDown)
             ClientReset();
+    }
+
+    private void SendClientPing()
+    {
+
+        preSendPingTime = Time.time;
+        SendToServer(new NetPing());
     }
 
     private void CheckAlive()
@@ -121,11 +135,19 @@ public class Client : MonoBehaviour
     private void RegisterToEvent()
     {
         NetUtility.C_KEEP_ALIVE += OnClientReceivedKeepAliveMessage;
+        NetUtility.C_PING += OnClientReceivedPingMessage;
     }
 
     private void UnregisterToEvent()
     {
         NetUtility.C_KEEP_ALIVE -= OnClientReceivedKeepAliveMessage;
+        NetUtility.C_PING -= OnClientReceivedPingMessage;
+    }
+
+    private void OnClientReceivedPingMessage(NetMessage message)
+    {
+        currentPingTime = Time.time - preSendPingTime;
+        pingCounterText.SetText($"Ping: {currentPingTime}ms");
     }
 
     private void OnClientReceivedKeepAliveMessage(NetMessage keepAliveMessage)

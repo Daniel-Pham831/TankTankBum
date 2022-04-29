@@ -4,6 +4,7 @@ using UnityEngine;
 
 public enum OpCode
 {
+    PING = 0,
     KEEP_ALIVE = 1,
     SEND_NAME = 2,
     JOIN = 3,
@@ -19,6 +20,7 @@ public enum OpCode
 public static class NetUtility
 {
     // Net Lobby messages
+    public static Action<NetMessage> C_PING;
     public static Action<NetMessage> C_KEEP_ALIVE;
     public static Action<NetMessage> C_SEND_NAME;
     public static Action<NetMessage> C_JOIN;
@@ -27,6 +29,7 @@ public static class NetUtility
     public static Action<NetMessage> C_READY;
     public static Action<NetMessage> C_SWITCHTEAM;
     public static Action<NetMessage> C_START;
+    public static Action<NetMessage, NetworkConnection> S_PING;
     public static Action<NetMessage, NetworkConnection> S_KEEP_ALIVE;
     public static Action<NetMessage, NetworkConnection> S_SEND_NAME;
     public static Action<NetMessage, NetworkConnection> S_JOIN;
@@ -49,6 +52,10 @@ public static class NetUtility
         var OpCode = (OpCode)streamReader.ReadByte();
         switch (OpCode)
         {
+            case OpCode.PING:
+                msg = new NetPing(ref streamReader);
+                break;
+
             case OpCode.KEEP_ALIVE:
                 msg = new NetKeepAlive(ref streamReader);
                 break;

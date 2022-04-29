@@ -26,6 +26,28 @@ public class Server : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    private void Start()
+    {
+        registerToEvent(true);
+    }
+
+    private void registerToEvent(bool confirm)
+    {
+        if (confirm)
+        {
+            NetUtility.S_PING += OnServerReceivedPingMessage;
+        }
+        else
+        {
+            NetUtility.S_PING -= OnServerReceivedPingMessage;
+        }
+    }
+
+    private void OnServerReceivedPingMessage(NetMessage message, NetworkConnection sentClient)
+    {
+        SendToClient(sentClient, message);
+    }
+
     // Methods
     public void Init(ushort port, int maximumConnection)
     {
