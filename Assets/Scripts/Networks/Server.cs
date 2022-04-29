@@ -84,7 +84,8 @@ public class Server : MonoBehaviour
 
     private void OnDestroy()
     {
-        ServerReset();
+        if (isActive)
+            ServerReset();
     }
 
     private void ServerReset()

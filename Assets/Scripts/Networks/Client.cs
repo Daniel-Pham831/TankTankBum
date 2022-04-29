@@ -53,6 +53,12 @@ public class Client : MonoBehaviour
         nextPingSend = Time.time + timeBetweenEachPingSend;
     }
 
+    private void OnDestroy()
+    {
+        if (isActive)
+            ClientReset();
+    }
+
     private void ClientReset()
     {
         driver.Dispose();
