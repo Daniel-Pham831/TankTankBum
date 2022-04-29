@@ -37,7 +37,7 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                     ""initialStateCheck"": true
                 },
                 {
-                    ""name"": ""CameraRotation"",
+                    ""name"": ""TowerRotation"",
                     ""type"": ""Value"",
                     ""id"": ""e3cccc73-be46-4d0e-891c-f81a0904df4b"",
                     ""expectedControlType"": ""Analog"",
@@ -109,7 +109,7 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": ""Normalize(min=-1,max=1)"",
                     ""groups"": """",
-                    ""action"": ""CameraRotation"",
+                    ""action"": ""TowerRotation"",
                     ""isComposite"": true,
                     ""isPartOfComposite"": false
                 },
@@ -120,7 +120,7 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""CameraRotation"",
+                    ""action"": ""TowerRotation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 },
@@ -131,7 +131,7 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": """",
-                    ""action"": ""CameraRotation"",
+                    ""action"": ""TowerRotation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
                 }
@@ -143,7 +143,7 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
         // Tank
         m_Tank = asset.FindActionMap("Tank", throwIfNotFound: true);
         m_Tank_Movement = m_Tank.FindAction("Movement", throwIfNotFound: true);
-        m_Tank_CameraRotation = m_Tank.FindAction("CameraRotation", throwIfNotFound: true);
+        m_Tank_TowerRotation = m_Tank.FindAction("TowerRotation", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -204,13 +204,13 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
     private readonly InputActionMap m_Tank;
     private ITankActions m_TankActionsCallbackInterface;
     private readonly InputAction m_Tank_Movement;
-    private readonly InputAction m_Tank_CameraRotation;
+    private readonly InputAction m_Tank_TowerRotation;
     public struct TankActions
     {
         private @InputSystem m_Wrapper;
         public TankActions(@InputSystem wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_Tank_Movement;
-        public InputAction @CameraRotation => m_Wrapper.m_Tank_CameraRotation;
+        public InputAction @TowerRotation => m_Wrapper.m_Tank_TowerRotation;
         public InputActionMap Get() { return m_Wrapper.m_Tank; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -223,9 +223,9 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                 @Movement.started -= m_Wrapper.m_TankActionsCallbackInterface.OnMovement;
                 @Movement.performed -= m_Wrapper.m_TankActionsCallbackInterface.OnMovement;
                 @Movement.canceled -= m_Wrapper.m_TankActionsCallbackInterface.OnMovement;
-                @CameraRotation.started -= m_Wrapper.m_TankActionsCallbackInterface.OnCameraRotation;
-                @CameraRotation.performed -= m_Wrapper.m_TankActionsCallbackInterface.OnCameraRotation;
-                @CameraRotation.canceled -= m_Wrapper.m_TankActionsCallbackInterface.OnCameraRotation;
+                @TowerRotation.started -= m_Wrapper.m_TankActionsCallbackInterface.OnTowerRotation;
+                @TowerRotation.performed -= m_Wrapper.m_TankActionsCallbackInterface.OnTowerRotation;
+                @TowerRotation.canceled -= m_Wrapper.m_TankActionsCallbackInterface.OnTowerRotation;
             }
             m_Wrapper.m_TankActionsCallbackInterface = instance;
             if (instance != null)
@@ -233,9 +233,9 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                 @Movement.started += instance.OnMovement;
                 @Movement.performed += instance.OnMovement;
                 @Movement.canceled += instance.OnMovement;
-                @CameraRotation.started += instance.OnCameraRotation;
-                @CameraRotation.performed += instance.OnCameraRotation;
-                @CameraRotation.canceled += instance.OnCameraRotation;
+                @TowerRotation.started += instance.OnTowerRotation;
+                @TowerRotation.performed += instance.OnTowerRotation;
+                @TowerRotation.canceled += instance.OnTowerRotation;
             }
         }
     }
@@ -243,6 +243,6 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
     public interface ITankActions
     {
         void OnMovement(InputAction.CallbackContext context);
-        void OnCameraRotation(InputAction.CallbackContext context);
+        void OnTowerRotation(InputAction.CallbackContext context);
     }
 }

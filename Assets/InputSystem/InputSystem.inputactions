@@ -15,7 +15,7 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "CameraRotation",
+                    "name": "TowerRotation",
                     "type": "Value",
                     "id": "e3cccc73-be46-4d0e-891c-f81a0904df4b",
                     "expectedControlType": "Analog",
@@ -87,7 +87,7 @@
                     "interactions": "",
                     "processors": "Normalize(min=-1,max=1)",
                     "groups": "",
-                    "action": "CameraRotation",
+                    "action": "TowerRotation",
                     "isComposite": true,
                     "isPartOfComposite": false
                 },
@@ -98,7 +98,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "CameraRotation",
+                    "action": "TowerRotation",
                     "isComposite": false,
                     "isPartOfComposite": true
                 },
@@ -109,7 +109,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "CameraRotation",
+                    "action": "TowerRotation",
                     "isComposite": false,
                     "isPartOfComposite": true
                 }

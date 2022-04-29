@@ -13,25 +13,34 @@ public class TankMovement : MonoBehaviour
     private Rigidbody localRb;
     private TankInformation localTankInfo;
 
-    private Vector2 currentInputVector;
+    // for tank movement
+    private Vector2 currentMovementInputVector;
     private Vector2 smoothInputVelocity;
 
-    [SerializeField] private float smoothInputSpeed = .1f;
-    [SerializeField] private float cameraRotationalSpeed;
-    [SerializeField] private GameObject tankTower;
-    [SerializeField] private Camera Camera;
+    // for tower rotation
+    private float currentRotationInput;
+    private float currentRotationVelocity;
 
+    // Interpolators
+    private int totalInterpolateStep = 10;
+    private FloatInterpolator floatInterpolator;
+
+    [SerializeField] private float smoothInputSpeed = .1f;
+
+    public GameObject TankTower;
 
     private void Awake()
     {
         localRb = GetComponent<Rigidbody>();
         localTankInfo = GetComponent<TankInformation>();
         inputsystem = InputEventManager.Singleton.Inputsystem;
+        floatInterpolator = new FloatInterpolator(totalInterpolateStep);
     }
 
     private void Start()
     {
         registerToEvent(true);
+
     }
 
     void FixedUpdate()
@@ -39,14 +48,18 @@ public class TankMovement : MonoBehaviour
         if (localTankInfo.IsLocalPlayer)
         {
             TankMovementInput();
-            TankCameraInput();
+            TankTowerInput();
         }
     }
 
-    private void TankCameraInput()
+    private void TankTowerInput()
     {
-        float rotationValue = inputsystem.Tank.CameraRotation.ReadValue<float>();
-        tankTower.transform.Rotate(Vector3.up * rotationValue * cameraRotationalSpeed * Time.deltaTime);
+        float inputFloat = inputsystem.Tank.TowerRotation.ReadValue<float>();
+
+        currentRotationInput = floatInterpolator.Interpolate(currentRotationInput, inputFloat);
+
+        if (currentRotationInput != 0)
+            Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, currentRotationInput));
     }
 
     private void TankMovementInput()
@@ -66,9 +79,10 @@ public class TankMovement : MonoBehaviour
             inputVector.x = 0;
         }
 
-        currentInputVector = Vector2.SmoothDamp(currentInputVector, inputVector, ref smoothInputVelocity, smoothInputSpeed);
-        if (currentInputVector != Vector2.zero)
-            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentInputVector.x, currentInputVector.y));
+        currentMovementInputVector = Vector2.SmoothDamp(currentMovementInputVector, inputVector, ref smoothInputVelocity, smoothInputSpeed);
+        Debug.Log(currentMovementInputVector);
+        if (currentMovementInputVector != Vector2.zero)
+            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentMovementInputVector.x, currentMovementInputVector.y));
     }
 
 
@@ -77,11 +91,22 @@ public class TankMovement : MonoBehaviour
         if (confirm)
         {
             NetUtility.C_T_TRANSFORM += OnClientReceivedTMoveMessage;
+            NetUtility.C_T_TOWER_ROTATION += OnClientReceivedTTowerRotation;
         }
         else
         {
             NetUtility.C_T_TRANSFORM -= OnClientReceivedTMoveMessage;
+            NetUtility.C_T_TOWER_ROTATION -= OnClientReceivedTTowerRotation;
         }
+    }
+
+    private void OnClientReceivedTTowerRotation(NetMessage message)
+    {
+        NetTTowerRotation tTowerRotationMessage = message as NetTTowerRotation;
+
+        if (localTankInfo.ID != tTowerRotationMessage.ID) return;
+
+        TankTower.transform.rotation = tTowerRotationMessage.Rotation;
     }
 
     private void OnClientReceivedTMoveMessage(NetMessage message)

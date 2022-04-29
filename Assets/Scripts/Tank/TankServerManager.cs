@@ -12,8 +12,12 @@ public class TankServerManager : MonoBehaviour
     #region UnityFunctions
     public static TankServerManager Singleton { get; private set; }
 
-    [SerializeField] private float tankMoveSpeed;
-    [SerializeField] private float tankRotateSpeed;
+    // Tank Movement
+    [SerializeField] private float tankMoveSpeed = 10f;
+    [SerializeField] private float tankRotateSpeed = 135f;
+
+    // Tank tower rotation
+    [SerializeField] private float towerRotationSpeed = 90f;
 
     private float timeBetweenEachSend = 0.1f;
     private float nextSendTime;
@@ -67,11 +71,24 @@ public class TankServerManager : MonoBehaviour
         if (confirm)
         {
             NetUtility.S_T_INPUT += OnServerReceivedTInputMessage;
+            NetUtility.S_T_TOWER_INPUT += OnServerReceivedTTowerInputMessage;
         }
         else
         {
             NetUtility.S_T_INPUT -= OnServerReceivedTInputMessage;
+            NetUtility.S_T_TOWER_INPUT -= OnServerReceivedTTowerInputMessage;
         }
+    }
+
+    private void OnServerReceivedTTowerInputMessage(NetMessage message, NetworkConnection sentPlayer)
+    {
+        NetTTowerInput tankTowerInputMessage = message as NetTTowerInput;
+
+        GameObject sentPlayerTankTower = TankRigidbodies[tankTowerInputMessage.ID].GetComponent<TankMovement>().TankTower;
+
+        sentPlayerTankTower.transform.Rotate(Vector3.up * tankTowerInputMessage.RotationInput * towerRotationSpeed * Time.deltaTime);
+
+        Server.Singleton.BroadCast(new NetTTowerRotation(tankTowerInputMessage.ID, sentPlayerTankTower.transform.rotation));
     }
 
     private void OnServerReceivedTInputMessage(NetMessage message, NetworkConnection sentPlayer)
@@ -82,7 +99,7 @@ public class TankServerManager : MonoBehaviour
             Server needs to calculate the sentPlayer position,rotation and send it back to all players
         */
 
-        Rigidbody sentPlayerRigidbody = TankRigidbodies[tankInputMessage.ID].GetComponent<Rigidbody>();
+        Rigidbody sentPlayerRigidbody = TankRigidbodies[tankInputMessage.ID];
 
         MoveSentPlayerRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
 

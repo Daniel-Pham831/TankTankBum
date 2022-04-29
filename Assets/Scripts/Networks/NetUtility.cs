@@ -14,7 +14,9 @@ public enum OpCode
     SWITCHTEAM = 7,
     START = 8,
     T_TRANSFORM = 9,
-    T_INPUT = 10
+    T_INPUT = 10,
+    T_TOWER_INPUT = 11,
+    T_TOWER_ROTATION = 12
 }
 
 public static class NetUtility
@@ -39,11 +41,15 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_SWITCHTEAM;
     public static Action<NetMessage, NetworkConnection> S_START;
 
-    // Net InGame messages
+    // Net Tank messages
     public static Action<NetMessage> C_T_TRANSFORM;
     public static Action<NetMessage> C_T_INPUT;
+    public static Action<NetMessage> C_T_TOWER_INPUT;
+    public static Action<NetMessage> C_T_TOWER_ROTATION;
     public static Action<NetMessage, NetworkConnection> S_T_TRANSFORM;
     public static Action<NetMessage, NetworkConnection> S_T_INPUT;
+    public static Action<NetMessage, NetworkConnection> S_T_TOWER_INPUT;
+    public static Action<NetMessage, NetworkConnection> S_T_TOWER_ROTATION;
 
 
     public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
@@ -89,13 +95,21 @@ public static class NetUtility
                 msg = new NetStartGame(ref streamReader);
                 break;
 
-            //InGame
+            //Tank
+            case OpCode.T_INPUT:
+                msg = new NetTInput(ref streamReader);
+                break;
+
             case OpCode.T_TRANSFORM:
                 msg = new NetTTransform(ref streamReader);
                 break;
 
-            case OpCode.T_INPUT:
-                msg = new NetTInput(ref streamReader);
+            case OpCode.T_TOWER_INPUT:
+                msg = new NetTTowerInput(ref streamReader);
+                break;
+
+            case OpCode.T_TOWER_ROTATION:
+                msg = new NetTTowerRotation(ref streamReader);
                 break;
 
             default:

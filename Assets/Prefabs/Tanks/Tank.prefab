@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3849040111357085565}
   - component: {fileID: 2595325352515417843}
   - component: {fileID: 1686036829951592223}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wheel_B_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -94,7 +94,7 @@ GameObject:
   - component: {fileID: 5629114124911054191}
   - component: {fileID: 5248251735533050167}
   - component: {fileID: 7925274291160927658}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wheel_F_Right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -179,7 +179,7 @@ GameObject:
   - component: {fileID: 1203978290991682003}
   - component: {fileID: 2913180305272265866}
   - component: {fileID: 3889707944643101281}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Tank
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -245,8 +245,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   smoothInputSpeed: 0.1
   cameraRotationalSpeed: 145
-  tankTower: {fileID: 7506027945531828106}
-  Camera: {fileID: 8888948984892297567, guid: 450c73f4b095432429f467217232e208, type: 3}
+  TankTower: {fileID: 7506027945531828106}
 --- !u!114 &3889707944643101281
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -274,7 +273,7 @@ GameObject:
   - component: {fileID: 8670958397078913043}
   - component: {fileID: 1266138181427884584}
   - component: {fileID: 4312055848112841322}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wheel_B_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -357,7 +356,7 @@ GameObject:
   - component: {fileID: 8258089063926419076}
   - component: {fileID: 8603167059515092376}
   - component: {fileID: 7634987730495081646}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Tank_Canon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -440,7 +439,7 @@ GameObject:
   - component: {fileID: 6239032317628718882}
   - component: {fileID: 8801154653429731515}
   - component: {fileID: 964489112691030025}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Tank_Tower
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -454,7 +453,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7506027945531828106}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0.50000006, z: -0.08876333}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -524,7 +523,7 @@ GameObject:
   - component: {fileID: 7477889948126501866}
   - component: {fileID: 7630835561599665961}
   - component: {fileID: 3234487187869843982}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Wheel_F_Left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -607,7 +606,7 @@ GameObject:
   - component: {fileID: 7204352082392036138}
   - component: {fileID: 3851750155300847579}
   - component: {fileID: 1194570927325130496}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: TankModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
