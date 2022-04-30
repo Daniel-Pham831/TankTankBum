@@ -22,7 +22,6 @@ public class TankName : MonoBehaviour
     {
         tank = tankToFollow;
         NameText.SetText(tankName);
-        Debug.Log("set");
     }
 
     public void SetNameRot(Quaternion rot)

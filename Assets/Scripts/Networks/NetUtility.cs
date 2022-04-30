@@ -6,6 +6,8 @@ public enum OpCode
 {
     PING = 0,
     KEEP_ALIVE = 1,
+
+    //For MainMenu + Lobby
     SEND_NAME = 2,
     JOIN = 3,
     DISCONNECT = 4,
@@ -13,6 +15,8 @@ public enum OpCode
     READY = 6,
     SWITCHTEAM = 7,
     START = 8,
+
+    // For tanks 
     T_TRANSFORM = 9,
     T_INPUT = 10,
     T_TOWER_INPUT = 11,

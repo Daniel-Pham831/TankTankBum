@@ -111,10 +111,9 @@ public class TankServerManager : MonoBehaviour
     #region Calculating Functions
     private void MoveSentPlayerRigidBodyBasedOnInput(ref Rigidbody rb, float horizontalInput, float verticalInput)
     {
-        // should refactor this MovePosition and MoveRotation into rb.AddForce
-        rb.MovePosition(rb.transform.position + rb.transform.forward * verticalInput * tankMoveSpeed * Time.fixedDeltaTime);
+        // rb.MovePosition(rb.transform.position + rb.transform.forward * verticalInput * tankMoveSpeed * Time.fixedDeltaTime);
+        rb.AddForce(rb.transform.forward * verticalInput * tankMoveSpeed, ForceMode.Force);
         rb.MoveRotation(rb.transform.rotation * Quaternion.Euler(Vector3.up * horizontalInput * tankRotateSpeed * Time.fixedDeltaTime));
     }
-
     #endregion
 }

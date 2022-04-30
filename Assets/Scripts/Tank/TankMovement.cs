@@ -24,6 +24,8 @@ public class TankMovement : MonoBehaviour
     // Interpolators
     private int totalInterpolateStep = 10;
     private FloatInterpolator floatInterpolator;
+    // private Vector3Interpolator Vector3Interpolator;
+    // private QuaternionInterpolator QuaternionInterpolator;
 
     [SerializeField] private float smoothInputSpeed = .1f;
 
@@ -81,7 +83,10 @@ public class TankMovement : MonoBehaviour
 
         currentMovementInputVector = Vector2.SmoothDamp(currentMovementInputVector, inputVector, ref smoothInputVelocity, smoothInputSpeed);
         if (currentMovementInputVector != Vector2.zero)
-            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentMovementInputVector.x, currentMovementInputVector.y));
+        {
+            // Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentMovementInputVector.x, currentMovementInputVector.y));
+            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, inputVector.x, inputVector.y)); //Input Raw without smoothing
+        }
     }
 
 
