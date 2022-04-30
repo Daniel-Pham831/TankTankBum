@@ -24,8 +24,8 @@ public class TankMovement : MonoBehaviour
     // Interpolators
     private int totalInterpolateStep = 10;
     private FloatInterpolator floatInterpolator;
-    // private Vector3Interpolator Vector3Interpolator;
-    // private QuaternionInterpolator QuaternionInterpolator;
+    private Vector3Interpolator vector3Interpolator;
+    private QuaternionInterpolator quaternionInterpolator;
 
     [SerializeField] private float smoothInputSpeed = .1f;
 
@@ -37,6 +37,8 @@ public class TankMovement : MonoBehaviour
         localTankInfo = GetComponent<TankInformation>();
         inputsystem = InputEventManager.Singleton.Inputsystem;
         floatInterpolator = new FloatInterpolator(totalInterpolateStep);
+        vector3Interpolator = new Vector3Interpolator(totalInterpolateStep);
+        quaternionInterpolator = new QuaternionInterpolator(totalInterpolateStep);
     }
 
     private void Start()
@@ -59,7 +61,6 @@ public class TankMovement : MonoBehaviour
         float inputFloat = inputsystem.Tank.TowerRotation.ReadValue<float>();
 
         currentRotationInput = floatInterpolator.Interpolate(currentRotationInput, inputFloat);
-
         if (currentRotationInput != 0)
             Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, currentRotationInput));
     }
@@ -124,7 +125,7 @@ public class TankMovement : MonoBehaviour
 
     private void Move(Vector3 position, Quaternion rotation)
     {
-        localRb.MovePosition(position);
-        localRb.MoveRotation(rotation);
+        localRb.transform.position = vector3Interpolator.Interpolate(localRb.transform.position, position);
+        localRb.transform.rotation = quaternionInterpolator.Interpolate(localRb.transform.rotation, rotation);
     }
 }

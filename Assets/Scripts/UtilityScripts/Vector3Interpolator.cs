@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Data;
 using UnityEngine;
 
-public class FloatInterpolator : Interpolator<float>
+public class Vector3Interpolator : Interpolator<Vector3>
 {
-    public new float PreTargetValue;
+    public new Vector3 PreTargetValue;
 
-    public FloatInterpolator(int totalStepsToTarget) : base(totalStepsToTarget) { }
+    public Vector3Interpolator(int totalStepsToTarget) : base(totalStepsToTarget) { }
 
-    public override float Interpolate(float currentValue, float targetValue)
+    public override Vector3 Interpolate(Vector3 currentValue, Vector3 targetValue)
     {
         if (Counter == TotalStepsToTarget || currentValue == targetValue)
         {
@@ -24,6 +24,6 @@ public class FloatInterpolator : Interpolator<float>
 
         PreTargetValue = targetValue;
 
-        return Mathf.Lerp(currentValue, targetValue, (float)Counter++ / TotalStepsToTarget);
+        return Vector3.Lerp(currentValue, targetValue, (float)Counter++ / TotalStepsToTarget);
     }
 }

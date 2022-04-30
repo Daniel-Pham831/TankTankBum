@@ -7452,6 +7452,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fad2dc520baa4f142b3e3bfa0d045ff7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tankMoveSpeed: 50
+  tankMoveSpeed: 30
   tankRotateSpeed: 135
   towerRotationSpeed: 720
