@@ -112,7 +112,8 @@ public class TankServerManager : MonoBehaviour
     private void MoveSentPlayerRigidBodyBasedOnInput(ref Rigidbody rb, float horizontalInput, float verticalInput)
     {
         // rb.MovePosition(rb.transform.position + rb.transform.forward * verticalInput * tankMoveSpeed * Time.fixedDeltaTime);
-        rb.AddForce(rb.transform.forward * verticalInput * tankMoveSpeed, ForceMode.Force);
+        // rb.AddForce(rb.transform.forward * verticalInput * tankMoveSpeed, ForceMode.Force);
+        rb.velocity = rb.transform.forward * verticalInput * tankMoveSpeed;
         rb.MoveRotation(rb.transform.rotation * Quaternion.Euler(Vector3.up * horizontalInput * tankRotateSpeed * Time.fixedDeltaTime));
     }
     #endregion
