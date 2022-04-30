@@ -23,6 +23,9 @@ public class TankServerManager : MonoBehaviour
     private float nextSendTime;
 
     public Dictionary<byte, Rigidbody> TankRigidbodies;
+    public Dictionary<byte, Vector3> PreRbPosition;
+    public Dictionary<byte, Quaternion> PreRbRotation;
+
 
     private void Awake()
     {
@@ -30,6 +33,8 @@ public class TankServerManager : MonoBehaviour
             Singleton = this;
 
         TankRigidbodies = new Dictionary<byte, Rigidbody>();
+        PreRbPosition = new Dictionary<byte, Vector3>();
+        PreRbRotation = new Dictionary<byte, Quaternion>();
         DontDestroyOnLoad(gameObject);
     }
 
@@ -40,8 +45,8 @@ public class TankServerManager : MonoBehaviour
 
     private void Update()
     {
-        if (IsSendable())
-            SendTransformToAll();
+        // if (IsSendable())
+        SendTransformToAll();
     }
 
     private bool IsSendable()
@@ -59,7 +64,20 @@ public class TankServerManager : MonoBehaviour
     {
         foreach (byte id in TankRigidbodies.Keys)
         {
-            Server.Singleton.BroadCast(new NetTTransform(id, TankRigidbodies[id].position, TankRigidbodies[id].rotation));
+            // Server.Singleton.BroadCast(new NetTTransform(id, TankRigidbodies[id].position, TankRigidbodies[id].rotation));
+            if (PreRbPosition[id] != TankRigidbodies[id].position)
+            {
+                PreRbPosition[id] = TankRigidbodies[id].position;
+                Server.Singleton.BroadCast(new NetTPosition(id, TankRigidbodies[id].position));
+                Debug.Log("Sent position");
+            }
+
+            if (PreRbRotation[id].eulerAngles != TankRigidbodies[id].rotation.eulerAngles)
+            {
+                PreRbRotation[id] = TankRigidbodies[id].rotation;
+                Server.Singleton.BroadCast(new NetTRotation(id, TankRigidbodies[id].rotation));
+                Debug.Log("Sent rotation");
+            }
         }
     }
 
@@ -103,7 +121,11 @@ public class TankServerManager : MonoBehaviour
 
         MoveSentPlayerRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
 
-        Server.Singleton.BroadCast(new NetTTransform(tankInputMessage.ID, sentPlayerRigidbody.position, sentPlayerRigidbody.rotation));
+        Server.Singleton.BroadCast(new NetTVelocity(tankInputMessage.ID, sentPlayerRigidbody.velocity));
+        // Server.Singleton.BroadCast(new NetTPosition(tankInputMessage.ID, sentPlayerRigidbody.position));
+        Server.Singleton.BroadCast(new NetTRotation(tankInputMessage.ID, sentPlayerRigidbody.rotation));
+
+        // Server.Singleton.BroadCast(new NetTTransform(tankInputMessage.ID, sentPlayerRigidbody.position, sentPlayerRigidbody.rotation));
     }
 
     #endregion
@@ -113,7 +135,7 @@ public class TankServerManager : MonoBehaviour
     {
         // rb.MovePosition(rb.transform.position + rb.transform.forward * verticalInput * tankMoveSpeed * Time.fixedDeltaTime);
         // rb.AddForce(rb.transform.forward * verticalInput * tankMoveSpeed, ForceMode.Force);
-        rb.velocity = rb.transform.forward * verticalInput * tankMoveSpeed;
+        rb.velocity = (rb.transform.forward * verticalInput * tankMoveSpeed) + Vector3.up * rb.velocity.y;
         rb.MoveRotation(rb.transform.rotation * Quaternion.Euler(Vector3.up * horizontalInput * tankRotateSpeed * Time.fixedDeltaTime));
     }
     #endregion

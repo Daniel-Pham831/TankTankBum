@@ -20,7 +20,10 @@ public enum OpCode
     T_TRANSFORM = 9,
     T_INPUT = 10,
     T_TOWER_INPUT = 11,
-    T_TOWER_ROTATION = 12
+    T_TOWER_ROTATION = 12,
+    T_VELOCITY = 13,
+    T_POSITION = 14,
+    T_ROTATION = 15
 }
 
 public static class NetUtility
@@ -50,10 +53,16 @@ public static class NetUtility
     public static Action<NetMessage> C_T_INPUT;
     public static Action<NetMessage> C_T_TOWER_INPUT;
     public static Action<NetMessage> C_T_TOWER_ROTATION;
+    public static Action<NetMessage> C_T_VELOCITY;
+    public static Action<NetMessage> C_T_POSITION;
+    public static Action<NetMessage> C_T_ROTATION;
     public static Action<NetMessage, NetworkConnection> S_T_TRANSFORM;
     public static Action<NetMessage, NetworkConnection> S_T_INPUT;
     public static Action<NetMessage, NetworkConnection> S_T_TOWER_INPUT;
     public static Action<NetMessage, NetworkConnection> S_T_TOWER_ROTATION;
+    public static Action<NetMessage, NetworkConnection> S_T_VELOCITY;
+    public static Action<NetMessage, NetworkConnection> S_T_POSITION;
+    public static Action<NetMessage, NetworkConnection> S_T_ROTATION;
 
 
     public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
@@ -114,6 +123,18 @@ public static class NetUtility
 
             case OpCode.T_TOWER_ROTATION:
                 msg = new NetTTowerRotation(ref streamReader);
+                break;
+
+            case OpCode.T_VELOCITY:
+                msg = new NetTVelocity(ref streamReader);
+                break;
+
+            case OpCode.T_POSITION:
+                msg = new NetTPosition(ref streamReader);
+                break;
+
+            case OpCode.T_ROTATION:
+                msg = new NetTRotation(ref streamReader);
                 break;
 
             default:

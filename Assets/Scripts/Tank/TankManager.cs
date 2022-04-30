@@ -75,7 +75,6 @@ public class TankManager : MonoBehaviour
         if (clientInformation.IsHost)
         {
             TankServerManager.Singleton.TankRigidbodies = TankRigidbodies;
-            //  TankServerManager.Singleton.PreTankRigidbodies = TankRigidbodies;
         }
 
         SetupAllNamesData();
@@ -107,6 +106,8 @@ public class TankManager : MonoBehaviour
         TankInformations.Add(tankInformation.ID, tankInformation);
         TankObjects.Add(tankInformation.ID, tank);
         TankRigidbodies.Add(tankInformation.ID, tankRigid);
+        TankServerManager.Singleton.PreRbPosition.Add(id, tankRigid.position);
+        TankServerManager.Singleton.PreRbRotation.Add(id, tankRigid.rotation);
     }
 
     private void SetLocalTankCamera(GameObject tank, Team team)
