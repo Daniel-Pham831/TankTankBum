@@ -96,8 +96,10 @@ public class TankManager : MonoBehaviour
             LocalTankInformation = tankInformation;
             SetLocalTankCamera(tank, team);
         }
-
-        SetTankName(id, tank, name);
+        else
+        {
+            SetTankName(id, tank, name); //Only show other tanks' name
+        }
         SetTankColorBasedOnTeam(tank, team);
 
         TankInformations.Add(tankInformation.ID, tankInformation);
