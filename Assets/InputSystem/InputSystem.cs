@@ -44,6 +44,15 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                     ""processors"": """",
                     ""interactions"": """",
                     ""initialStateCheck"": true
+                },
+                {
+                    ""name"": ""Fire"",
+                    ""type"": ""Button"",
+                    ""id"": ""70afe6b7-fcc7-4d04-bff8-4c3ac6f205b2"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """",
+                    ""initialStateCheck"": false
                 }
             ],
             ""bindings"": [
@@ -134,6 +143,17 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                     ""action"": ""TowerRotation"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""fde9c62a-59a4-4f09-a8f2-3385f451d62f"",
+                    ""path"": ""<Keyboard>/space"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Fire"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
                 }
             ]
         }
@@ -144,6 +164,7 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
         m_Tank = asset.FindActionMap("Tank", throwIfNotFound: true);
         m_Tank_Movement = m_Tank.FindAction("Movement", throwIfNotFound: true);
         m_Tank_TowerRotation = m_Tank.FindAction("TowerRotation", throwIfNotFound: true);
+        m_Tank_Fire = m_Tank.FindAction("Fire", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -205,12 +226,14 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
     private ITankActions m_TankActionsCallbackInterface;
     private readonly InputAction m_Tank_Movement;
     private readonly InputAction m_Tank_TowerRotation;
+    private readonly InputAction m_Tank_Fire;
     public struct TankActions
     {
         private @InputSystem m_Wrapper;
         public TankActions(@InputSystem wrapper) { m_Wrapper = wrapper; }
         public InputAction @Movement => m_Wrapper.m_Tank_Movement;
         public InputAction @TowerRotation => m_Wrapper.m_Tank_TowerRotation;
+        public InputAction @Fire => m_Wrapper.m_Tank_Fire;
         public InputActionMap Get() { return m_Wrapper.m_Tank; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -226,6 +249,9 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                 @TowerRotation.started -= m_Wrapper.m_TankActionsCallbackInterface.OnTowerRotation;
                 @TowerRotation.performed -= m_Wrapper.m_TankActionsCallbackInterface.OnTowerRotation;
                 @TowerRotation.canceled -= m_Wrapper.m_TankActionsCallbackInterface.OnTowerRotation;
+                @Fire.started -= m_Wrapper.m_TankActionsCallbackInterface.OnFire;
+                @Fire.performed -= m_Wrapper.m_TankActionsCallbackInterface.OnFire;
+                @Fire.canceled -= m_Wrapper.m_TankActionsCallbackInterface.OnFire;
             }
             m_Wrapper.m_TankActionsCallbackInterface = instance;
             if (instance != null)
@@ -236,6 +262,9 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                 @TowerRotation.started += instance.OnTowerRotation;
                 @TowerRotation.performed += instance.OnTowerRotation;
                 @TowerRotation.canceled += instance.OnTowerRotation;
+                @Fire.started += instance.OnFire;
+                @Fire.performed += instance.OnFire;
+                @Fire.canceled += instance.OnFire;
             }
         }
     }
@@ -244,5 +273,6 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
     {
         void OnMovement(InputAction.CallbackContext context);
         void OnTowerRotation(InputAction.CallbackContext context);
+        void OnFire(InputAction.CallbackContext context);
     }
 }

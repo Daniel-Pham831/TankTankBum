@@ -1,3 +1,4 @@
+using System.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -74,6 +75,7 @@ public class TankManager : MonoBehaviour
         if (clientInformation.IsHost)
         {
             TankServerManager.Singleton.TankRigidbodies = TankRigidbodies;
+            //  TankServerManager.Singleton.PreTankRigidbodies = TankRigidbodies;
         }
 
         SetupAllNamesData();

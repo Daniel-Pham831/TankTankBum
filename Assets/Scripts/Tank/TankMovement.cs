@@ -36,9 +36,11 @@ public class TankMovement : MonoBehaviour
         localRb = GetComponent<Rigidbody>();
         localTankInfo = GetComponent<TankInformation>();
         inputsystem = InputEventManager.Singleton.Inputsystem;
+        inputsystem.Tank.Fire.performed += OnFireInputPerFormed;
+
         floatInterpolator = new FloatInterpolator(totalInterpolateStep);
-        vector3Interpolator = new Vector3Interpolator(totalInterpolateStep);
-        quaternionInterpolator = new QuaternionInterpolator(totalInterpolateStep);
+        vector3Interpolator = new Vector3Interpolator(totalInterpolateStep / 2);
+        quaternionInterpolator = new QuaternionInterpolator(totalInterpolateStep / 2);
     }
 
     private void Start()
@@ -54,6 +56,11 @@ public class TankMovement : MonoBehaviour
             TankMovementInput();
             TankTowerInput();
         }
+    }
+
+    private void OnFireInputPerFormed(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        Debug.Log(context);
     }
 
     private void TankTowerInput()
