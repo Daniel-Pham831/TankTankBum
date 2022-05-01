@@ -14,6 +14,8 @@ public class GameInformation : MonoBehaviour
         if (Singleton == null)
             Singleton = this;
 
+        QualitySettings.vSyncCount = 1;
+        Application.targetFrameRate = 60;
         DontDestroyOnLoad(gameObject);
     }
 }

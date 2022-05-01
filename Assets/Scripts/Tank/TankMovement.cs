@@ -13,14 +13,13 @@ public class TankMovement : MonoBehaviour
     private Rigidbody localRb;
 
     public GameObject TankTower;
-    private Vector3Interpolator vector3Interpolator;
-    private readonly int totalInterpolateStep = 10;
+
+    private float smoothTime = 10f;
 
     private void Awake()
     {
         localRb = GetComponent<Rigidbody>();
         localTankInfo = GetComponent<TankInformation>();
-        vector3Interpolator = new Vector3Interpolator(totalInterpolateStep);
     }
 
     private void Start()
@@ -32,7 +31,6 @@ public class TankMovement : MonoBehaviour
     {
         if (confirm)
         {
-            // NetUtility.C_T_TRANSFORM += OnClientReceivedTMoveMessage;
             NetUtility.C_T_TOWER_ROTATION += OnClientReceivedTTowerRotationMessage;
             NetUtility.C_T_VELOCITY += OnClientReceivedTVelocityMessage;
             NetUtility.C_T_POSITION += OnClientReceivedTPositionMessage;
@@ -40,7 +38,6 @@ public class TankMovement : MonoBehaviour
         }
         else
         {
-            // NetUtility.C_T_TRANSFORM -= OnClientReceivedTMoveMessage;
             NetUtility.C_T_TOWER_ROTATION -= OnClientReceivedTTowerRotationMessage;
             NetUtility.C_T_VELOCITY -= OnClientReceivedTVelocityMessage;
             NetUtility.C_T_POSITION -= OnClientReceivedTPositionMessage;
@@ -54,7 +51,7 @@ public class TankMovement : MonoBehaviour
 
         if (localTankInfo.ID != tPositionMessage.ID) return;
 
-        localRb.transform.position = vector3Interpolator.Interpolate(localRb.transform.position, tPositionMessage.Position);
+        localRb.transform.position = Vector3.Lerp(localRb.transform.position, tPositionMessage.Position, Time.deltaTime * smoothTime);
         // localRb.MovePosition(tPositionMessage.Position);
     }
 
@@ -84,23 +81,4 @@ public class TankMovement : MonoBehaviour
 
         TankTower.transform.rotation = tTowerRotationMessage.Rotation;
     }
-
-    // private void OnClientReceivedTMoveMessage(NetMessage message)
-    // {
-    //     NetTTransform tTransformMessage = message as NetTTransform;
-
-    //     if (localTankInfo.ID != tTransformMessage.ID) return;
-
-    //     Move(tTransformMessage.Position, tTransformMessage.Rotation);
-    // }
-
-    // private void Move(Vector3 position, Quaternion rotation)
-    // {
-    //     // localRb.transform.position = vector3Interpolator.Interpolate(localRb.transform.position, position);
-    //     // localRb.transform.rotation = quaternionInterpolator.Interpolate(localRb.transform.rotation, rotation);
-    //     localRb.transform.position = position;
-    //     localRb.transform.rotation = rotation;
-    //     // localRb.MovePosition(position);
-    //     // localRb.MoveRotation(rotation);
-    // }
 }
