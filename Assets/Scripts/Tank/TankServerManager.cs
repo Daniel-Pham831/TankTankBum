@@ -122,10 +122,7 @@ public class TankServerManager : MonoBehaviour
         MoveSentPlayerRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
 
         Server.Singleton.BroadCast(new NetTVelocity(tankInputMessage.ID, sentPlayerRigidbody.velocity));
-        // Server.Singleton.BroadCast(new NetTPosition(tankInputMessage.ID, sentPlayerRigidbody.position));
         Server.Singleton.BroadCast(new NetTRotation(tankInputMessage.ID, sentPlayerRigidbody.rotation));
-
-        // Server.Singleton.BroadCast(new NetTTransform(tankInputMessage.ID, sentPlayerRigidbody.position, sentPlayerRigidbody.rotation));
     }
 
     #endregion

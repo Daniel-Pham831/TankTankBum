@@ -25,7 +25,6 @@ public class TankMovement : MonoBehaviour
     private int totalInterpolateStep = 10;
     private FloatInterpolator floatInterpolator;
     private Vector3Interpolator vector3Interpolator;
-    private QuaternionInterpolator quaternionInterpolator;
 
     [SerializeField] private float smoothInputSpeed = .1f;
 
@@ -39,8 +38,7 @@ public class TankMovement : MonoBehaviour
         inputsystem.Tank.Fire.performed += OnFireInputPerFormed;
 
         floatInterpolator = new FloatInterpolator(totalInterpolateStep);
-        vector3Interpolator = new Vector3Interpolator(totalInterpolateStep);
-        quaternionInterpolator = new QuaternionInterpolator(totalInterpolateStep);
+        vector3Interpolator = new Vector3Interpolator(totalInterpolateStep / 2);
     }
 
     private void Start()
@@ -123,7 +121,8 @@ public class TankMovement : MonoBehaviour
 
         if (localTankInfo.ID != tPositionMessage.ID) return;
 
-        localRb.MovePosition(tPositionMessage.Position);
+        localRb.transform.position = vector3Interpolator.Interpolate(localRb.transform.position, tPositionMessage.Position);
+        // localRb.MovePosition(tPositionMessage.Position);
     }
 
     private void OnClientReceivedTRotationMessage(NetMessage message)
@@ -133,7 +132,6 @@ public class TankMovement : MonoBehaviour
         if (localTankInfo.ID != tRotationMessage.ID) return;
 
         localRb.MoveRotation(tRotationMessage.Rotation);
-
     }
 
     private void OnClientReceivedTVelocityMessage(NetMessage message)
