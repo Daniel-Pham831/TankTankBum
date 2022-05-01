@@ -69,14 +69,12 @@ public class TankServerManager : MonoBehaviour
             {
                 PreRbPosition[id] = TankRigidbodies[id].position;
                 Server.Singleton.BroadCast(new NetTPosition(id, TankRigidbodies[id].position));
-                Debug.Log("Sent position");
             }
 
             if (PreRbRotation[id].eulerAngles != TankRigidbodies[id].rotation.eulerAngles)
             {
                 PreRbRotation[id] = TankRigidbodies[id].rotation;
                 Server.Singleton.BroadCast(new NetTRotation(id, TankRigidbodies[id].rotation));
-                Debug.Log("Sent rotation");
             }
         }
     }

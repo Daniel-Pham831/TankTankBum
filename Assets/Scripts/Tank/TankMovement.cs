@@ -13,11 +13,14 @@ public class TankMovement : MonoBehaviour
     private Rigidbody localRb;
 
     public GameObject TankTower;
+    private Vector3Interpolator vector3Interpolator;
+    private readonly int totalInterpolateStep = 10;
 
     private void Awake()
     {
         localRb = GetComponent<Rigidbody>();
         localTankInfo = GetComponent<TankInformation>();
+        vector3Interpolator = new Vector3Interpolator(totalInterpolateStep);
     }
 
     private void Start()
@@ -51,8 +54,8 @@ public class TankMovement : MonoBehaviour
 
         if (localTankInfo.ID != tPositionMessage.ID) return;
 
-        // localRb.transform.position = vector3Interpolator.Interpolate(localRb.transform.position, tPositionMessage.Position);
-        localRb.MovePosition(tPositionMessage.Position);
+        localRb.transform.position = vector3Interpolator.Interpolate(localRb.transform.position, tPositionMessage.Position);
+        // localRb.MovePosition(tPositionMessage.Position);
     }
 
     private void OnClientReceivedTRotationMessage(NetMessage message)
