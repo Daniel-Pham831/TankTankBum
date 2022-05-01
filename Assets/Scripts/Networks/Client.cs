@@ -53,6 +53,12 @@ public class Client : MonoBehaviour
         nextPingSend = Time.time + timeBetweenEachPingSend;
     }
 
+    private void OnDestroy()
+    {
+        if (isActive)
+            ClientReset();
+    }
+
     private void ClientReset()
     {
         driver.Dispose();
@@ -150,8 +156,8 @@ public class Client : MonoBehaviour
 
     private void OnClientReceivedPingMessage(NetMessage message)
     {
-        currentPingTime = (Time.time - preSendPingTime) * 1000;
-        currentPingTime = Mathf.Round(currentPingTime);
+        currentPingTime = (Time.time - preSendPingTime);
+        currentPingTime = Mathf.Round(currentPingTime * 1000); // Multiplied by 1000 to get ms
         pingCounterText.SetText($"Ping: {currentPingTime}ms");
     }
 

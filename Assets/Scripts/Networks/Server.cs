@@ -82,6 +82,12 @@ public class Server : MonoBehaviour
         }
     }
 
+    private void OnDestroy()
+    {
+        if (isActive)
+            ServerReset();
+    }
+
     private void ServerReset()
     {
         driver.Dispose();
@@ -194,7 +200,7 @@ public class Server : MonoBehaviour
         {
             if (connections[i].IsCreated)
             {
-                Debug.Log($"Server sent {msg.Code} to: {connections[i].InternalId}");
+                // Debug.Log($"Server sent {msg.Code} to: {connections[i].InternalId}");
                 SendToClient(connections[i], msg);
             }
         }
@@ -206,7 +212,7 @@ public class Server : MonoBehaviour
         {
             if (connections[i].IsCreated && connections[i] != exceptClient)
             {
-                Debug.Log($"Server sent {msg.Code} to: {connections[i].InternalId}");
+                // Debug.Log($"Server sent {msg.Code} to: {connections[i].InternalId}");
                 SendToClient(connections[i], msg);
             }
         }

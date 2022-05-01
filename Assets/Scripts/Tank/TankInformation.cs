@@ -3,6 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum Role
+{
+    Attacker = 0,
+    Defender = 1
+}
+
 /*
     This class is for storing ONE TankInformation
 */

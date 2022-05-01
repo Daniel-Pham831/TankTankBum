@@ -3,30 +3,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 /*
     This class is for handling tank movement
 */
 public class TankMovement : MonoBehaviour
 {
-    private InputSystem inputsystem;
-    private Rigidbody localRb;
     private TankInformation localTankInfo;
 
-    private Vector2 currentInputVector;
-    private Vector2 smoothInputVelocity;
+    private Rigidbody localRb;
 
-    [SerializeField] private float smoothInputSpeed = .1f;
-    [SerializeField] private float cameraRotationalSpeed;
-    [SerializeField] private GameObject tankTower;
-    [SerializeField] private Camera Camera;
+    public GameObject TankTower;
 
+    private float smoothTime = 10f;
 
     private void Awake()
     {
         localRb = GetComponent<Rigidbody>();
         localTankInfo = GetComponent<TankInformation>();
-        inputsystem = InputEventManager.Singleton.Inputsystem;
     }
 
     private void Start()
@@ -34,68 +27,58 @@ public class TankMovement : MonoBehaviour
         registerToEvent(true);
     }
 
-    void FixedUpdate()
-    {
-        if (localTankInfo.IsLocalPlayer)
-        {
-            TankMovementInput();
-            TankCameraInput();
-        }
-    }
-
-    private void TankCameraInput()
-    {
-        float rotationValue = inputsystem.Tank.CameraRotation.ReadValue<float>();
-        tankTower.transform.Rotate(Vector3.up * rotationValue * cameraRotationalSpeed * Time.deltaTime);
-    }
-
-    private void TankMovementInput()
-    {
-        Vector2 inputVector = inputsystem.Tank.Movement.ReadValue<Vector2>();
-
-        if (inputVector.y != 0)
-        {
-            if (inputVector.y < 0)
-            {
-                inputVector.x *= -1;
-            }
-        }
-        else
-        {
-            // If the player is NOT pressing down on the verticalInputs(W,S) then that means no rotation for the player
-            inputVector.x = 0;
-        }
-
-        currentInputVector = Vector2.SmoothDamp(currentInputVector, inputVector, ref smoothInputVelocity, smoothInputSpeed);
-        if (currentInputVector != Vector2.zero)
-            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentInputVector.x, currentInputVector.y));
-    }
-
-
     private void registerToEvent(bool confirm)
     {
         if (confirm)
         {
-            NetUtility.C_T_TRANSFORM += OnClientReceivedTMoveMessage;
+            NetUtility.C_T_TOWER_ROTATION += OnClientReceivedTTowerRotationMessage;
+            NetUtility.C_T_VELOCITY += OnClientReceivedTVelocityMessage;
+            NetUtility.C_T_POSITION += OnClientReceivedTPositionMessage;
+            NetUtility.C_T_ROTATION += OnClientReceivedTRotationMessage;
         }
         else
         {
-            NetUtility.C_T_TRANSFORM -= OnClientReceivedTMoveMessage;
+            NetUtility.C_T_TOWER_ROTATION -= OnClientReceivedTTowerRotationMessage;
+            NetUtility.C_T_VELOCITY -= OnClientReceivedTVelocityMessage;
+            NetUtility.C_T_POSITION -= OnClientReceivedTPositionMessage;
+            NetUtility.C_T_ROTATION -= OnClientReceivedTRotationMessage;
         }
     }
 
-    private void OnClientReceivedTMoveMessage(NetMessage message)
+    private void OnClientReceivedTPositionMessage(NetMessage message)
     {
-        NetTTransform tTransformMessage = message as NetTTransform;
+        NetTPosition tPositionMessage = message as NetTPosition;
 
-        if (localTankInfo.ID != tTransformMessage.ID) return;
+        if (localTankInfo.ID != tPositionMessage.ID) return;
 
-        Move(tTransformMessage.Position, tTransformMessage.Rotation);
+        localRb.transform.position = Vector3.Lerp(localRb.transform.position, tPositionMessage.Position, Time.deltaTime * smoothTime);
+        // localRb.MovePosition(tPositionMessage.Position);
     }
 
-    private void Move(Vector3 position, Quaternion rotation)
+    private void OnClientReceivedTRotationMessage(NetMessage message)
     {
-        localRb.MovePosition(position);
-        localRb.MoveRotation(rotation);
+        NetTRotation tRotationMessage = message as NetTRotation;
+
+        if (localTankInfo.ID != tRotationMessage.ID) return;
+
+        localRb.MoveRotation(tRotationMessage.Rotation);
+    }
+
+    private void OnClientReceivedTVelocityMessage(NetMessage message)
+    {
+        NetTVelocity tVelocityMessage = message as NetTVelocity;
+
+        if (localTankInfo.ID != tVelocityMessage.ID) return;
+
+        localRb.velocity = tVelocityMessage.Velocity;
+    }
+
+    private void OnClientReceivedTTowerRotationMessage(NetMessage message)
+    {
+        NetTTowerRotation tTowerRotationMessage = message as NetTTowerRotation;
+
+        if (localTankInfo.ID != tTowerRotationMessage.ID) return;
+
+        TankTower.transform.localEulerAngles = tTowerRotationMessage.LocalEulerAngles;
     }
 }

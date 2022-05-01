@@ -10,8 +10,6 @@ public class InputEventManager : MonoBehaviour
         Singleton = this;
         Inputsystem = new InputSystem();
         Inputsystem.Tank.Enable();
-        Inputsystem.Tank.Movement.Enable();
-        Inputsystem.Tank.CameraRotation.Enable();
         DontDestroyOnLoad(gameObject);
     }
 }
