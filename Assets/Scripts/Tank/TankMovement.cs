@@ -79,6 +79,6 @@ public class TankMovement : MonoBehaviour
 
         if (localTankInfo.ID != tTowerRotationMessage.ID) return;
 
-        TankTower.transform.rotation = tTowerRotationMessage.Rotation;
+        TankTower.transform.localEulerAngles = tTowerRotationMessage.LocalEulerAngles;
     }
 }

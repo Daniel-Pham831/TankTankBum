@@ -6,13 +6,13 @@ using UnityEngine;
 public class NetTTowerRotation : NetMessage
 {
     public byte ID { get; set; }
-    public Quaternion Rotation { get; set; }
+    public Vector3 LocalEulerAngles { get; set; }
 
-    public NetTTowerRotation(byte id, Quaternion rotation)
+    public NetTTowerRotation(byte id, Vector3 localEulerAngles)
     {
         Code = OpCode.T_TOWER_ROTATION;
         ID = id;
-        Rotation = rotation;
+        LocalEulerAngles = localEulerAngles;
     }
 
     public NetTTowerRotation(ref DataStreamReader reader)
@@ -27,10 +27,9 @@ public class NetTTowerRotation : NetMessage
 
         writer.WriteByte(ID);
 
-        writer.WriteFloat(Rotation.x);
-        writer.WriteFloat(Rotation.y);
-        writer.WriteFloat(Rotation.z);
-        writer.WriteFloat(Rotation.w);
+        writer.WriteFloat(LocalEulerAngles.x);
+        writer.WriteFloat(LocalEulerAngles.y);
+        writer.WriteFloat(LocalEulerAngles.z);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
@@ -39,8 +38,7 @@ public class NetTTowerRotation : NetMessage
         float x = reader.ReadFloat();
         float y = reader.ReadFloat();
         float z = reader.ReadFloat();
-        float w = reader.ReadFloat();
-        Rotation = new Quaternion(x, y, z, w);
+        LocalEulerAngles = new Vector3(x, y, z);
     }
 
     public override void ReceivedOnClient()

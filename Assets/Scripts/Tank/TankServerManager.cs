@@ -17,7 +17,7 @@ public class TankServerManager : MonoBehaviour
     [SerializeField] private float tankRotateSpeed = 135f;
 
     // Tank tower rotation
-    [SerializeField] private float towerRotationSpeed = 90f;
+    [SerializeField] private float towerRotationAngle = 45f;
 
     private float timeBetweenEachSend = 0.1f;
     private float nextSendTime;
@@ -102,9 +102,8 @@ public class TankServerManager : MonoBehaviour
 
         GameObject sentPlayerTankTower = TankRigidbodies[tankTowerInputMessage.ID].GetComponent<TankMovement>().TankTower;
 
-        sentPlayerTankTower.transform.Rotate(Vector3.up * tankTowerInputMessage.RotationInput * towerRotationSpeed * Time.deltaTime);
-
-        Server.Singleton.BroadCast(new NetTTowerRotation(tankTowerInputMessage.ID, sentPlayerTankTower.transform.rotation));
+        sentPlayerTankTower.transform.localEulerAngles += Vector3.up * tankTowerInputMessage.RotationInput * towerRotationAngle;
+        Server.Singleton.BroadCast(new NetTTowerRotation(tankTowerInputMessage.ID, sentPlayerTankTower.transform.localEulerAngles));
     }
 
     private void OnServerReceivedTInputMessage(NetMessage message, NetworkConnection sentPlayer)
