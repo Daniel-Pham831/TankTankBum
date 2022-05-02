@@ -407,6 +407,7 @@ GameObject:
   - component: {fileID: 2913180305272265866}
   - component: {fileID: 3889707944643101281}
   - component: {fileID: 8630298612837423109}
+  - component: {fileID: 1241107886939541999}
   m_Layer: 6
   m_Name: Tank
   m_TagString: Untagged
@@ -472,7 +473,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd5d0a286bdfd96419ed32d3f1ef3bab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smoothInputSpeed: 0.1
   TankTower: {fileID: 7506027945531828106}
 --- !u!114 &3889707944643101281
 MonoBehaviour:
@@ -502,6 +502,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd3853fd069643b428f7fdcadd4e880d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  smoothInputSpeed: 0.1
+--- !u!114 &1241107886939541999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4655256615376615491}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ded15383db670254bb4da63bd8d5f354, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  localTankInfo: {fileID: 3889707944643101281}
+  tankAnimator: {fileID: 7261466336950967217}
 --- !u!1 &5011558002008663621
 GameObject:
   m_ObjectHideFlags: 0
@@ -1107,6 +1122,7 @@ GameObject:
   - component: {fileID: 7204352082392036138}
   - component: {fileID: 3851750155300847579}
   - component: {fileID: 1194570927325130496}
+  - component: {fileID: 7261466336950967217}
   m_Layer: 6
   m_Name: TankModel
   m_TagString: Untagged
@@ -1184,6 +1200,26 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!95 &7261466336950967217
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8840471929908216987}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 13a4eaa649621514ea041be56e98417d, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &9120980435057033626
 GameObject:
   m_ObjectHideFlags: 0

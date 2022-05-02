@@ -114,9 +114,9 @@ public partial class @InputSystem : IInputActionCollection2, IDisposable
                 {
                     ""name"": ""1D Axis"",
                     ""id"": ""2d99f1a1-8342-4414-b631-85374d4f9cdf"",
-                    ""path"": ""1DAxis"",
+                    ""path"": ""1DAxis(minValue=-0.1,maxValue=0.1)"",
                     ""interactions"": """",
-                    ""processors"": ""Normalize(min=-1,max=1)"",
+                    ""processors"": """",
                     ""groups"": """",
                     ""action"": ""TowerRotation"",
                     ""isComposite"": true,

@@ -1,5 +1,3 @@
-using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Networking.Transport;
 using UnityEngine;
@@ -109,24 +107,38 @@ public class TankServerManager : MonoBehaviour
 
         GameObject sentPlayerTankTower = TankRigidbodies[tankTowerInputMessage.ID].GetComponent<TankMovement>().TankTower;
 
-        sentPlayerTankTower.transform.localEulerAngles += Vector3.up * tankTowerInputMessage.RotationInput * towerRotationAngle;
+        sentPlayerTankTower.transform.localEulerAngles += tankTowerInputMessage.RotationInput * towerRotationAngle * Vector3.up;
         Server.Singleton.BroadCast(new NetTTowerRotation(tankTowerInputMessage.ID, sentPlayerTankTower.transform.localEulerAngles));
     }
 
     private void OnServerReceivedTInputMessage(NetMessage message, NetworkConnection sentPlayer)
     {
         NetTInput tankInputMessage = message as NetTInput;
-        /*
-            At this point, Server just received an input message from sentPlayer
-            Server needs to calculate the sentPlayer position,rotation and send it back to all players
-        */
+
+        Server.Singleton.BroadCast(new NetTInput(tankInputMessage.ID, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput));
+
+        if (!Mathf.Approximately(tankInputMessage.VerticalInput, 0f))
+        {
+            ConvertAndBroadCast(tankInputMessage);
+        }
+    }
+
+    /*
+        At this point, Server just received an input message from sentPlayer
+        Server needs to calculate the sentPlayer position,rotation and send it back to all players
+    */
+    private void ConvertAndBroadCast(NetTInput tankInputMessage)
+    {
+        if (tankInputMessage.VerticalInput < 0)
+        {
+            tankInputMessage.HorizontalInput *= -1;
+        }
 
         Rigidbody sentPlayerRigidbody = TankRigidbodies[tankInputMessage.ID];
 
         MoveSentPlayerRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
-
-        Server.Singleton.BroadCast(new NetTVelocity(tankInputMessage.ID, sentPlayerRigidbody.velocity));
         Server.Singleton.BroadCast(new NetTRotation(tankInputMessage.ID, sentPlayerRigidbody.rotation));
+        Server.Singleton.BroadCast(new NetTVelocity(tankInputMessage.ID, sentPlayerRigidbody.velocity));
     }
 
     #endregion
