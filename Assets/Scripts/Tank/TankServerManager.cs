@@ -12,7 +12,7 @@ public class TankServerManager : MonoBehaviour
 
     // Tank Movement
     [SerializeField] private float tankMoveSpeed = 10f;
-    [SerializeField] private float tankRotateSpeed = 135f;
+    [SerializeField] private float tankRotateSpeed = 720f;
 
     // Tank tower rotation
     [SerializeField] private float towerRotationAngle = 45f;
@@ -62,7 +62,6 @@ public class TankServerManager : MonoBehaviour
     {
         foreach (byte id in TankRigidbodies.Keys)
         {
-            // Server.Singleton.BroadCast(new NetTTransform(id, TankRigidbodies[id].position, TankRigidbodies[id].rotation));
             if (PreRbPosition[id] != TankRigidbodies[id].position)
             {
                 PreRbPosition[id] = TankRigidbodies[id].position;
@@ -98,7 +97,11 @@ public class TankServerManager : MonoBehaviour
 
     private void OnServerReceivedTFireInputMessage(NetMessage message, NetworkConnection sentPlayer)
     {
-        Server.Singleton.BroadCast(new NetTFireInput((message as NetTFireInput).ID));
+        NetTFireInput tFireInputMessage = message as NetTFireInput;
+
+        GameObject sentPlayerTankTower = TankRigidbodies[tFireInputMessage.ID].GetComponent<TankMovement>().TankTower;
+        tFireInputMessage.FireDirection = sentPlayerTankTower.transform.forward;
+        Server.Singleton.BroadCast(tFireInputMessage);
     }
 
     private void OnServerReceivedTTowerInputMessage(NetMessage message, NetworkConnection sentPlayer)
@@ -124,7 +127,7 @@ public class TankServerManager : MonoBehaviour
     }
 
     /*
-        At this point, Server just received an input message from sentPlayer
+        At this point, Server just received an movement input message from sentPlayer
         Server needs to calculate the sentPlayer position,rotation and send it back to all players
     */
     private void ConvertAndBroadCast(NetTInput tankInputMessage)
