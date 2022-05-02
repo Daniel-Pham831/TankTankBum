@@ -146,8 +146,6 @@ public class TankServerManager : MonoBehaviour
     #region Calculating Functions
     private void MoveSentPlayerRigidBodyBasedOnInput(ref Rigidbody rb, float horizontalInput, float verticalInput)
     {
-        // rb.MovePosition(rb.transform.position + rb.transform.forward * verticalInput * tankMoveSpeed * Time.fixedDeltaTime);
-        // rb.AddForce(rb.transform.forward * verticalInput * tankMoveSpeed, ForceMode.Force);
         rb.velocity = (rb.transform.forward * verticalInput * tankMoveSpeed) + Vector3.up * rb.velocity.y;
         rb.MoveRotation(rb.transform.rotation * Quaternion.Euler(Vector3.up * horizontalInput * tankRotateSpeed * Time.fixedDeltaTime));
     }

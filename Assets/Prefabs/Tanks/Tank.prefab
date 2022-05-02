@@ -515,6 +515,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ded15383db670254bb4da63bd8d5f354, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tankInput: {fileID: 8630298612837423109}
   localTankInfo: {fileID: 3889707944643101281}
   tankAnimator: {fileID: 7261466336950967217}
 --- !u!1 &5011558002008663621
