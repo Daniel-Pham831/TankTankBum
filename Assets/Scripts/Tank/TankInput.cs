@@ -1,6 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /*
@@ -11,11 +8,17 @@ public class TankInput : MonoBehaviour
     private TankInformation localTankInfo;
     private InputSystem inputsystem;
 
-    // for tank movement
+    /// <summary>
+    /// for tank movement
+    /// </summary>
     private Vector2 currentMovementInputVector;
     private Vector2 smoothInputVelocity;
 
-    [SerializeField] private float smoothInputSpeed = .1f;
+    [SerializeField]
+    private float smoothInputSpeed = .1f;
+
+    private float towerRotation;
+    private bool isRotating;
 
     private void Awake()
     {
@@ -28,15 +31,28 @@ public class TankInput : MonoBehaviour
         if (localTankInfo.IsLocalPlayer)
         {
             inputsystem.Tank.TowerRotation.performed += OnTowerRotationInputPerformed;
+            inputsystem.Tank.TowerRotation.canceled += OnTowerRotationInputPerformed;
             inputsystem.Tank.Fire.performed += OnFireInputPerformed;
         }
     }
 
     private void Update()
     {
-        if (!localTankInfo.IsLocalPlayer) return;
+        if (!localTankInfo.IsLocalPlayer)
+        {
+            return;
+        }
 
         MovementInput();
+        TryRotateTower();
+    }
+
+    private void TryRotateTower()
+    {
+        if (isRotating)
+        {
+            Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, towerRotation));
+        }
     }
 
     private void MovementInput()
@@ -58,14 +74,15 @@ public class TankInput : MonoBehaviour
         currentMovementInputVector = Vector2.SmoothDamp(currentMovementInputVector, inputVector, ref smoothInputVelocity, smoothInputSpeed);
         if (currentMovementInputVector != Vector2.zero)
         {
-            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentMovementInputVector.x, currentMovementInputVector.y)); //Has smoothing effect
-            // Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, inputVector.x, inputVector.y)); //Input Raw without smoothing
+            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentMovementInputVector.x, currentMovementInputVector.y));
         }
     }
 
     private void OnTowerRotationInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, context.ReadValue<float>()));
+        isRotating = context.performed;
+        towerRotation = context.ReadValue<float>();
+        Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, towerRotation));
     }
 
     private void OnFireInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)

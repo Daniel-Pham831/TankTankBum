@@ -407,6 +407,7 @@ GameObject:
   - component: {fileID: 2913180305272265866}
   - component: {fileID: 3889707944643101281}
   - component: {fileID: 8630298612837423109}
+  - component: {fileID: 8575475808710551914}
   m_Layer: 6
   m_Name: Tank
   m_TagString: Untagged
@@ -472,7 +473,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd5d0a286bdfd96419ed32d3f1ef3bab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smoothInputSpeed: 0.1
   TankTower: {fileID: 7506027945531828106}
 --- !u!114 &3889707944643101281
 MonoBehaviour:
@@ -502,6 +502,27 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd3853fd069643b428f7fdcadd4e880d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  smoothInputSpeed: 0.1
+--- !u!95 &8575475808710551914
+Animator:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4655256615376615491}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 0}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &5011558002008663621
 GameObject:
   m_ObjectHideFlags: 0
