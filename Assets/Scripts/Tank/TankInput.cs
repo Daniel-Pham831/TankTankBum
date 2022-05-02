@@ -45,6 +45,7 @@ public class TankInput : MonoBehaviour
     private void OnFireInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
         Debug.Log(context);
+        Client.Singleton.SendToServer(new NetTFireInput(localTankInfo.ID));
     }
 
     private void Update()
