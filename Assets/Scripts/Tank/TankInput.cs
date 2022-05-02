@@ -61,24 +61,12 @@ public class TankInput : MonoBehaviour
     private void MovementInput()
     {
         Vector2 inputVector = inputsystem.Tank.Movement.ReadValue<Vector2>();
-        if (inputVector.y != 0)
-        {
-            if (inputVector.y < 0)
-            {
-                inputVector.x *= -1;
-            }
-        }
-        else
-        {
-            // If the player is NOT pressing down on the verticalInputs(W,S) then that means no rotation for the player
-            inputVector.x = 0;
-        }
 
         currentMovementInputVector = Vector2.SmoothDamp(currentMovementInputVector, inputVector, ref smoothInputVelocity, smoothInputSpeed);
-        if (currentMovementInputVector != Vector2.zero)
-        {
-            Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentMovementInputVector.x, currentMovementInputVector.y));
-        }
+
+        currentMovementInputVector.y = Mathf.Approximately(inputVector.y, 0f) ? 0 : currentMovementInputVector.y;
+
+        Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentMovementInputVector.x, currentMovementInputVector.y));
     }
 
     private void TryRotateTower()
