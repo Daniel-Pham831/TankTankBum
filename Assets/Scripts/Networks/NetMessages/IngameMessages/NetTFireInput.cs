@@ -6,11 +6,13 @@ using UnityEngine;
 public class NetTFireInput : NetMessage
 {
     public byte ID { get; set; }
+    public Vector3 FireDirection { get; set; }
 
-    public NetTFireInput(byte id)
+    public NetTFireInput(byte id, Vector3 fireDirection)
     {
         Code = OpCode.T_FIRE_INPUT;
         ID = id;
+        FireDirection = fireDirection;
     }
 
     public NetTFireInput(ref DataStreamReader reader)
@@ -24,11 +26,20 @@ public class NetTFireInput : NetMessage
         base.Serialize(ref writer);
 
         writer.WriteByte(ID);
+
+        writer.WriteFloat(FireDirection.x);
+        writer.WriteFloat(FireDirection.y);
+        writer.WriteFloat(FireDirection.z);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
         ID = reader.ReadByte();
+        float x = reader.ReadFloat();
+        float y = reader.ReadFloat();
+        float z = reader.ReadFloat();
+
+        FireDirection = new Vector3(x, y, z);
     }
 
     public override void ReceivedOnClient()
