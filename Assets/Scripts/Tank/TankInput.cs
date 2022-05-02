@@ -9,16 +9,15 @@ public class TankInput : MonoBehaviour
     private InputSystem inputsystem;
 
     /// <summary>
-    /// for tank movement
+    /// For tank movement.
     /// </summary>
     private Vector2 currentMovementInputVector;
     private Vector2 smoothInputVelocity;
+    private float towerRotation;
+    private bool isRotating;
 
     [SerializeField]
     private float smoothInputSpeed = .1f;
-
-    private float towerRotation;
-    private bool isRotating;
 
     private void Awake()
     {
@@ -36,6 +35,18 @@ public class TankInput : MonoBehaviour
         }
     }
 
+    private void OnTowerRotationInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        isRotating = context.performed;
+        towerRotation = context.ReadValue<float>();
+        Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, towerRotation));
+    }
+
+    private void OnFireInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        Debug.Log(context);
+    }
+
     private void Update()
     {
         if (!localTankInfo.IsLocalPlayer)
@@ -45,14 +56,6 @@ public class TankInput : MonoBehaviour
 
         MovementInput();
         TryRotateTower();
-    }
-
-    private void TryRotateTower()
-    {
-        if (isRotating)
-        {
-            Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, towerRotation));
-        }
     }
 
     private void MovementInput()
@@ -78,15 +81,11 @@ public class TankInput : MonoBehaviour
         }
     }
 
-    private void OnTowerRotationInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    private void TryRotateTower()
     {
-        isRotating = context.performed;
-        towerRotation = context.ReadValue<float>();
-        Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, towerRotation));
-    }
-
-    private void OnFireInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
-    {
-        Debug.Log(context);
+        if (isRotating)
+        {
+            Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, towerRotation));
+        }
     }
 }
