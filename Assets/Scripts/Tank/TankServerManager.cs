@@ -88,12 +88,19 @@ public class TankServerManager : MonoBehaviour
         {
             NetUtility.S_T_INPUT += OnServerReceivedTInputMessage;
             NetUtility.S_T_TOWER_INPUT += OnServerReceivedTTowerInputMessage;
+            NetUtility.S_T_FIRE_INPUT += OnServerReceivedTFireInputMessage;
         }
         else
         {
             NetUtility.S_T_INPUT -= OnServerReceivedTInputMessage;
             NetUtility.S_T_TOWER_INPUT -= OnServerReceivedTTowerInputMessage;
+            NetUtility.S_T_FIRE_INPUT -= OnServerReceivedTFireInputMessage;
         }
+    }
+
+    private void OnServerReceivedTFireInputMessage(NetMessage message, NetworkConnection sentPlayer)
+    {
+        Server.Singleton.BroadCast(new NetTFireInput((message as NetTFireInput).ID));
     }
 
     private void OnServerReceivedTTowerInputMessage(NetMessage message, NetworkConnection sentPlayer)

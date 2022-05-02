@@ -32,6 +32,16 @@ public class TankInput : MonoBehaviour
         }
     }
 
+    private void OnTowerRotationInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, context.ReadValue<float>()));
+    }
+
+    private void OnFireInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
+    {
+        Client.Singleton.SendToServer(new NetTFireInput(localTankInfo.ID));
+    }
+
     private void Update()
     {
         if (!localTankInfo.IsLocalPlayer) return;
@@ -61,15 +71,5 @@ public class TankInput : MonoBehaviour
             Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentMovementInputVector.x, currentMovementInputVector.y)); //Has smoothing effect
             // Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, inputVector.x, inputVector.y)); //Input Raw without smoothing
         }
-    }
-
-    private void OnTowerRotationInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
-    {
-        Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, context.ReadValue<float>()));
-    }
-
-    private void OnFireInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
-    {
-        Debug.Log(context);
     }
 }
