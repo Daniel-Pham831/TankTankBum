@@ -48,11 +48,7 @@ public class TankInteraction : MonoBehaviour, IDamageable, IFireable
 
     private void OnClientReceivedTFireInputMessage(NetMessage message)
     {
-        NetTFireInput tFireInputMessage = message as NetTFireInput;
-
-        if (localTankInfo.ID != tFireInputMessage.ID) return;
-
-        //Spawn grenade here
+        
     }
 
     public void Die()

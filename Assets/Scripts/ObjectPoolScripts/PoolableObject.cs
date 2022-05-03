@@ -17,10 +17,4 @@ public class PoolableObject : MonoBehaviour, IPoolable
         get => poolObjectType;
         set => poolObjectType = value;
     }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        Debug.Log("OnTriggerEnter");
-        ReleaseAction?.Invoke(this.gameObject);
-    }
 }
