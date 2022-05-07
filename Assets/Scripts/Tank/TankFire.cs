@@ -46,5 +46,8 @@ public class TankFire : MonoBehaviour
         GrenadeInformation grenadeInformation = tankGrenade.GetComponent<GrenadeInformation>();
         grenadeInformation.ID = localTankInfo.ID;
         grenadeInformation.Team = localTankInfo.Team;
+
+        GrenadeColor grenadeColor = tankGrenade.GetComponent<GrenadeColor>();
+        grenadeColor.SetupGrenadeColor(grenadeInformation.Team);
     }
 }

@@ -6,7 +6,7 @@ using UnityEngine;
 public enum PoolType
 {
     TGrenade,
-    GrenadeParticle
+    GrenadeExplosion
 }
 
 public class ObjectPoolManager : MonoBehaviour
