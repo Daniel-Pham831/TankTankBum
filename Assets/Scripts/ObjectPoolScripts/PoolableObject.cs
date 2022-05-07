@@ -17,4 +17,15 @@ public class PoolableObject : MonoBehaviour, IPoolable
         get => poolObjectType;
         set => poolObjectType = value;
     }
+
+    public void ReturnToPoolAfter(float second)
+    {
+        StartCoroutine(ReturnToPoolAfterHelper(second));
+    }
+
+    private IEnumerator ReturnToPoolAfterHelper(float second)
+    {
+        yield return new WaitForSeconds(second);
+        ReleaseAction?.Invoke(this.gameObject);
+    }
 }

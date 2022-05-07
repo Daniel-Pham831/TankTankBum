@@ -34,7 +34,6 @@ public class Pool : MonoBehaviour
             rb.velocity = Vector3.zero;
         }
         releasedObject.transform.position = this.transform.position;
-        releasedObject.transform.rotation = this.transform.rotation;
         releasedObject.gameObject.SetActive(false);
     }
 
