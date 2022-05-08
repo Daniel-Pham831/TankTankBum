@@ -1,19 +1,22 @@
 using UnityEngine;
 using System;
 
-public class TankInteraction : MonoBehaviour, IDamageable
+public class TankHealth : MonoBehaviour, IDamageable
 {
     [SerializeField] private TankInformation localTankInfo;
-    [SerializeField] private GameObject tankGrenadePrefab;
 
     private float health;
     public float Health
     {
         get => health;
-        set => health = value;
+        set
+        {
+            health = value;
+            OnCurrentHealthChanged?.Invoke(health);
+        }
     }
 
-    public Action OnTakeDamage;
+    public Action<float> OnCurrentHealthChanged;
     public Action OnDie;
 
     private void Start()
@@ -38,7 +41,6 @@ public class TankInteraction : MonoBehaviour, IDamageable
 
     public void TakeDamage(float damage)
     {
-        OnTakeDamage?.Invoke();
         Health -= damage;
         if (Health <= 0)
         {

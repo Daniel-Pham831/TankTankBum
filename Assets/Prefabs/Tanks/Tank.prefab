@@ -440,7 +440,7 @@ GameObject:
   - component: {fileID: 8630298612837423109}
   - component: {fileID: 1241107886939541999}
   - component: {fileID: 1460986932612665120}
-  - component: {fileID: 5028615975415348626}
+  - component: {fileID: 308169056504649566}
   m_Layer: 6
   m_Name: Tank
   m_TagString: Untagged
@@ -564,7 +564,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   localTankInfo: {fileID: 3889707944643101281}
   firePosition: {fileID: 4020179169516745857}
---- !u!114 &5028615975415348626
+--- !u!114 &308169056504649566
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -573,14 +573,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 4655256615376615491}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a895d86c82aaf244a2caee8ae4270b5, type: 3}
+  m_Script: {fileID: 11500000, guid: 59dd0ce020b780f4e838a3200ac1eb24, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 100
-  rateOfFire: 0
-  projectileSpeed: 0
   localTankInfo: {fileID: 3889707944643101281}
-  tankGrenadePrefab: {fileID: 1582285097027523096, guid: 95c8d9fb5469f7346aedbb0c5791d8bd, type: 3}
+  tankGrenadePrefab: {fileID: 0}
 --- !u!1 &5011558002008663621
 GameObject:
   m_ObjectHideFlags: 0

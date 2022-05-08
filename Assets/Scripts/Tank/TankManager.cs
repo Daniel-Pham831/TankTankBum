@@ -1,10 +1,6 @@
-using System.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using Unity.Networking.Transport;
 using UnityEngine;
-
 
 /*
     This class is for spawning and assign tank for each players in the game
@@ -14,27 +10,29 @@ public class TankManager : MonoBehaviour
     public static TankManager Singleton { get; private set; }
     [SerializeField] private GameObject tankPrefab;
     [SerializeField] private GameObject tankNamePrefab;
+    [SerializeField] private GameObject tankHealthPrefab;
     [SerializeField] private GameObject localTankCameraPrefab;
     [SerializeField] private Material blueTankMaterial;
     [SerializeField] private Material redTankMaterial;
     [SerializeField] private GameObject[] spawnPositions;
+    [SerializeField] private float tankDefaultHealth = 100f;
 
     // Tanks data
     public TankCamera LocalTankCamera { get; set; }
     public TankInformation LocalTankInformation { get; set; }
     public Dictionary<byte, TankInformation> TankInformations { get; set; }
-    public Dictionary<byte, GameObject> TankObjects { get; set; }
     public Dictionary<byte, Rigidbody> TankRigidbodies { get; set; }
     public Dictionary<byte, TankName> TankNames { get; set; }
+    public Dictionary<byte, HealthBar> TankHealthBar { get; set; }
 
 
     private void Awake()
     {
         Singleton = this;
         TankInformations = new Dictionary<byte, TankInformation>();
-        TankObjects = new Dictionary<byte, GameObject>();
         TankRigidbodies = new Dictionary<byte, Rigidbody>();
         TankNames = new Dictionary<byte, TankName>();
+        TankHealthBar = new Dictionary<byte, HealthBar>();
 
         DontDestroyOnLoad(gameObject);
     }
@@ -101,13 +99,23 @@ public class TankManager : MonoBehaviour
         {
             SetTankName(id, tank, name); //Only show other tanks' name
         }
+        SetTankHealth(id, tank, tankDefaultHealth);
         SetTankColorBasedOnTeam(tank, team);
 
         TankInformations.Add(tankInformation.ID, tankInformation);
-        TankObjects.Add(tankInformation.ID, tank);
         TankRigidbodies.Add(tankInformation.ID, tankRigid);
         TankServerManager.Singleton.PreRbPosition.Add(id, tankRigid.position);
         TankServerManager.Singleton.PreRbRotation.Add(id, tankRigid.rotation);
+    }
+
+    private void SetTankHealth(byte id, GameObject tank, float tankDefaultHealth)
+    {
+        GameObject tankHealthObject = Instantiate(tankHealthPrefab);
+        HealthBar heathBar = tankHealthObject.GetComponent<HealthBar>();
+        heathBar.SetUpTankHealth(tank, tankDefaultHealth);
+        heathBar.SetRot(LocalTankCamera.GetActualCameraRot);
+
+        tank.GetComponent<TankHealth>().Health = tankDefaultHealth;
     }
 
     private void SetLocalTankCamera(GameObject tank, Team team)
