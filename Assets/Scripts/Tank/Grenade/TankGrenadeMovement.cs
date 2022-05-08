@@ -24,16 +24,17 @@ public class TankGrenadeMovement : MonoBehaviour
     {
         if (other.TryGetComponent<TankInformation>(out TankInformation tankInformation))
         {
-
+            //Prevent the bullet to collide with the tank that shot it
             if (tankInformation.ID == grenadeInformation.ID)
                 return;
         }
+
 
         Pool GrenadeExplosionPool = ObjectPoolManager.Singleton.GetPool(PoolType.GrenadeExplosion);
         GameObject grenadeExplosion = GrenadeExplosionPool.Get();
         grenadeExplosion.transform.position = transform.position;
 
-        grenadeExplosion.GetComponent<PoolableObject>()?.ReturnToPoolAfter(5);
+        grenadeExplosion.GetComponent<PoolableObject>()?.ReturnToPoolAfter(2);
         if (grenadeExplosion.TryGetComponent<ParticleSystem>(out ParticleSystem ps))
         {
             ps.Play();

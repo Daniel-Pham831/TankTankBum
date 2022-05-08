@@ -17,12 +17,17 @@ public class TankServerManager : MonoBehaviour
     // Tank tower rotation
     [SerializeField] private float towerRotationAngle = 45f;
 
+    // Tank Grenade default speed;
+    [SerializeField] private float grenadeSpeed = 30f;
+    private float timeBetweenEachTFire = 0.5f;
     private float timeBetweenEachSend = 0.1f;
     private float nextSendTime;
 
     public Dictionary<byte, Rigidbody> TankRigidbodies;
     public Dictionary<byte, Vector3> PreRbPosition;
     public Dictionary<byte, Quaternion> PreRbRotation;
+    public Dictionary<byte, bool> CanBroadCastTFire;
+    public Dictionary<byte, float> NextSendTFireTime;
 
 
     private void Awake()
@@ -33,6 +38,8 @@ public class TankServerManager : MonoBehaviour
         TankRigidbodies = new Dictionary<byte, Rigidbody>();
         PreRbPosition = new Dictionary<byte, Vector3>();
         PreRbRotation = new Dictionary<byte, Quaternion>();
+        CanBroadCastTFire = new Dictionary<byte, bool>();
+        NextSendTFireTime = new Dictionary<byte, float>();
         DontDestroyOnLoad(gameObject);
     }
 
@@ -98,10 +105,20 @@ public class TankServerManager : MonoBehaviour
     private void OnServerReceivedTFireInputMessage(NetMessage message, NetworkConnection sentPlayer)
     {
         NetTFireInput tFireInputMessage = message as NetTFireInput;
+        float nextSendTFireTime;
+        if (!NextSendTFireTime.TryGetValue(tFireInputMessage.ID, out nextSendTFireTime))
+            NextSendTFireTime[tFireInputMessage.ID] = 0;
 
-        GameObject sentPlayerTankTower = TankRigidbodies[tFireInputMessage.ID].GetComponent<TankMovement>().TankTower;
-        tFireInputMessage.FireDirection = sentPlayerTankTower.transform.forward;
-        Server.Singleton.BroadCast(tFireInputMessage);
+        nextSendTFireTime = NextSendTFireTime[tFireInputMessage.ID];
+        if (Time.time >= nextSendTFireTime)
+        {
+            NextSendTFireTime[tFireInputMessage.ID] = Time.time + timeBetweenEachTFire;
+
+            GameObject sentPlayerTankTower = TankRigidbodies[tFireInputMessage.ID].GetComponent<TankMovement>().TankTower;
+            tFireInputMessage.FireDirection = sentPlayerTankTower.transform.forward;
+            tFireInputMessage.Speed = grenadeSpeed;
+            Server.Singleton.BroadCast(tFireInputMessage);
+        }
     }
 
     private void OnServerReceivedTTowerInputMessage(NetMessage message, NetworkConnection sentPlayer)

@@ -4,8 +4,7 @@ using UnityEngine;
 public class TankFire : MonoBehaviour
 {
 
-    [SerializeField]
-    private TankInformation localTankInfo;
+    [SerializeField] private TankInformation localTankInfo;
     [SerializeField] private GameObject firePosition;
 
 
@@ -41,7 +40,7 @@ public class TankFire : MonoBehaviour
         GameObject tankGrenade = tankGrenadePool.Get();
 
         TankGrenadeMovement tankGrenadeMovement = tankGrenade.GetComponent<TankGrenadeMovement>();
-        tankGrenadeMovement.FireAtDirection(tFireInputMessage.FireDirection, firePosition.transform.position, 20);
+        tankGrenadeMovement.FireAtDirection(tFireInputMessage.FireDirection, firePosition.transform.position, tFireInputMessage.Speed);
 
         GrenadeInformation grenadeInformation = tankGrenade.GetComponent<GrenadeInformation>();
         grenadeInformation.ID = localTankInfo.ID;
