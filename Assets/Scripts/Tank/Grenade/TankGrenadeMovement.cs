@@ -1,6 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 
 public class TankGrenadeMovement : MonoBehaviour
@@ -8,6 +5,7 @@ public class TankGrenadeMovement : MonoBehaviour
     [SerializeField] private Rigidbody rb;
     [SerializeField] private GrenadeInformation grenadeInformation;
     [SerializeField] private PoolableObject poolableObject;
+    private float timeReturnGrenadeToPool = 10f;
 
     public void FireAtDirection(Vector3 direction, Vector3 position, float speed)
     {
@@ -17,30 +15,29 @@ public class TankGrenadeMovement : MonoBehaviour
 
         this.GetComponentInChildren<TrailRenderer>().Clear();
 
-        poolableObject.ReturnToPoolAfter(10);
+        //Return the grenade to pool if it doesn't collide with any colliders
+        poolableObject.ReturnToPoolAfter(timeReturnGrenadeToPool);
     }
 
     private void OnTriggerEnter(Collider other)
     {
+        //Prevent the grenade to collide with the tank that shot it
         if (other.TryGetComponent<TankInformation>(out TankInformation tankInformation))
-        {
-            //Prevent the bullet to collide with the tank that shot it
             if (tankInformation.ID == grenadeInformation.ID)
                 return;
-        }
 
+        SpawnExplosionFXOnTrigger();
+        poolableObject.ReleaseAction?.Invoke(this.gameObject);
+    }
 
+    private void SpawnExplosionFXOnTrigger()
+    {
         Pool GrenadeExplosionPool = ObjectPoolManager.Singleton.GetPool(PoolType.GrenadeExplosion);
         GameObject grenadeExplosion = GrenadeExplosionPool.Get();
         grenadeExplosion.transform.position = transform.position;
 
         grenadeExplosion.GetComponent<PoolableObject>()?.ReturnToPoolAfter(2);
         if (grenadeExplosion.TryGetComponent<ParticleSystem>(out ParticleSystem ps))
-        {
             ps.Play();
-        }
-
-        poolableObject.ReleaseAction?.Invoke(this.gameObject);
     }
-
 }

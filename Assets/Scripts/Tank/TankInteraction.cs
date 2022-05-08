@@ -1,29 +1,16 @@
 using UnityEngine;
 using System;
 
-public class TankInteraction : MonoBehaviour, IDamageable, IFireable
+public class TankInteraction : MonoBehaviour, IDamageable
 {
-    [SerializeField] private float health;
-    [SerializeField] private float rateOfFire;
-    [SerializeField] private float projectileSpeed;
     [SerializeField] private TankInformation localTankInfo;
     [SerializeField] private GameObject tankGrenadePrefab;
 
+    private float health;
     public float Health
     {
         get => health;
         set => health = value;
-    }
-
-    public float RateOfFire
-    {
-        get => rateOfFire;
-        set => rateOfFire = value;
-    }
-    public float ProjectileSpeed
-    {
-        get => projectileSpeed;
-        set => projectileSpeed = value;
     }
 
     public Action OnTakeDamage;
@@ -38,26 +25,15 @@ public class TankInteraction : MonoBehaviour, IDamageable, IFireable
     {
         if (confirm)
         {
-            NetUtility.C_T_FIRE_INPUT += OnClientReceivedTFireInputMessage;
         }
         else
         {
-            NetUtility.C_T_FIRE_INPUT -= OnClientReceivedTFireInputMessage;
         }
-    }
-
-    private void OnClientReceivedTFireInputMessage(NetMessage message)
-    {
-        
     }
 
     public void Die()
     {
         OnDie?.Invoke();
-    }
-
-    public void Fire()
-    {
     }
 
     public void TakeDamage(float damage)
