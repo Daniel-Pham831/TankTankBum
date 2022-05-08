@@ -7502,6 +7502,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   tankMoveSpeed: 10
-  tankRotateSpeed: 300
+  tankRotateSpeed: 2.8
   towerRotationAngle: 45
   grenadeSpeed: 30
