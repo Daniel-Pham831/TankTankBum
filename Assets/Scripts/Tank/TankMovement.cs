@@ -60,7 +60,7 @@ public class TankMovement : MonoBehaviour
 
         if (localTankInfo.ID != tRotationMessage.ID) return;
 
-        localRb.transform.rotation = Quaternion.Slerp(localRb.transform.rotation, tRotationMessage.Rotation, Time.deltaTime * smoothTime);
+        localRb.transform.forward = Vector3.Lerp(localRb.transform.forward, tRotationMessage.Forward, Time.deltaTime * smoothTime);
     }
 
     private void OnClientReceivedTVelocityMessage(NetMessage message)

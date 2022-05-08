@@ -12,7 +12,7 @@ public class TankServerManager : MonoBehaviour
 
     // Tank Movement
     [SerializeField] private float tankMoveSpeed = 10f;
-    [SerializeField] private float tankRotateSpeed = 720f;
+    [SerializeField] private float tankRotateSpeed = 2.8f;
 
     // Tank tower rotation
     [SerializeField] private float towerRotationAngle = 45f;
@@ -20,7 +20,8 @@ public class TankServerManager : MonoBehaviour
     // Tank Grenade default speed;
     [SerializeField] private float grenadeSpeed = 30f;
     private float timeBetweenEachTFire = 0.5f;
-    private float timeBetweenEachSend = 0.1f;
+
+    private float timeBetweenEachSend = 0.05f;
     private float nextSendTime;
 
     public Dictionary<byte, Rigidbody> TankRigidbodies;
@@ -78,7 +79,7 @@ public class TankServerManager : MonoBehaviour
             if (PreRbRotation[id].eulerAngles != TankRigidbodies[id].rotation.eulerAngles)
             {
                 PreRbRotation[id] = TankRigidbodies[id].rotation;
-                Server.Singleton.BroadCast(new NetTRotation(id, TankRigidbodies[id].rotation));
+                Server.Singleton.BroadCast(new NetTRotation(id, TankRigidbodies[id].transform.forward));
             }
         }
     }
@@ -157,7 +158,7 @@ public class TankServerManager : MonoBehaviour
         Rigidbody sentPlayerRigidbody = TankRigidbodies[tankInputMessage.ID];
 
         MoveSentPlayerRigidBodyBasedOnInput(ref sentPlayerRigidbody, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput);
-        Server.Singleton.BroadCast(new NetTRotation(tankInputMessage.ID, sentPlayerRigidbody.rotation));
+        Server.Singleton.BroadCast(new NetTRotation(tankInputMessage.ID, sentPlayerRigidbody.transform.forward));
         Server.Singleton.BroadCast(new NetTVelocity(tankInputMessage.ID, sentPlayerRigidbody.velocity));
     }
 
@@ -167,7 +168,7 @@ public class TankServerManager : MonoBehaviour
     private void MoveSentPlayerRigidBodyBasedOnInput(ref Rigidbody rb, float horizontalInput, float verticalInput)
     {
         rb.velocity = (rb.transform.forward * verticalInput * tankMoveSpeed) + Vector3.up * rb.velocity.y;
-        rb.MoveRotation(rb.transform.rotation * Quaternion.Euler(Vector3.up * horizontalInput * tankRotateSpeed * Time.fixedDeltaTime));
+        rb.transform.localEulerAngles += horizontalInput * tankRotateSpeed * Vector3.up;
     }
     #endregion
 }

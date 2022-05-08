@@ -6,13 +6,13 @@ using UnityEngine;
 public class NetTRotation : NetMessage
 {
     public byte ID { get; set; }
-    public Quaternion Rotation { get; set; }
+    public Vector3 Forward { get; set; }
 
-    public NetTRotation(byte id, Quaternion rotation)
+    public NetTRotation(byte id, Vector3 forward)
     {
         Code = OpCode.T_ROTATION;
         ID = id;
-        Rotation = rotation;
+        Forward = forward;
     }
 
     public NetTRotation(ref DataStreamReader reader)
@@ -26,10 +26,9 @@ public class NetTRotation : NetMessage
         base.Serialize(ref writer);
 
         writer.WriteByte(ID);
-        writer.WriteFloat(Rotation.x);
-        writer.WriteFloat(Rotation.y);
-        writer.WriteFloat(Rotation.z);
-        writer.WriteFloat(Rotation.w);
+        writer.WriteFloat(Forward.x);
+        writer.WriteFloat(Forward.y);
+        writer.WriteFloat(Forward.z);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
@@ -38,8 +37,7 @@ public class NetTRotation : NetMessage
         float x = reader.ReadFloat();
         float y = reader.ReadFloat();
         float z = reader.ReadFloat();
-        float w = reader.ReadFloat();
-        Rotation = new Quaternion(x, y, z, w);
+        Forward = new Vector3(x, y, z);
     }
 
     public override void ReceivedOnClient()
