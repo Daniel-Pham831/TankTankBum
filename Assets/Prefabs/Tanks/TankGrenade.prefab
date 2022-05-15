@@ -84,6 +84,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 5298587962358593089}
   grenadeInformation: {fileID: 492655118496787721}
+  grenadeExplosionInformation: {fileID: 11400000, guid: 3976ee7f9ec523d47bd81c84b0b64bf0, type: 2}
   poolableObject: {fileID: 7997908194639469129}
 --- !u!114 &7997908194639469129
 MonoBehaviour:

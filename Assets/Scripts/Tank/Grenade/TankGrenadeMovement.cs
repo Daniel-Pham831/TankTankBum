@@ -1,9 +1,11 @@
+using System;
 using UnityEngine;
 
 public class TankGrenadeMovement : MonoBehaviour
 {
     [SerializeField] private Rigidbody rb;
     [SerializeField] private GrenadeInformation grenadeInformation;
+    [SerializeField] private GrenadeExplosionInformation grenadeExplosionInformation;
     [SerializeField] private PoolableObject poolableObject;
     private float timeReturnGrenadeToPool = 10f;
 
@@ -26,8 +28,30 @@ public class TankGrenadeMovement : MonoBehaviour
             if (tankInformation.ID == grenadeInformation.ID)
                 return;
 
+        ApplyDamageToAll();
+
         SpawnExplosionFXOnTrigger();
+
+        // Return this Grenade to its pool
         poolableObject.ReleaseAction?.Invoke(this.gameObject);
+    }
+
+    private void ApplyDamageToAll()
+    {
+        Collider[] colliders = Physics.OverlapSphere(this.transform.position, grenadeExplosionInformation.ExplosionRadius);
+        foreach (Collider collider in colliders)
+        {
+            if (collider.TryGetComponent<IDamageable>(out IDamageable damageable))
+            {
+                float damage = grenadeExplosionInformation.Damage;
+                if (collider.TryGetComponent<TankInformation>(out TankInformation tankInformation))
+                {
+                    damage = grenadeInformation.Team != tankInformation.Team ? damage : grenadeExplosionInformation.SameTeamDamage;
+                }
+
+                damageable.TakeDamage(damage);
+            }
+        }
     }
 
     private void SpawnExplosionFXOnTrigger()
