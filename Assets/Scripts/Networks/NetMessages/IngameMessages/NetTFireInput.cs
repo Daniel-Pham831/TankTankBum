@@ -7,12 +7,14 @@ public class NetTFireInput : NetMessage
 {
     public byte ID { get; set; }
     public Vector3 FireDirection { get; set; }
+    public float Speed { get; set; }
 
-    public NetTFireInput(byte id, Vector3 fireDirection)
+    public NetTFireInput(byte id, Vector3 fireDirection, float speed)
     {
         Code = OpCode.T_FIRE_INPUT;
         ID = id;
         FireDirection = fireDirection;
+        Speed = speed;
     }
 
     public NetTFireInput(ref DataStreamReader reader)
@@ -30,6 +32,7 @@ public class NetTFireInput : NetMessage
         writer.WriteFloat(FireDirection.x);
         writer.WriteFloat(FireDirection.y);
         writer.WriteFloat(FireDirection.z);
+        writer.WriteFloat(Speed);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
@@ -40,6 +43,7 @@ public class NetTFireInput : NetMessage
         float z = reader.ReadFloat();
 
         FireDirection = new Vector3(x, y, z);
+        Speed = reader.ReadFloat();
     }
 
     public override void ReceivedOnClient()

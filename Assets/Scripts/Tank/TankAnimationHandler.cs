@@ -33,7 +33,7 @@ public class TankAnimationHandler : MonoBehaviour
 
     private void OnClientReceivedTFireInputMessage(NetMessage message)
     {
-        Debug.Log($"Client {(message as NetTFireInput).FireDirection}");
+        // Debug.Log($"Client {(message as NetTFireInput).FireDirection}");
     }
 
     private void OnClientReceivedTInputMessage(NetMessage message)

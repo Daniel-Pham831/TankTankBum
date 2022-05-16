@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /*
@@ -16,6 +17,9 @@ public class TankInput : MonoBehaviour
     private float towerRotation;
     private bool isRotating;
 
+    // For tank fire
+    private bool isFiring;
+
     [SerializeField]
     private float smoothInputSpeed = .1f;
 
@@ -32,6 +36,7 @@ public class TankInput : MonoBehaviour
             inputsystem.Tank.TowerRotation.performed += OnTowerRotationInputPerformed;
             inputsystem.Tank.TowerRotation.canceled += OnTowerRotationInputPerformed;
             inputsystem.Tank.Fire.performed += OnFireInputPerformed;
+            inputsystem.Tank.Fire.canceled += OnFireInputPerformed;
         }
     }
 
@@ -39,12 +44,11 @@ public class TankInput : MonoBehaviour
     {
         isRotating = context.performed;
         towerRotation = context.ReadValue<float>();
-        Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, towerRotation));
     }
 
     private void OnFireInputPerformed(UnityEngine.InputSystem.InputAction.CallbackContext context)
     {
-        Client.Singleton.SendToServer(new NetTFireInput(localTankInfo.ID, Vector3.zero));
+        isFiring = context.performed;
     }
 
     private void Update()
@@ -56,6 +60,7 @@ public class TankInput : MonoBehaviour
 
         MovementInput();
         TryRotateTower();
+        TryFireGrenade();
     }
 
     private void MovementInput()
@@ -74,6 +79,14 @@ public class TankInput : MonoBehaviour
         if (isRotating)
         {
             Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, towerRotation));
+        }
+    }
+
+    private void TryFireGrenade()
+    {
+        if (isFiring)
+        {
+            Client.Singleton.SendToServer(new NetTFireInput(localTankInfo.ID, Vector3.zero, 0));
         }
     }
 }

@@ -26,12 +26,15 @@ public enum OpCode
     T_TRANSFORM,
     T_VELOCITY,
     T_POSITION,
-    T_ROTATION
+    T_ROTATION,
+
+    // For tank grenade
+    GRENADE_EXPLOSION
 }
 
 public static class NetUtility
 {
-    // Net Lobby messages
+    // Net Lobby events
     public static Action<NetMessage> C_PING;
     public static Action<NetMessage> C_KEEP_ALIVE;
     public static Action<NetMessage> C_SEND_NAME;
@@ -51,7 +54,7 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_SWITCHTEAM;
     public static Action<NetMessage, NetworkConnection> S_START;
 
-    // Net Tank input messages
+    // Net Tank input events
     public static Action<NetMessage> C_T_INPUT;
     public static Action<NetMessage> C_T_TOWER_INPUT;
     public static Action<NetMessage> C_T_FIRE_INPUT;
@@ -59,7 +62,7 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_T_TOWER_INPUT;
     public static Action<NetMessage, NetworkConnection> S_T_FIRE_INPUT;
 
-    // Net Tank movement messages
+    // Net Tank movement events
     public static Action<NetMessage> C_T_TRANSFORM;
     public static Action<NetMessage> C_T_TOWER_ROTATION;
     public static Action<NetMessage> C_T_VELOCITY;
@@ -71,6 +74,9 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_T_POSITION;
     public static Action<NetMessage, NetworkConnection> S_T_ROTATION;
 
+    // Grenade events
+    public static Action<NetMessage> C_GRENADE_EXPLOSION;
+    public static Action<NetMessage, NetworkConnection> S_GRENADE_EXPLOSION;
 
     public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
     {
@@ -148,6 +154,11 @@ public static class NetUtility
 
             case OpCode.T_ROTATION:
                 msg = new NetTRotation(ref streamReader);
+                break;
+
+            //Grenade
+            case OpCode.GRENADE_EXPLOSION:
+                msg = new NetGrenadeExplosion(ref streamReader);
                 break;
 
             default:
