@@ -13,7 +13,6 @@ public class TankMovement : MonoBehaviour
     private Rigidbody localRb;
 
     public GameObject TankTower;
-
     private float smoothTime = 10f;
 
     private void Awake()
@@ -52,7 +51,6 @@ public class TankMovement : MonoBehaviour
         if (localTankInfo.ID != tPositionMessage.ID) return;
 
         localRb.transform.position = Vector3.Lerp(localRb.transform.position, tPositionMessage.Position, Time.deltaTime * smoothTime);
-        // localRb.MovePosition(tPositionMessage.Position);
     }
 
     private void OnClientReceivedTRotationMessage(NetMessage message)
@@ -61,7 +59,7 @@ public class TankMovement : MonoBehaviour
 
         if (localTankInfo.ID != tRotationMessage.ID) return;
 
-        localRb.MoveRotation(tRotationMessage.Rotation);
+        localRb.transform.forward = Vector3.Lerp(localRb.transform.forward, tRotationMessage.Forward, Time.deltaTime * smoothTime);
     }
 
     private void OnClientReceivedTVelocityMessage(NetMessage message)

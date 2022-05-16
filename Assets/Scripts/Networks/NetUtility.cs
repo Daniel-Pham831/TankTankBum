@@ -8,27 +8,33 @@ public enum OpCode
     KEEP_ALIVE = 1,
 
     //For MainMenu + Lobby
-    SEND_NAME = 2,
-    JOIN = 3,
-    DISCONNECT = 4,
-    WELCOME = 5,
-    READY = 6,
-    SWITCHTEAM = 7,
-    START = 8,
+    SEND_NAME,
+    JOIN,
+    DISCONNECT,
+    WELCOME,
+    READY,
+    SWITCHTEAM,
+    START,
 
-    // For tanks 
-    T_TRANSFORM = 9,
-    T_INPUT = 10,
-    T_TOWER_INPUT = 11,
-    T_TOWER_ROTATION = 12,
-    T_VELOCITY = 13,
-    T_POSITION = 14,
-    T_ROTATION = 15
+    // For tanks input
+    T_INPUT,
+    T_TOWER_INPUT,
+    T_FIRE_INPUT,
+
+    // For tanks movement
+    T_TOWER_ROTATION,
+    T_TRANSFORM,
+    T_VELOCITY,
+    T_POSITION,
+    T_ROTATION,
+
+    // For tank grenade
+    GRENADE_EXPLOSION
 }
 
 public static class NetUtility
 {
-    // Net Lobby messages
+    // Net Lobby events
     public static Action<NetMessage> C_PING;
     public static Action<NetMessage> C_KEEP_ALIVE;
     public static Action<NetMessage> C_SEND_NAME;
@@ -48,22 +54,29 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_SWITCHTEAM;
     public static Action<NetMessage, NetworkConnection> S_START;
 
-    // Net Tank messages
-    public static Action<NetMessage> C_T_TRANSFORM;
+    // Net Tank input events
     public static Action<NetMessage> C_T_INPUT;
     public static Action<NetMessage> C_T_TOWER_INPUT;
+    public static Action<NetMessage> C_T_FIRE_INPUT;
+    public static Action<NetMessage, NetworkConnection> S_T_INPUT;
+    public static Action<NetMessage, NetworkConnection> S_T_TOWER_INPUT;
+    public static Action<NetMessage, NetworkConnection> S_T_FIRE_INPUT;
+
+    // Net Tank movement events
+    public static Action<NetMessage> C_T_TRANSFORM;
     public static Action<NetMessage> C_T_TOWER_ROTATION;
     public static Action<NetMessage> C_T_VELOCITY;
     public static Action<NetMessage> C_T_POSITION;
     public static Action<NetMessage> C_T_ROTATION;
     public static Action<NetMessage, NetworkConnection> S_T_TRANSFORM;
-    public static Action<NetMessage, NetworkConnection> S_T_INPUT;
-    public static Action<NetMessage, NetworkConnection> S_T_TOWER_INPUT;
     public static Action<NetMessage, NetworkConnection> S_T_TOWER_ROTATION;
     public static Action<NetMessage, NetworkConnection> S_T_VELOCITY;
     public static Action<NetMessage, NetworkConnection> S_T_POSITION;
     public static Action<NetMessage, NetworkConnection> S_T_ROTATION;
 
+    // Grenade events
+    public static Action<NetMessage> C_GRENADE_EXPLOSION;
+    public static Action<NetMessage, NetworkConnection> S_GRENADE_EXPLOSION;
 
     public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
     {
@@ -108,17 +121,23 @@ public static class NetUtility
                 msg = new NetStartGame(ref streamReader);
                 break;
 
-            //Tank
+            //Tank Input
             case OpCode.T_INPUT:
                 msg = new NetTInput(ref streamReader);
                 break;
 
-            case OpCode.T_TRANSFORM:
-                msg = new NetTTransform(ref streamReader);
-                break;
-
             case OpCode.T_TOWER_INPUT:
                 msg = new NetTTowerInput(ref streamReader);
+                break;
+
+            case OpCode.T_FIRE_INPUT:
+                msg = new NetTFireInput(ref streamReader);
+                break;
+
+
+            //Tank Movement
+            case OpCode.T_TRANSFORM:
+                msg = new NetTTransform(ref streamReader);
                 break;
 
             case OpCode.T_TOWER_ROTATION:
@@ -135,6 +154,11 @@ public static class NetUtility
 
             case OpCode.T_ROTATION:
                 msg = new NetTRotation(ref streamReader);
+                break;
+
+            //Grenade
+            case OpCode.GRENADE_EXPLOSION:
+                msg = new NetGrenadeExplosion(ref streamReader);
                 break;
 
             default:
