@@ -25,6 +25,8 @@ public class TankManager : MonoBehaviour
     public Dictionary<byte, TankName> TankNames { get; set; }
     public Dictionary<byte, HealthBar> TankHealthBar { get; set; }
 
+    public bool IsLocalPlayer => LocalTankInformation.IsLocalPlayer;
+
 
     private void Awake()
     {

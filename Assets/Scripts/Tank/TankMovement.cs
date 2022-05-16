@@ -13,7 +13,6 @@ public class TankMovement : MonoBehaviour
     private Rigidbody localRb;
 
     public GameObject TankTower;
-
     private float smoothTime = 10f;
 
     private void Awake()
