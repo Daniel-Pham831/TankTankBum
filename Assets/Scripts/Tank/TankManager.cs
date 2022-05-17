@@ -22,7 +22,6 @@ public class TankManager : MonoBehaviour
     public TankInformation LocalTankInformation { get; set; }
     public Dictionary<byte, TankInformation> TankInformations { get; set; }
     public Dictionary<byte, Rigidbody> TankRigidbodies { get; set; }
-    public Dictionary<byte, TankName> TankNames { get; set; }
     public Dictionary<byte, HealthBar> TankHealthBar { get; set; }
 
     public bool IsLocalPlayer => LocalTankInformation.IsLocalPlayer;
@@ -33,7 +32,6 @@ public class TankManager : MonoBehaviour
         Singleton = this;
         TankInformations = new Dictionary<byte, TankInformation>();
         TankRigidbodies = new Dictionary<byte, Rigidbody>();
-        TankNames = new Dictionary<byte, TankName>();
         TankHealthBar = new Dictionary<byte, HealthBar>();
 
         DontDestroyOnLoad(gameObject);
@@ -76,11 +74,7 @@ public class TankManager : MonoBehaviour
         {
             TankServerManager.Singleton.TankRigidbodies = TankRigidbodies;
         }
-
-        SetupAllNamesData();
     }
-
-
 
     private void SpawnTank(byte id, Team team, string name, bool isLocalPlayer, bool isHost)
     {
@@ -91,6 +85,11 @@ public class TankManager : MonoBehaviour
         tankInformation.Team = team;
         tankInformation.IsLocalPlayer = isLocalPlayer;
         tankInformation.IsHost = isHost;
+
+        TankInformations.Add(tankInformation.ID, tankInformation);
+        TankRigidbodies.Add(tankInformation.ID, tankRigid);
+        TankServerManager.Singleton.PreRbPosition.Add(id, tankRigid.position);
+        TankServerManager.Singleton.PreRbRotation.Add(id, tankRigid.rotation);
 
         if (isLocalPlayer)
         {
@@ -103,11 +102,6 @@ public class TankManager : MonoBehaviour
         }
         SetTankHealth(id, tank, tankDefaultHealth);
         SetTankColorBasedOnTeam(tank, team);
-
-        TankInformations.Add(tankInformation.ID, tankInformation);
-        TankRigidbodies.Add(tankInformation.ID, tankRigid);
-        TankServerManager.Singleton.PreRbPosition.Add(id, tankRigid.position);
-        TankServerManager.Singleton.PreRbRotation.Add(id, tankRigid.rotation);
     }
 
     private void SetTankHealth(byte id, GameObject tank, float tankDefaultHealth)
@@ -135,8 +129,8 @@ public class TankManager : MonoBehaviour
         GameObject tankNameObject = Instantiate(tankNamePrefab);
         TankName tankNameScript = tankNameObject.GetComponent<TankName>();
         tankNameScript.SetUpTankName(tank, name);
-
-        TankNames.Add(id, tankNameScript);
+        tankNameScript.SetNameRot(LocalTankCamera.GetActualCameraRot);
+        tankNameScript.SetNameColor(LocalTankInformation.Team, TankInformations[id].Team);
     }
 
     private void SetTankColorBasedOnTeam(GameObject tank, Team team)
@@ -148,13 +142,5 @@ public class TankManager : MonoBehaviour
         }
     }
 
-    private void SetupAllNamesData()
-    {
-        foreach (byte id in TankNames.Keys)
-        {
-            TankNames[id].SetNameRot(LocalTankCamera.GetActualCameraRot);
-            TankNames[id].SetNameColor(LocalTankInformation.Team, TankInformations[id].Team);
-        }
-    }
     #endregion
 }
