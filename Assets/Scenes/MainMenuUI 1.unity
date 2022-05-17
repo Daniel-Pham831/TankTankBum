@@ -1165,6 +1165,7 @@ MonoBehaviour:
   ObjectNeedToPool:
   - {fileID: 1582285097027523096, guid: 95c8d9fb5469f7346aedbb0c5791d8bd, type: 3}
   - {fileID: 195792, guid: 1911d89758d97cc4898d240e9e2545f4, type: 3}
+  - {fileID: 1813018202934516, guid: bf78dc043967d5e4e9cbc4f2c1213d05, type: 3}
 --- !u!4 &342949513
 Transform:
   m_ObjectHideFlags: 0

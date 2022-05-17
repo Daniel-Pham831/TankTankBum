@@ -36,6 +36,12 @@ public class TankHealth : MonoBehaviour, IDamageable
 
     public void Die()
     {
+        Pool tankExplosionPool = ObjectPoolManager.Singleton.GetPool(PoolType.TankExplosion);
+        GameObject tankExplosionFX = tankExplosionPool.Get();
+        tankExplosionFX.transform.position = this.transform.position;
+        tankExplosionFX.GetComponent<ParticleSystem>().Play();
+
+        tankExplosionFX.GetComponent<PoolableObject>().ReturnToPoolAfter(3f);
         OnDie?.Invoke();
     }
 
