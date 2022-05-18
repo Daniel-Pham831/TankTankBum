@@ -93,6 +93,7 @@ public class TankServerManager : MonoBehaviour
             NetUtility.S_T_INPUT += OnServerReceivedTInputMessage;
             NetUtility.S_T_TOWER_INPUT += OnServerReceivedTTowerInputMessage;
             NetUtility.S_T_FIRE_INPUT += OnServerReceivedTFireInputMessage;
+            NetUtility.S_T_DIE += OnServerReceivedTDieMessage;
 
             TankManager.Singleton.OnNewTankAdded += OnNewTankAdded;
             TankManager.Singleton.OnTankRemoved += OnTankRemoved;
@@ -102,10 +103,17 @@ public class TankServerManager : MonoBehaviour
             NetUtility.S_T_INPUT -= OnServerReceivedTInputMessage;
             NetUtility.S_T_TOWER_INPUT -= OnServerReceivedTTowerInputMessage;
             NetUtility.S_T_FIRE_INPUT -= OnServerReceivedTFireInputMessage;
+            NetUtility.S_T_DIE -= OnServerReceivedTDieMessage;
 
             TankManager.Singleton.OnNewTankAdded -= OnNewTankAdded;
             TankManager.Singleton.OnTankRemoved -= OnTankRemoved;
         }
+    }
+
+    private void OnServerReceivedTDieMessage(NetMessage message, NetworkConnection sender)
+    {
+        // At this point a tank just die
+        Server.Singleton.BroadCast(message as NetTDie);
     }
 
     private void OnTankRemoved(byte removedTankID)

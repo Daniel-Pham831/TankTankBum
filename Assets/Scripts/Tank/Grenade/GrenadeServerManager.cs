@@ -40,7 +40,6 @@ public class GrenadeServerManager : MonoBehaviour
 
     private void OnServerReceivedGrenadeExplosionMessage(NetMessage message, NetworkConnection sender)
     {
-        Debug.Log("Received On Server");
         Server.Singleton.BroadCast(message as NetGrenadeExplosion);
     }
 }

@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour
 {
+    private readonly float timeToDestroyAfterTankDie = 1;
     private GameObject tank;
     [SerializeField] private Slider slider;
 
@@ -41,6 +42,8 @@ public class HealthBar : MonoBehaviour
         {
             tankHealth.OnCurrentHealthChanged -= OnCurrentHealthChanged;
             tankHealth.OnDie -= OnTankDie;
+
+            Destroy(this.gameObject, timeToDestroyAfterTankDie);
         }
     }
 

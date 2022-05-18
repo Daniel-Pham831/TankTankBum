@@ -21,10 +21,8 @@ public class TankManager : MonoBehaviour
     public TankCamera LocalTankCamera { get; set; }
     public TankInformation LocalTankInformation { get; set; }
     public Dictionary<byte, GameObject> Tanks { get; set; }
-    public Dictionary<byte, GameObject> HealthBars { get; set; }
-    public Dictionary<byte, GameObject> Names { get; set; }
 
-    public bool IsLocalPlayer => LocalTankInformation.IsLocalPlayer;
+    public bool IsLocalPlayer => LocalTankInformation != null ? LocalTankInformation.IsLocalPlayer : false;
 
     public Action<GameObject> OnNewTankAdded;
     public Action<byte> OnTankRemoved;
@@ -34,8 +32,6 @@ public class TankManager : MonoBehaviour
     {
         Singleton = this;
         Tanks = new Dictionary<byte, GameObject>();
-        HealthBars = new Dictionary<byte, GameObject>();
-        Names = new Dictionary<byte, GameObject>();
 
         DontDestroyOnLoad(gameObject);
     }
@@ -43,6 +39,18 @@ public class TankManager : MonoBehaviour
     void Start()
     {
         registerToEvent(true);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            ClientInformation clientInformation = ClientInformation.Singleton;
+            SlotPlayerInformation myPlayer = clientInformation.MyPlayerInformation;
+            List<SlotPlayerInformation> otherPlayers = clientInformation.PlayerList;
+
+            SpawnAndSetupTankData(myPlayer.Id, myPlayer.Team, myPlayer.Name, true, clientInformation.IsHost);
+        }
     }
 
 
@@ -53,11 +61,23 @@ public class TankManager : MonoBehaviour
         if (confirm)
         {
             ClientInformation.Singleton.StartGame += OnStartGame;
+            NetUtility.C_T_DIE += OnClientReceivedTDieMessage;
         }
         else
         {
             ClientInformation.Singleton.StartGame -= OnStartGame;
+            NetUtility.C_T_DIE -= OnClientReceivedTDieMessage;
         }
+    }
+
+    private void OnClientReceivedTDieMessage(NetMessage message)
+    {
+        byte deathTankID = (message as NetTDie).ID;
+        OnTankRemoved?.Invoke(deathTankID);
+
+        GameObject deathTankObject = Tanks[deathTankID];
+        Tanks.Remove(deathTankID);
+        Destroy(deathTankObject);
     }
 
     private void OnStartGame()
@@ -113,13 +133,13 @@ public class TankManager : MonoBehaviour
         heathBar.SetRot(LocalTankCamera.GetActualCameraRot);
 
         tank.GetComponent<TankHealth>().Health = tankDefaultHealth;
-
-        HealthBars.Add(id, tankHealthObject);
     }
 
     private void SetLocalTankCamera(GameObject tank, Team team)
     {
-        GameObject localTankCameraObject = Instantiate(localTankCameraPrefab);
+        GameObject localTankCameraObject =
+        LocalTankCamera == null ? Instantiate(localTankCameraPrefab) : LocalTankCamera.gameObject;
+
         TankCamera localTankCameraScript = localTankCameraObject.GetComponent<TankCamera>();
 
         localTankCameraScript.SetupTankCamera(tank, team == Team.Blue ? Role.Defender : Role.Attacker);
@@ -133,8 +153,6 @@ public class TankManager : MonoBehaviour
         tankNameScript.SetUpTankName(tank, name);
         tankNameScript.SetNameRot(LocalTankCamera.GetActualCameraRot);
         tankNameScript.SetNameColor(LocalTankInformation.Team, tankInformation.Team);
-
-        Names.Add(tankInformation.ID, tankNameObject);
     }
 
     private void SetTankColorBasedOnTeam(GameObject tank, Team team)

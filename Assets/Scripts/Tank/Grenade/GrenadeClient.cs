@@ -36,7 +36,6 @@ public class GrenadeClient : MonoBehaviour
 
     private void OnClientReceivedGrenadeExplosionMessage(NetMessage message)
     {
-        Debug.Log("ReceivedOnClient");
         HandleGrenadeExplosionMessage(message as NetGrenadeExplosion);
     }
 

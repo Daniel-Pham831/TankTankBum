@@ -35,15 +35,17 @@ public class PlayerManager : MonoBehaviour
 
     private void OnStartGame()
     {
+        Players = new Dictionary<byte, Player>();
+
         ClientInformation clientInformation = ClientInformation.Singleton;
         SlotPlayerInformation myPlayer = clientInformation.MyPlayerInformation;
         List<SlotPlayerInformation> otherPlayers = clientInformation.PlayerList;
 
-        AddPlayer(new Player(myPlayer.Id, myPlayer.Team, myPlayer.Name));
+        AddPlayer(new Player(myPlayer.Id, myPlayer.Team, myPlayer.Name, true, myPlayer.IsHost));
 
         foreach (var player in otherPlayers)
         {
-            AddPlayer(new Player(player.Id, player.Team, player.Name));
+            AddPlayer(new Player(player.Id, player.Team, player.Name, false, player.IsHost));
         }
     }
 
@@ -54,6 +56,6 @@ public class PlayerManager : MonoBehaviour
 
     public void RemovePlayer(byte id)
     {
-
+        Players.Remove(id);
     }
 }

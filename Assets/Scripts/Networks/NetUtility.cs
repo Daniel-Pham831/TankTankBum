@@ -29,7 +29,10 @@ public enum OpCode
     T_ROTATION,
 
     // For tank grenade
-    GRENADE_EXPLOSION
+    GRENADE_EXPLOSION,
+
+    // For tank Interactions
+    T_DIE
 }
 
 public static class NetUtility
@@ -77,6 +80,11 @@ public static class NetUtility
     // Grenade events
     public static Action<NetMessage> C_GRENADE_EXPLOSION;
     public static Action<NetMessage, NetworkConnection> S_GRENADE_EXPLOSION;
+
+    // Tank Interactions
+    public static Action<NetMessage> C_T_DIE;
+    public static Action<NetMessage, NetworkConnection> S_T_DIE;
+
 
     public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
     {
@@ -159,6 +167,11 @@ public static class NetUtility
             //Grenade
             case OpCode.GRENADE_EXPLOSION:
                 msg = new NetGrenadeExplosion(ref streamReader);
+                break;
+
+            // Tank Interactions
+            case OpCode.T_DIE:
+                msg = new NetTDie(ref streamReader);
                 break;
 
             default:
