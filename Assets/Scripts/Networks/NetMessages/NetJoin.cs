@@ -5,9 +5,9 @@ using UnityEngine;
 
 public class NetJoin : NetMessage
 {
-    public Player JoinedPlayer { set; get; }
+    public SlotPlayerInformation JoinedPlayer { set; get; }
 
-    public NetJoin(Player joinedPlayer)
+    public NetJoin(SlotPlayerInformation joinedPlayer)
     {
         Code = OpCode.JOIN;
         JoinedPlayer = joinedPlayer;
@@ -23,12 +23,12 @@ public class NetJoin : NetMessage
     {
         base.Serialize(ref writer);
 
-        Player.SerializePlayer(ref writer, JoinedPlayer);
+        SlotPlayerInformation.SerializePlayer(ref writer, JoinedPlayer);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        JoinedPlayer = Player.DeserializePlayer(ref reader);
+        JoinedPlayer = SlotPlayerInformation.DeserializePlayer(ref reader);
     }
 
     public override void ReceivedOnClient()

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Unity.Networking.Transport;
 using UnityEngine;
@@ -27,7 +28,6 @@ public class TankServerManager : MonoBehaviour
     public Dictionary<byte, Rigidbody> TankRigidbodies;
     public Dictionary<byte, Vector3> PreRbPosition;
     public Dictionary<byte, Quaternion> PreRbRotation;
-    public Dictionary<byte, bool> CanBroadCastTFire;
     public Dictionary<byte, float> NextSendTFireTime;
 
 
@@ -39,7 +39,6 @@ public class TankServerManager : MonoBehaviour
         TankRigidbodies = new Dictionary<byte, Rigidbody>();
         PreRbPosition = new Dictionary<byte, Vector3>();
         PreRbRotation = new Dictionary<byte, Quaternion>();
-        CanBroadCastTFire = new Dictionary<byte, bool>();
         NextSendTFireTime = new Dictionary<byte, float>();
         DontDestroyOnLoad(gameObject);
     }
@@ -94,13 +93,37 @@ public class TankServerManager : MonoBehaviour
             NetUtility.S_T_INPUT += OnServerReceivedTInputMessage;
             NetUtility.S_T_TOWER_INPUT += OnServerReceivedTTowerInputMessage;
             NetUtility.S_T_FIRE_INPUT += OnServerReceivedTFireInputMessage;
+
+            TankManager.Singleton.OnNewTankAdded += OnNewTankAdded;
+            TankManager.Singleton.OnTankRemoved += OnTankRemoved;
         }
         else
         {
             NetUtility.S_T_INPUT -= OnServerReceivedTInputMessage;
             NetUtility.S_T_TOWER_INPUT -= OnServerReceivedTTowerInputMessage;
             NetUtility.S_T_FIRE_INPUT -= OnServerReceivedTFireInputMessage;
+
+            TankManager.Singleton.OnNewTankAdded -= OnNewTankAdded;
+            TankManager.Singleton.OnTankRemoved -= OnTankRemoved;
         }
+    }
+
+    private void OnTankRemoved(byte removedTankID)
+    {
+        TankRigidbodies.Remove(removedTankID);
+        PreRbPosition.Remove(removedTankID);
+        PreRbRotation.Remove(removedTankID);
+        NextSendTFireTime.Remove(removedTankID);
+    }
+
+    private void OnNewTankAdded(GameObject addedTank)
+    {
+        TankInformation tankInformation = addedTank.GetComponent<TankInformation>();
+
+        TankRigidbodies.Add(tankInformation.ID, addedTank.GetComponent<Rigidbody>());
+        PreRbPosition.Add(tankInformation.ID, addedTank.transform.position);
+        PreRbRotation.Add(tankInformation.ID, addedTank.transform.rotation);
+        NextSendTFireTime.Add(tankInformation.ID, 0);
     }
 
     private void OnServerReceivedTFireInputMessage(NetMessage message, NetworkConnection sentPlayer)

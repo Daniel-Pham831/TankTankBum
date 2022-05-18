@@ -15,8 +15,8 @@ public class LobbyUI : MonoBehaviour
     [SerializeField] private Image switchTeamBtn;
     [SerializeField] private Animator lobbyAnimator;
 
-    public Action<Player> OnPlayerJoinedSlot;
-    public Action<Player> OnPlayerExitedSlot;
+    public Action<SlotPlayerInformation> OnPlayerJoinedSlot;
+    public Action<SlotPlayerInformation> OnPlayerExitedSlot;
     public Action<byte, SlotState> OnSlotStateChanged;
     public Action<byte, ReadyState> OnSlotReadyOrStartPress;
     public Action<byte> OnSlotReset;
@@ -92,19 +92,19 @@ public class LobbyUI : MonoBehaviour
 
     public void OnStartOrReadyBtn()
     {
-        Player MyPlayerInformation = ClientInformation.Singleton.MyPlayerInformation;
+        SlotPlayerInformation MyPlayerInformation = ClientInformation.Singleton.MyPlayerInformation;
 
         // If the host press start btn
         if (MyPlayerInformation.IsHost)
         {
-            if (!Player.HaveAllPlayersReadied(ClientInformation.Singleton.PlayerList))
+            if (!SlotPlayerInformation.HaveAllPlayersReadied(ClientInformation.Singleton.PlayerList))
             {
                 // Pop up a READY error box indicating that can only start when all players are ready
                 lobbyAnimator.SetTrigger("IntoLobbyReadyError");
                 return;
             }
 
-            if (!Player.Have2TeamsEqual(ServerInformation.Singleton.PlayerList))
+            if (!SlotPlayerInformation.Have2TeamsEqual(ServerInformation.Singleton.PlayerList))
             {
                 // Pop up a TEAM error box indicating that can only start when all players are ready
                 lobbyAnimator.SetTrigger("IntoLobbyTeamError");
@@ -120,7 +120,7 @@ public class LobbyUI : MonoBehaviour
 
     public void OnSwitchTeamBtn()
     {
-        Player MyPlayerInformation = ClientInformation.Singleton.MyPlayerInformation;
+        SlotPlayerInformation MyPlayerInformation = ClientInformation.Singleton.MyPlayerInformation;
 
         MyPlayerInformation.SwitchTeam();
         SetSwitchTeamBtnColor(MyPlayerInformation.Team);
@@ -153,12 +153,12 @@ public class LobbyUI : MonoBehaviour
         readyOrStartBtnName.SetText(isHost ? "StartGame" : "Ready");
     }
 
-    private void OnDisconnectedClient(Player disconnectedPlayer)
+    private void OnDisconnectedClient(SlotPlayerInformation disconnectedPlayer)
     {
         OnPlayerExitedSlot?.Invoke(disconnectedPlayer);
     }
 
-    private void OnNewJoinedPlayer(Player joinedPlayer)
+    private void OnNewJoinedPlayer(SlotPlayerInformation joinedPlayer)
     {
         OnPlayerJoinedSlot?.Invoke(joinedPlayer);
 

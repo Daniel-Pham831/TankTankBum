@@ -20,19 +20,22 @@ public class TankManager : MonoBehaviour
     // Tanks data
     public TankCamera LocalTankCamera { get; set; }
     public TankInformation LocalTankInformation { get; set; }
-    public Dictionary<byte, TankInformation> TankInformations { get; set; }
-    public Dictionary<byte, Rigidbody> TankRigidbodies { get; set; }
-    public Dictionary<byte, HealthBar> TankHealthBar { get; set; }
+    public Dictionary<byte, GameObject> Tanks { get; set; }
+    public Dictionary<byte, GameObject> HealthBars { get; set; }
+    public Dictionary<byte, GameObject> Names { get; set; }
 
     public bool IsLocalPlayer => LocalTankInformation.IsLocalPlayer;
+
+    public Action<GameObject> OnNewTankAdded;
+    public Action<byte> OnTankRemoved;
 
 
     private void Awake()
     {
         Singleton = this;
-        TankInformations = new Dictionary<byte, TankInformation>();
-        TankRigidbodies = new Dictionary<byte, Rigidbody>();
-        TankHealthBar = new Dictionary<byte, HealthBar>();
+        Tanks = new Dictionary<byte, GameObject>();
+        HealthBars = new Dictionary<byte, GameObject>();
+        Names = new Dictionary<byte, GameObject>();
 
         DontDestroyOnLoad(gameObject);
     }
@@ -60,36 +63,30 @@ public class TankManager : MonoBehaviour
     private void OnStartGame()
     {
         ClientInformation clientInformation = ClientInformation.Singleton;
-        Player myPlayer = clientInformation.MyPlayerInformation;
-        List<Player> otherPlayers = clientInformation.PlayerList;
+        SlotPlayerInformation myPlayer = clientInformation.MyPlayerInformation;
+        List<SlotPlayerInformation> otherPlayers = clientInformation.PlayerList;
 
-        SpawnTank(myPlayer.Id, myPlayer.Team, myPlayer.Name, true, clientInformation.IsHost);
+        SpawnAndSetupTankData(myPlayer.Id, myPlayer.Team, myPlayer.Name, true, clientInformation.IsHost);
 
-        foreach (Player player in otherPlayers)
+        foreach (SlotPlayerInformation player in otherPlayers)
         {
-            SpawnTank(player.Id, player.Team, player.Name, false, clientInformation.IsHost);
-        }
-
-        if (clientInformation.IsHost)
-        {
-            TankServerManager.Singleton.TankRigidbodies = TankRigidbodies;
+            SpawnAndSetupTankData(player.Id, player.Team, player.Name, false, clientInformation.IsHost);
         }
     }
 
-    private void SpawnTank(byte id, Team team, string name, bool isLocalPlayer, bool isHost)
+    /// <summary>
+    /// Spawn tank, data, name, health bar, tank color
+    /// </summary>
+    private void SpawnAndSetupTankData(byte id, Team team, string name, bool isLocalPlayer, bool isHost)
     {
+        // Spawn tank
         GameObject tank = Instantiate(tankPrefab, spawnPositions[id].transform.position, Quaternion.identity);
         Rigidbody tankRigid = tank.GetComponent<Rigidbody>();
-        TankInformation tankInformation = tank.GetComponent<TankInformation>();
-        tankInformation.ID = id;
-        tankInformation.Team = team;
-        tankInformation.IsLocalPlayer = isLocalPlayer;
-        tankInformation.IsHost = isHost;
 
-        TankInformations.Add(tankInformation.ID, tankInformation);
-        TankRigidbodies.Add(tankInformation.ID, tankRigid);
-        TankServerManager.Singleton.PreRbPosition.Add(id, tankRigid.position);
-        TankServerManager.Singleton.PreRbRotation.Add(id, tankRigid.rotation);
+        // Setup tank data
+        TankInformation tankInformation = tank.GetComponent<TankInformation>();
+        tankInformation.Setup(id, team, isLocalPlayer, isHost);
+        Tanks.Add(id, tank);
 
         if (isLocalPlayer)
         {
@@ -98,10 +95,14 @@ public class TankManager : MonoBehaviour
         }
         else
         {
-            SetTankName(id, tank, name); //Only show other tanks' name
+            SetTankName(tank, tankInformation, name); //Only show other tanks' name
         }
+
         SetTankHealth(id, tank, tankDefaultHealth);
         SetTankColorBasedOnTeam(tank, team);
+
+        if (isHost)
+            OnNewTankAdded?.Invoke(tank);
     }
 
     private void SetTankHealth(byte id, GameObject tank, float tankDefaultHealth)
@@ -112,6 +113,8 @@ public class TankManager : MonoBehaviour
         heathBar.SetRot(LocalTankCamera.GetActualCameraRot);
 
         tank.GetComponent<TankHealth>().Health = tankDefaultHealth;
+
+        HealthBars.Add(id, tankHealthObject);
     }
 
     private void SetLocalTankCamera(GameObject tank, Team team)
@@ -120,17 +123,18 @@ public class TankManager : MonoBehaviour
         TankCamera localTankCameraScript = localTankCameraObject.GetComponent<TankCamera>();
 
         localTankCameraScript.SetupTankCamera(tank, team == Team.Blue ? Role.Defender : Role.Attacker);
-
         LocalTankCamera = localTankCameraScript;
     }
 
-    private void SetTankName(byte id, GameObject tank, string name)
+    private void SetTankName(GameObject tank, TankInformation tankInformation, string name)
     {
         GameObject tankNameObject = Instantiate(tankNamePrefab);
         TankName tankNameScript = tankNameObject.GetComponent<TankName>();
         tankNameScript.SetUpTankName(tank, name);
         tankNameScript.SetNameRot(LocalTankCamera.GetActualCameraRot);
-        tankNameScript.SetNameColor(LocalTankInformation.Team, TankInformations[id].Team);
+        tankNameScript.SetNameColor(LocalTankInformation.Team, tankInformation.Team);
+
+        Names.Add(tankInformation.ID, tankNameObject);
     }
 
     private void SetTankColorBasedOnTeam(GameObject tank, Team team)

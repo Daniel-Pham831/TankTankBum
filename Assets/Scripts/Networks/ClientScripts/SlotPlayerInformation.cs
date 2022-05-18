@@ -14,7 +14,8 @@ public enum ReadyState
     Unready = 1
 }
 
-public class Player
+/// <summary> This class is for storing a player information of a specific slot</summary>
+public class SlotPlayerInformation
 {
     public byte Id;
     public Team Team;
@@ -22,7 +23,7 @@ public class Player
     public string Name;
     public ReadyState ReadyState;
 
-    public Player()
+    public SlotPlayerInformation()
     {
         Id = 0;
         Team = 0;
@@ -31,7 +32,7 @@ public class Player
         ReadyState = ReadyState.Unready;
     }
 
-    public Player(byte id, Team team, byte slotIndex, string name, ReadyState readyState)
+    public SlotPlayerInformation(byte id, Team team, byte slotIndex, string name, ReadyState readyState)
     {
         Id = id;
         Team = team;
@@ -40,7 +41,7 @@ public class Player
         ReadyState = readyState;
     }
 
-    public static void SerializePlayer(ref DataStreamWriter writer, Player player)
+    public static void SerializePlayer(ref DataStreamWriter writer, SlotPlayerInformation player)
     {
         writer.WriteByte(player.Id);
         writer.WriteByte((byte)player.Team);
@@ -49,7 +50,7 @@ public class Player
         writer.WriteByte((byte)player.ReadyState);
     }
 
-    public static Player DeserializePlayer(ref DataStreamReader reader)
+    public static SlotPlayerInformation DeserializePlayer(ref DataStreamReader reader)
     {
         byte playerId = reader.ReadByte();
         Team playerTeam = (Team)reader.ReadByte();
@@ -57,21 +58,21 @@ public class Player
         string playerName = reader.ReadFixedString32().ToString();
         ReadyState readyState = (ReadyState)reader.ReadByte();
 
-        return new Player(playerId, playerTeam, playerSlotIndex, playerName, readyState);
+        return new SlotPlayerInformation(playerId, playerTeam, playerSlotIndex, playerName, readyState);
     }
 
-    public static Player FindPlayerWithID(List<Player> playerList, byte playerId)
+    public static SlotPlayerInformation FindPlayerWithID(List<SlotPlayerInformation> playerList, byte playerId)
     {
-        foreach (Player player in playerList)
+        foreach (SlotPlayerInformation player in playerList)
         {
             if (player.Id == playerId) return player;
         }
         return null;
     }
 
-    public static Player FindPlayerWithIDAndRemove(ref List<Player> playerList, byte playerId)
+    public static SlotPlayerInformation FindPlayerWithIDAndRemove(ref List<SlotPlayerInformation> playerList, byte playerId)
     {
-        foreach (Player player in playerList)
+        foreach (SlotPlayerInformation player in playerList)
         {
             if (player.Id == playerId)
             {
@@ -82,9 +83,9 @@ public class Player
         return null;
     }
 
-    public static bool HaveAllPlayersReadied(List<Player> players)
+    public static bool HaveAllPlayersReadied(List<SlotPlayerInformation> players)
     {
-        foreach (Player player in players)
+        foreach (SlotPlayerInformation player in players)
         {
             if (player.ReadyState == ReadyState.Unready)
                 return false;
@@ -92,15 +93,15 @@ public class Player
         return true;
     }
 
-    public static bool Have2TeamsEqual(List<Player> players)
+    public static bool Have2TeamsEqual(List<SlotPlayerInformation> players)
     {
         return MathF.Abs(CountTeamPlayer(players, Team.Blue) - CountTeamPlayer(players, Team.Red)) <= 1;
     }
 
-    public static int CountTeamPlayer(List<Player> players, Team team)
+    public static int CountTeamPlayer(List<SlotPlayerInformation> players, Team team)
     {
         int counter = 0;
-        foreach (Player player in players)
+        foreach (SlotPlayerInformation player in players)
         {
             if (player.Team == team)
                 counter++;

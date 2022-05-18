@@ -4,13 +4,13 @@ using Unity.Networking.Transport;
 
 public class NetWelcome : NetMessage
 {
-    public Player MyPlayerInformation { set; get; }
+    public SlotPlayerInformation MyPlayerInformation { set; get; }
 
     public byte TotalPlayer { set; get; }
-    public List<Player> PlayerList { set; get; }
+    public List<SlotPlayerInformation> PlayerList { set; get; }
 
 
-    public NetWelcome(Player player, byte totalPlayer, List<Player> playerList)
+    public NetWelcome(SlotPlayerInformation player, byte totalPlayer, List<SlotPlayerInformation> playerList)
     {
         Code = OpCode.WELCOME;
 
@@ -30,24 +30,24 @@ public class NetWelcome : NetMessage
     {
         base.Serialize(ref writer);
 
-        Player.SerializePlayer(ref writer, MyPlayerInformation);
+        SlotPlayerInformation.SerializePlayer(ref writer, MyPlayerInformation);
 
         writer.WriteByte(TotalPlayer);
-        foreach (Player player in PlayerList)
+        foreach (SlotPlayerInformation player in PlayerList)
         {
-            Player.SerializePlayer(ref writer, player);
+            SlotPlayerInformation.SerializePlayer(ref writer, player);
         }
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        MyPlayerInformation = Player.DeserializePlayer(ref reader);
+        MyPlayerInformation = SlotPlayerInformation.DeserializePlayer(ref reader);
 
         TotalPlayer = reader.ReadByte();
-        PlayerList = new List<Player>();
+        PlayerList = new List<SlotPlayerInformation>();
         for (int i = 0; i < TotalPlayer; i++)
         {
-            PlayerList.Add(Player.DeserializePlayer(ref reader));
+            PlayerList.Add(SlotPlayerInformation.DeserializePlayer(ref reader));
         }
     }
 

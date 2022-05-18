@@ -40,7 +40,7 @@ public class Slot : MonoBehaviour
 
     private bool IsOwnerSlot(byte slotIndex)
     {
-        Player ownerInformation = ClientInformation.Singleton.MyPlayerInformation;
+        SlotPlayerInformation ownerInformation = ClientInformation.Singleton.MyPlayerInformation;
 
         return ownerInformation.SlotIndex == slotIndex;
     }
@@ -83,7 +83,7 @@ public class Slot : MonoBehaviour
         nameBackgroundColor.color = color;
     }
 
-    private void SetSlotInformationBasedOf(Player player)
+    private void SetSlotInformationBasedOf(SlotPlayerInformation player)
     {
         if (IsThisSlot(player.SlotIndex))
         {
@@ -158,12 +158,12 @@ public class Slot : MonoBehaviour
         }
     }
 
-    private void OnPlayerExitedSlot(Player exitedPlayer)
+    private void OnPlayerExitedSlot(SlotPlayerInformation exitedPlayer)
     {
         ResetSlot(exitedPlayer.SlotIndex);
     }
 
-    private void OnPlayerJoinedSlot(Player joinedPlayer)
+    private void OnPlayerJoinedSlot(SlotPlayerInformation joinedPlayer)
     {
         SetSlotInformationBasedOf(joinedPlayer);
     }
