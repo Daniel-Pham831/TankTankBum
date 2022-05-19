@@ -33,7 +33,7 @@ public class TankCamera : MonoBehaviour
         Vector3 targetPositionView = role == Role.Attacker ? attackerPositionView : defenderPositionView;
         Vector3 targetRotationEulerView = role == Role.Attacker ? attackerRotationEulerView : defenderRotationEulerView;
 
-        ActualTankCamera.transform.position = targetPositionView;
-        ActualTankCamera.transform.rotation = Quaternion.Euler(targetRotationEulerView);
+        ActualTankCamera.transform.localPosition = targetPositionView;
+        ActualTankCamera.transform.localRotation = Quaternion.Euler(targetRotationEulerView);
     }
 }
