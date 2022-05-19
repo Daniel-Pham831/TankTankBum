@@ -18,11 +18,11 @@ public class TankManager : MonoBehaviour
     [SerializeField] private float tankDefaultHealth = 100f;
 
     // Tanks data
-    public TankCamera LocalTankCamera { get; set; }
     public TankInformation LocalTankInformation { get; set; }
-    public Dictionary<byte, GameObject> Tanks { get; set; }
+    private TankCamera LocalTankCamera { get; set; }
+    private Dictionary<byte, GameObject> Tanks { get; set; }
 
-    public bool IsLocalPlayer => LocalTankInformation != null ? LocalTankInformation.IsLocalPlayer : false;
+    private bool IsLocalPlayer => LocalTankInformation != null ? LocalTankInformation.IsLocalPlayer : false;
 
     public Action<GameObject> OnNewTankAdded;
     public Action<byte> OnTankRemoved;
@@ -34,6 +34,7 @@ public class TankManager : MonoBehaviour
 
         DontDestroyOnLoad(gameObject);
     }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -42,8 +43,6 @@ public class TankManager : MonoBehaviour
 
     private void Update()
     {
-
-
         if (Input.GetKeyDown(KeyCode.P))
         {
             ClientInformation clientInformation = ClientInformation.Singleton;
@@ -53,7 +52,6 @@ public class TankManager : MonoBehaviour
             SpawnAndSetupTankData(myPlayer.Id, myPlayer.Team, myPlayer.Name, true, clientInformation.IsHost);
         }
     }
-
 
     #region Networking Functions
 
@@ -80,6 +78,7 @@ public class TankManager : MonoBehaviour
         Tanks.Remove(deathTankID);
         Destroy(deathTankObject);
     }
+
 
     private void OnStartGame()
     {
