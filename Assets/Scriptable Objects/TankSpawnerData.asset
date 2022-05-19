@@ -12,11 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f5105730fd5b8d449d87d2303c66d17, type: 3}
   m_Name: TankSpawnerData
   m_EditorClassIdentifier: 
-  tankPrefab: {fileID: 0}
-  tankNamePrefab: {fileID: 0}
-  tankHealthPrefab: {fileID: 0}
-  localTankCameraPrefab: {fileID: 0}
-  blueTankMaterial: {fileID: 0}
-  redTankMaterial: {fileID: 0}
-  spawnPositions: []
+  tankPrefab: {fileID: 4655256615376615491, guid: b68463d498615494c83cf1b8d6592fca, type: 3}
+  tankNamePrefab: {fileID: 7722871201896819139, guid: 8b7fcc8a86c716349883dc131663ebb1, type: 3}
+  tankHealthPrefab: {fileID: 7722871201896819139, guid: d2771c4e46703f0438ba5cc3f9ace403, type: 3}
+  localTankCameraPrefab: {fileID: 5882524695110162460, guid: 514c0e177303cc14d81b61ff3566eba2, type: 3}
+  blueTankMaterial: {fileID: 2100000, guid: 4577ee2046668dc4faae41439ead563c, type: 2}
+  redTankMaterial: {fileID: 2100000, guid: 4bd122cb58a5d8645afd8bf406f31e3f, type: 2}
+  spawnPositions:
+  - {fileID: 1618305781477507770, guid: 9a79adf463535aa4c96c34d517f4ac8a, type: 3}
+  - {fileID: 5721986366745564834, guid: c9bd42f54bdaed54aa083024d46e2c1c, type: 3}
+  - {fileID: 5395752526955359317, guid: 45c439efcb9b76542ad519a97b1b7862, type: 3}
+  - {fileID: 1017993517734759862, guid: c656920ae95a0aa4e9630da0cf3b0ee4, type: 3}
   tankDefaultHealth: 100
