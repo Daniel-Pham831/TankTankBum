@@ -27,7 +27,6 @@ public class TankManager : MonoBehaviour
     public Action<GameObject> OnNewTankAdded;
     public Action<byte> OnTankRemoved;
 
-
     private void Awake()
     {
         Singleton = this;
@@ -43,6 +42,8 @@ public class TankManager : MonoBehaviour
 
     private void Update()
     {
+
+
         if (Input.GetKeyDown(KeyCode.P))
         {
             ClientInformation clientInformation = ClientInformation.Singleton;

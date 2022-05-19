@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using Unity.Networking.Transport;
 using UnityEngine;
 
-public class NetJoin : NetMessage
+public class NetTSpawn : NetMessage
 {
-    public SlotPlayerInformation JoinedPlayer { set; get; }
+    public Player Player { get; set; }
 
-    public NetJoin(SlotPlayerInformation joinedPlayer)
+    public NetTSpawn(Player player)
     {
-        Code = OpCode.JOIN;
-        JoinedPlayer = joinedPlayer;
+        Code = OpCode.T_SPAWN;
+        Player = player;
     }
 
-    public NetJoin(ref DataStreamReader reader)
+    public NetTSpawn(ref DataStreamReader reader)
     {
-        Code = OpCode.JOIN;
+        Code = OpCode.T_SPAWN;
         Deserialize(ref reader);
     }
 
@@ -23,25 +23,25 @@ public class NetJoin : NetMessage
     {
         base.Serialize(ref writer);
 
-        SlotPlayerInformation.SerializeSlotPlayer(ref writer, JoinedPlayer);
+        Player.SerializePlayer(ref writer, Player);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        JoinedPlayer = SlotPlayerInformation.DeserializeSlotPlayer(ref reader);
+        Player = Player.DeserializePlayer(ref reader);
     }
 
     public override void ReceivedOnClient()
     {
         base.ReceivedOnClient();
 
-        NetUtility.C_JOIN?.Invoke(this);
+        NetUtility.C_T_SPAWN?.Invoke(this);
     }
 
     public override void ReceivedOnServer(NetworkConnection cnn)
     {
         base.ReceivedOnServer(cnn);
 
-        NetUtility.S_JOIN?.Invoke(this, cnn);
+        NetUtility.S_T_SPAWN?.Invoke(this, cnn);
     }
 }

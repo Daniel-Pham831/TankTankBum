@@ -62,7 +62,7 @@ public class ServerInformation
     {
         NetReady readyMessage = message as NetReady;
 
-        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindPlayerWithIDAndRemove(ref PlayerList, readyMessage.Id);
+        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindSlotPlayerWithIDAndRemove(ref PlayerList, readyMessage.Id);
 
         if (sentPlayer.IsHost)
         {
@@ -84,7 +84,7 @@ public class ServerInformation
     {
         NetSwitchTeam switchTeamMessage = message as NetSwitchTeam;
 
-        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindPlayerWithIDAndRemove(ref PlayerList, switchTeamMessage.Id);
+        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindSlotPlayerWithIDAndRemove(ref PlayerList, switchTeamMessage.Id);
 
         //SwitchTeam
         if (sentPlayer != null)
@@ -103,7 +103,7 @@ public class ServerInformation
 
     private void OnClientDisconnected(byte disconnectedClientId)
     {
-        SlotPlayerInformation disconnectedPlayer = SlotPlayerInformation.FindPlayerWithID(PlayerList, disconnectedClientId);
+        SlotPlayerInformation disconnectedPlayer = SlotPlayerInformation.FindSlotPlayerWithID(PlayerList, disconnectedClientId);
         PlayerList.Remove(disconnectedPlayer);
 
         availableSlots.Add(disconnectedPlayer.SlotIndex);

@@ -1,3 +1,4 @@
+using Unity.Networking.Transport;
 using UnityEngine;
 
 // This class is for storing a player data
@@ -16,5 +17,27 @@ public class Player
         Name = name;
         IsLocalPlayer = isLocalPlayer;
         IsHost = isHost;
+    }
+
+    public static void SerializePlayer(ref DataStreamWriter writer, Player player)
+    {
+        writer.WriteByte(player.ID);
+        writer.WriteByte((byte)player.Team);
+        writer.WriteFixedString32(player.Name);
+        writer.WriteFixedString32(player.IsLocalPlayer.ToString());
+        writer.WriteFixedString32(player.IsHost.ToString());
+    }
+
+    public static Player DeserializePlayer(ref DataStreamReader reader)
+    {
+        string trueValue = true.ToString(); // For compare
+
+        byte id = reader.ReadByte();
+        Team team = (Team)reader.ReadByte();
+        string name = reader.ReadFixedString32().ToString();
+        bool isLocalPlayer = reader.ReadFixedString32().ToString() == trueValue ? true : false;
+        bool isHost = reader.ReadFixedString32().ToString() == trueValue ? true : false;
+
+        return new Player(id, team, name, isLocalPlayer, isHost);
     }
 }

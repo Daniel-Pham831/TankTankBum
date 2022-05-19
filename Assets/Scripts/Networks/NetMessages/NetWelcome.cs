@@ -30,24 +30,24 @@ public class NetWelcome : NetMessage
     {
         base.Serialize(ref writer);
 
-        SlotPlayerInformation.SerializePlayer(ref writer, MyPlayerInformation);
+        SlotPlayerInformation.SerializeSlotPlayer(ref writer, MyPlayerInformation);
 
         writer.WriteByte(TotalPlayer);
         foreach (SlotPlayerInformation player in PlayerList)
         {
-            SlotPlayerInformation.SerializePlayer(ref writer, player);
+            SlotPlayerInformation.SerializeSlotPlayer(ref writer, player);
         }
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        MyPlayerInformation = SlotPlayerInformation.DeserializePlayer(ref reader);
+        MyPlayerInformation = SlotPlayerInformation.DeserializeSlotPlayer(ref reader);
 
         TotalPlayer = reader.ReadByte();
         PlayerList = new List<SlotPlayerInformation>();
         for (int i = 0; i < TotalPlayer; i++)
         {
-            PlayerList.Add(SlotPlayerInformation.DeserializePlayer(ref reader));
+            PlayerList.Add(SlotPlayerInformation.DeserializeSlotPlayer(ref reader));
         }
     }
 

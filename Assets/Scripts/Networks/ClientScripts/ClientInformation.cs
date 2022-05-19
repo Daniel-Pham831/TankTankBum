@@ -95,7 +95,7 @@ public class ClientInformation : MonoBehaviour
     {
         NetReady readyMessage = message as NetReady;
 
-        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindPlayerWithIDAndRemove(ref PlayerList, readyMessage.Id);
+        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindSlotPlayerWithIDAndRemove(ref PlayerList, readyMessage.Id);
 
         //Switch ReadyState
         if (sentPlayer != null)
@@ -110,7 +110,7 @@ public class ClientInformation : MonoBehaviour
     {
         NetSwitchTeam switchTeamMessage = message as NetSwitchTeam;
 
-        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindPlayerWithIDAndRemove(ref PlayerList, switchTeamMessage.Id);
+        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindSlotPlayerWithIDAndRemove(ref PlayerList, switchTeamMessage.Id);
 
         //SwitchTeam
         if (sentPlayer != null)
@@ -130,7 +130,7 @@ public class ClientInformation : MonoBehaviour
     {
         NetDisconnect disconnectMessage = message as NetDisconnect;
 
-        SlotPlayerInformation disconnectedPlayer = SlotPlayerInformation.FindPlayerWithID(PlayerList, disconnectMessage.DisconnectedClientId);
+        SlotPlayerInformation disconnectedPlayer = SlotPlayerInformation.FindSlotPlayerWithID(PlayerList, disconnectMessage.DisconnectedClientId);
 
         OnDisconnectedClient?.Invoke(disconnectedPlayer);
 

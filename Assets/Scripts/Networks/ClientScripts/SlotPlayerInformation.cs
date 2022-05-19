@@ -41,16 +41,16 @@ public class SlotPlayerInformation
         ReadyState = readyState;
     }
 
-    public static void SerializePlayer(ref DataStreamWriter writer, SlotPlayerInformation player)
+    public static void SerializeSlotPlayer(ref DataStreamWriter writer, SlotPlayerInformation slotPlayer)
     {
-        writer.WriteByte(player.Id);
-        writer.WriteByte((byte)player.Team);
-        writer.WriteByte(player.SlotIndex);
-        writer.WriteFixedString32(player.Name);
-        writer.WriteByte((byte)player.ReadyState);
+        writer.WriteByte(slotPlayer.Id);
+        writer.WriteByte((byte)slotPlayer.Team);
+        writer.WriteByte(slotPlayer.SlotIndex);
+        writer.WriteFixedString32(slotPlayer.Name);
+        writer.WriteByte((byte)slotPlayer.ReadyState);
     }
 
-    public static SlotPlayerInformation DeserializePlayer(ref DataStreamReader reader)
+    public static SlotPlayerInformation DeserializeSlotPlayer(ref DataStreamReader reader)
     {
         byte playerId = reader.ReadByte();
         Team playerTeam = (Team)reader.ReadByte();
@@ -61,7 +61,7 @@ public class SlotPlayerInformation
         return new SlotPlayerInformation(playerId, playerTeam, playerSlotIndex, playerName, readyState);
     }
 
-    public static SlotPlayerInformation FindPlayerWithID(List<SlotPlayerInformation> playerList, byte playerId)
+    public static SlotPlayerInformation FindSlotPlayerWithID(List<SlotPlayerInformation> playerList, byte playerId)
     {
         foreach (SlotPlayerInformation player in playerList)
         {
@@ -70,7 +70,7 @@ public class SlotPlayerInformation
         return null;
     }
 
-    public static SlotPlayerInformation FindPlayerWithIDAndRemove(ref List<SlotPlayerInformation> playerList, byte playerId)
+    public static SlotPlayerInformation FindSlotPlayerWithIDAndRemove(ref List<SlotPlayerInformation> playerList, byte playerId)
     {
         foreach (SlotPlayerInformation player in playerList)
         {

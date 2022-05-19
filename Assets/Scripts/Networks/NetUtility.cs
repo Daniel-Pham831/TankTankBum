@@ -32,6 +32,7 @@ public enum OpCode
     GRENADE_EXPLOSION,
 
     // For tank Interactions
+    T_SPAWN,
     T_DIE
 }
 
@@ -83,7 +84,9 @@ public static class NetUtility
 
     // Tank Interactions
     public static Action<NetMessage> C_T_DIE;
+    public static Action<NetMessage> C_T_SPAWN;
     public static Action<NetMessage, NetworkConnection> S_T_DIE;
+    public static Action<NetMessage, NetworkConnection> S_T_SPAWN;
 
 
     public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
@@ -170,6 +173,10 @@ public static class NetUtility
                 break;
 
             // Tank Interactions
+            case OpCode.T_SPAWN:
+                msg = new NetTSpawn(ref streamReader);
+                break;
+
             case OpCode.T_DIE:
                 msg = new NetTDie(ref streamReader);
                 break;
