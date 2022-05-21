@@ -95,8 +95,8 @@ public class TankServerManager : MonoBehaviour
             NetUtility.S_T_FIRE_INPUT += OnServerReceivedTFireInputMessage;
             NetUtility.S_T_DIE += OnServerReceivedTDieMessage;
 
-            TankManager.Singleton.OnNewTankAdded += OnNewTankAdded;
-            TankManager.Singleton.OnTankRemoved += OnTankRemoved;
+            TankSpawner.Singleton.OnNewTankAdded += OnNewTankAdded;
+            TankSpawner.Singleton.OnTankRemoved += OnTankRemoved;
         }
         else
         {
@@ -105,8 +105,8 @@ public class TankServerManager : MonoBehaviour
             NetUtility.S_T_FIRE_INPUT -= OnServerReceivedTFireInputMessage;
             NetUtility.S_T_DIE -= OnServerReceivedTDieMessage;
 
-            TankManager.Singleton.OnNewTankAdded -= OnNewTankAdded;
-            TankManager.Singleton.OnTankRemoved -= OnTankRemoved;
+            TankSpawner.Singleton.OnNewTankAdded -= OnNewTankAdded;
+            TankSpawner.Singleton.OnTankRemoved -= OnTankRemoved;
         }
     }
 
@@ -128,10 +128,10 @@ public class TankServerManager : MonoBehaviour
     {
         TankInformation tankInformation = addedTank.GetComponent<TankInformation>();
 
-        TankRigidbodies.Add(tankInformation.ID, addedTank.GetComponent<Rigidbody>());
-        PreRbPosition.Add(tankInformation.ID, addedTank.transform.position);
-        PreRbRotation.Add(tankInformation.ID, addedTank.transform.rotation);
-        NextSendTFireTime.Add(tankInformation.ID, 0);
+        TankRigidbodies.Add(tankInformation.Player.ID, addedTank.GetComponent<Rigidbody>());
+        PreRbPosition.Add(tankInformation.Player.ID, addedTank.transform.position);
+        PreRbRotation.Add(tankInformation.Player.ID, addedTank.transform.rotation);
+        NextSendTFireTime.Add(tankInformation.Player.ID, 0);
     }
 
     private void OnServerReceivedTFireInputMessage(NetMessage message, NetworkConnection sentPlayer)

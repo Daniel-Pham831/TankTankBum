@@ -7,12 +7,15 @@ public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager Singleton { get; private set; }
 
+    public Player MyPlayer;
     public Dictionary<byte, Player> Players;
+    public Action<Player> PlayerManagerIsReady;
+
 
     private void Awake()
     {
         Singleton = this;
-
+        Players = new Dictionary<byte, Player>();
         DontDestroyOnLoad(gameObject);
     }
 
@@ -35,18 +38,19 @@ public class PlayerManager : MonoBehaviour
 
     private void OnStartGame()
     {
-        Players = new Dictionary<byte, Player>();
-
         ClientInformation clientInformation = ClientInformation.Singleton;
         SlotPlayerInformation myPlayer = clientInformation.MyPlayerInformation;
         List<SlotPlayerInformation> otherPlayers = clientInformation.PlayerList;
 
-        AddPlayer(new Player(myPlayer.Id, myPlayer.Team, myPlayer.Name, true, myPlayer.IsHost));
+        MyPlayer = new Player(myPlayer.Id, myPlayer.Team, myPlayer.Name, true, myPlayer.IsHost);
 
+        AddPlayer(MyPlayer);
         foreach (var player in otherPlayers)
         {
             AddPlayer(new Player(player.Id, player.Team, player.Name, false, player.IsHost));
         }
+
+        PlayerManagerIsReady?.Invoke(MyPlayer);
     }
 
     public void AddPlayer(Player newPlayer)
@@ -57,5 +61,10 @@ public class PlayerManager : MonoBehaviour
     public void RemovePlayer(byte id)
     {
         Players.Remove(id);
+    }
+
+    public Player GetPlayer(byte id)
+    {
+        return Players[id];
     }
 }

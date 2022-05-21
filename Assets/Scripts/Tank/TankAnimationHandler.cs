@@ -35,7 +35,7 @@ public class TankAnimationHandler : MonoBehaviour
     {
         NetTInput tInputMessage = message as NetTInput;
 
-        if (localTankInfo.ID != tInputMessage.ID) return;
+        if (localTankInfo.Player.ID != tInputMessage.ID) return;
 
         tankWheelAnimator.SetFloat("X", tInputMessage.HorizontalInput);
         tankWheelAnimator.SetFloat("Y", tInputMessage.VerticalInput);

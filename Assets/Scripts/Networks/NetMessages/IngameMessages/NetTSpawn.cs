@@ -5,12 +5,17 @@ using UnityEngine;
 
 public class NetTSpawn : NetMessage
 {
-    public Player Player { get; set; }
-
-    public NetTSpawn(Player player)
+    public byte ID { get; set; }
+    public Vector3 Position { get; set; }
+    private bool HasSpawnPostion;
+    public NetTSpawn(byte id, Vector3? position = null)
     {
         Code = OpCode.T_SPAWN;
-        Player = player;
+        ID = id;
+
+        HasSpawnPostion = position != null;
+        if (HasSpawnPostion)
+            Position = position.Value;
     }
 
     public NetTSpawn(ref DataStreamReader reader)
@@ -23,12 +28,32 @@ public class NetTSpawn : NetMessage
     {
         base.Serialize(ref writer);
 
-        Player.SerializePlayer(ref writer, Player);
+        writer.WriteByte(ID);
+        writer.WriteFixedString32(HasSpawnPostion.ToString());
+
+        if (HasSpawnPostion)
+        {
+            writer.WriteFloat(Position.x);
+            writer.WriteFloat(Position.y);
+            writer.WriteFloat(Position.z);
+        }
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
-        Player = Player.DeserializePlayer(ref reader);
+        ID = reader.ReadByte();
+
+        string trueValue = true.ToString();
+        HasSpawnPostion = reader.ReadFixedString32().ToString() == trueValue;
+
+        if (HasSpawnPostion)
+        {
+            float x = reader.ReadFloat();
+            float y = reader.ReadFloat();
+            float z = reader.ReadFloat();
+
+            Position = new Vector3(x, y, z);
+        }
     }
 
     public override void ReceivedOnClient()

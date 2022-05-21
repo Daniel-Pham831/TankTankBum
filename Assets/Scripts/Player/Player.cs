@@ -9,6 +9,7 @@ public class Player
     public string Name;
     public bool IsLocalPlayer;
     public bool IsHost;
+    public Role Role => RoleController.Singleton.GetRole(Team);
 
     public Player(byte id, Team team, string name, bool isLocalPlayer, bool isHost)
     {
@@ -35,8 +36,8 @@ public class Player
         byte id = reader.ReadByte();
         Team team = (Team)reader.ReadByte();
         string name = reader.ReadFixedString32().ToString();
-        bool isLocalPlayer = reader.ReadFixedString32().ToString() == trueValue ? true : false;
-        bool isHost = reader.ReadFixedString32().ToString() == trueValue ? true : false;
+        bool isLocalPlayer = reader.ReadFixedString32().ToString() == trueValue;
+        bool isHost = reader.ReadFixedString32().ToString() == trueValue;
 
         return new Player(id, team, name, isLocalPlayer, isHost);
     }

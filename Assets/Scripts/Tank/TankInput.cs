@@ -31,7 +31,7 @@ public class TankInput : MonoBehaviour
 
     private void Start()
     {
-        if (localTankInfo.IsLocalPlayer)
+        if (localTankInfo.Player.IsLocalPlayer)
         {
             inputsystem.Tank.TowerRotation.performed += OnTowerRotationInputPerformed;
             inputsystem.Tank.TowerRotation.canceled += OnTowerRotationInputPerformed;
@@ -53,7 +53,7 @@ public class TankInput : MonoBehaviour
 
     private void Update()
     {
-        if (!localTankInfo.IsLocalPlayer)
+        if (!localTankInfo.Player.IsLocalPlayer)
         {
             return;
         }
@@ -71,14 +71,14 @@ public class TankInput : MonoBehaviour
 
         currentMovementInputVector.y = Mathf.Approximately(inputVector.y, 0f) ? 0 : currentMovementInputVector.y;
 
-        Client.Singleton.SendToServer(new NetTInput(localTankInfo.ID, currentMovementInputVector.x, currentMovementInputVector.y));
+        Client.Singleton.SendToServer(new NetTInput(localTankInfo.Player.ID, currentMovementInputVector.x, currentMovementInputVector.y));
     }
 
     private void TryRotateTower()
     {
         if (isRotating)
         {
-            Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.ID, towerRotation));
+            Client.Singleton.SendToServer(new NetTTowerInput(localTankInfo.Player.ID, towerRotation));
         }
     }
 
@@ -86,7 +86,7 @@ public class TankInput : MonoBehaviour
     {
         if (isFiring)
         {
-            Client.Singleton.SendToServer(new NetTFireInput(localTankInfo.ID, Vector3.zero, 0));
+            Client.Singleton.SendToServer(new NetTFireInput(localTankInfo.Player.ID, Vector3.zero, 0));
         }
     }
 }

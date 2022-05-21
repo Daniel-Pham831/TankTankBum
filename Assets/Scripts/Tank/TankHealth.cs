@@ -33,9 +33,9 @@ public class TankHealth : MonoBehaviour, IDamageable
         tankExplosionFX.GetComponent<PoolableObject>().ReturnToPoolAfter(3f);
         OnDie?.Invoke();
 
-        if (localTankInfo.IsLocalPlayer)
+        if (localTankInfo.Player.IsLocalPlayer)
         {
-            Client.Singleton.SendToServer(new NetTDie(localTankInfo.ID));
+            Client.Singleton.SendToServer(new NetTDie(localTankInfo.Player.ID));
         }
     }
 

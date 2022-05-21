@@ -29,7 +29,7 @@ public class TankFire : MonoBehaviour
     {
         NetTFireInput tFireInputMessage = message as NetTFireInput;
 
-        if (localTankInfo.ID != tFireInputMessage.ID) return;
+        if (localTankInfo.Player.ID != tFireInputMessage.ID) return;
 
         GetGrenadeAndFireIt(tFireInputMessage);
     }
@@ -43,8 +43,8 @@ public class TankFire : MonoBehaviour
         tankGrenadeMovement.FireAtDirection(tFireInputMessage.FireDirection, firePosition.transform.position, tFireInputMessage.Speed);
 
         GrenadeInformation grenadeInformation = tankGrenade.GetComponent<GrenadeInformation>();
-        grenadeInformation.ID = localTankInfo.ID;
-        grenadeInformation.Team = localTankInfo.Team;
+        grenadeInformation.ID = localTankInfo.Player.ID;
+        grenadeInformation.Team = localTankInfo.Player.Team;
 
         GrenadeColor grenadeColor = tankGrenade.GetComponent<GrenadeColor>();
         grenadeColor.SetupGrenadeColor(grenadeInformation.Team);

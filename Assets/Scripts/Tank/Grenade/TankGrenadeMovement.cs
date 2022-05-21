@@ -24,11 +24,11 @@ public class TankGrenadeMovement : MonoBehaviour
     {
         //Prevent the grenade to collide with the tank that shot it
         if (other.TryGetComponent<TankInformation>(out TankInformation tankInformation))
-            if (tankInformation.ID == grenadeInformation.ID)
+            if (tankInformation.Player.ID == grenadeInformation.ID)
                 return;
 
         // If this grenade is from the local player tank, then send message
-        if (grenadeInformation.ID == TankManager.Singleton.LocalTankInformation.ID)
+        if (grenadeInformation.ID == TankManager.Singleton.LocalTankInformation.Player.ID)
             Client.Singleton.SendToServer(new NetGrenadeExplosion(transform.position, grenadeInformation));
 
         SpawnExplosionFXOnTrigger();
