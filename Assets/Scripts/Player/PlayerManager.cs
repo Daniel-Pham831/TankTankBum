@@ -6,8 +6,10 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager Singleton { get; private set; }
-    public Player MyPlayer;
+    [HideInInspector] public Player MyPlayer;
     public Dictionary<byte, Player> Players;
+    public bool IsLocalPlayer => MyPlayer != null ? MyPlayer.IsLocalPlayer : false;
+
     public Action<Player> PlayerManagerIsReady;
     public Action<TankCamera> LocalCameraIsready;
 

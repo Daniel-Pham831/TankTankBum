@@ -33,10 +33,32 @@ public class TankInput : MonoBehaviour
     {
         if (localTankInfo.Player.IsLocalPlayer)
         {
+            registerToEvent(true);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (localTankInfo.Player.IsLocalPlayer)
+        {
+            registerToEvent(false);
+        }
+    }
+    private void registerToEvent(bool confirm)
+    {
+        if (confirm)
+        {
             inputsystem.Tank.TowerRotation.performed += OnTowerRotationInputPerformed;
             inputsystem.Tank.TowerRotation.canceled += OnTowerRotationInputPerformed;
             inputsystem.Tank.Fire.performed += OnFireInputPerformed;
             inputsystem.Tank.Fire.canceled += OnFireInputPerformed;
+        }
+        else
+        {
+            inputsystem.Tank.TowerRotation.performed -= OnTowerRotationInputPerformed;
+            inputsystem.Tank.TowerRotation.canceled -= OnTowerRotationInputPerformed;
+            inputsystem.Tank.Fire.performed -= OnFireInputPerformed;
+            inputsystem.Tank.Fire.canceled -= OnFireInputPerformed;
         }
     }
 

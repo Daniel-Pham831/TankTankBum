@@ -15,8 +15,8 @@ public class TankSpawner : MonoBehaviour
     // Tanks data
     public TankInformation LocalTankInformation { get; set; }
     public TankCamera LocalTankCamera { get; set; }
-    private bool IsLocalPlayer => LocalTankInformation != null ? LocalTankInformation.Player.IsLocalPlayer : false;
     public Dictionary<byte, GameObject> Tanks { get; set; }
+
     public Action<GameObject> OnNewTankAdded;
     public Action<byte> OnTankRemoved;
 
@@ -38,45 +38,31 @@ public class TankSpawner : MonoBehaviour
     {
         if (confirm)
         {
-            NetUtility.C_T_SPAWN_REQ += OnClientReceivedTSpawnRequestMessage;
-            NetUtility.C_T_SPAWN += OnClientReceivedTSpawnMessage;
-            NetUtility.C_T_DIE += OnClientReceivedTDieMessage;
+            TankManager.Singleton.OnTankSpawn += OnTankSpawn;
+            TankManager.Singleton.OnTankDie += OnTankDie;
         }
         else
         {
-            NetUtility.C_T_SPAWN_REQ -= OnClientReceivedTSpawnRequestMessage;
-            NetUtility.C_T_SPAWN -= OnClientReceivedTSpawnMessage;
-            NetUtility.C_T_DIE -= OnClientReceivedTDieMessage;
+            TankManager.Singleton.OnTankSpawn -= OnTankSpawn;
+            TankManager.Singleton.OnTankDie -= OnTankDie;
         }
     }
 
-    private void OnClientReceivedTSpawnMessage(NetMessage message)
+    private void OnTankDie(byte id)
     {
-        NetTSpawn tSpawnMessage = message as NetTSpawn;
+        OnTankRemoved?.Invoke(id);
 
-        Player sendPlayerInfo = PlayerManager.Singleton.GetPlayer(tSpawnMessage.ID);
-
-        SpawnAndSetupTankData(sendPlayerInfo, tSpawnMessage.Position);
-    }
-
-    private void OnClientReceivedTSpawnRequestMessage(NetMessage message)
-    {
-        NetTSpawnReq tSpawnReqMessage = message as NetTSpawnReq;
-
-        Player sendPlayerInfo = PlayerManager.Singleton.GetPlayer(tSpawnReqMessage.ID);
-
-        SpawnAndSetupTankData(sendPlayerInfo, tSpawnReqMessage.Position);
-        Client.Singleton.SendToServer(new NetTSpawn(sendPlayerInfo.ID, tSpawnReqMessage.Position));
-    }
-
-    private void OnClientReceivedTDieMessage(NetMessage message)
-    {
-        byte deathTankID = (message as NetTDie).ID;
-        OnTankRemoved?.Invoke(deathTankID);
-
-        GameObject deathTankObject = Tanks[deathTankID];
-        Tanks.Remove(deathTankID);
+        GameObject deathTankObject = Tanks[id];
+        Tanks.Remove(id);
         Destroy(deathTankObject);
+    }
+
+    private void OnTankSpawn(byte id, Vector3 spawnPostion)
+    {
+        Player player = PlayerManager.Singleton.GetPlayer(id);
+        Debug.Log($"Spawn {player.IsLocalPlayer}");
+        Debug.Log($"Spawn {player.Name}");
+        SpawnAndSetupTankData(player, spawnPostion);
     }
 
     /// <summary>

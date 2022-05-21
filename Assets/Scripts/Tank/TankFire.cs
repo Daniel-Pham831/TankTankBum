@@ -13,6 +13,11 @@ public class TankFire : MonoBehaviour
         RegisterToEvent(true);
     }
 
+    private void OnDestroy()
+    {
+        RegisterToEvent(false);
+    }
+
     private void RegisterToEvent(bool confirm)
     {
         if (confirm)

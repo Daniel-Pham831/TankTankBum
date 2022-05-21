@@ -12,6 +12,8 @@ public class TankManager : MonoBehaviour
 
     // Tanks data
     [HideInInspector] public TankInformation LocalTankInformation;
+    public Action<byte, Vector3> OnTankSpawn;
+    public Action<byte> OnTankDie;
 
     private void Awake()
     {
@@ -20,21 +22,69 @@ public class TankManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    void Start()
+    private void Start()
     {
         registerToEvent(true);
     }
 
+    private void Update()
+    {
+        if (PlayerManager.Singleton.IsLocalPlayer)
+        {
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                NetworkSpawnTankRequest(PlayerManager.Singleton.MyPlayer.ID);
+            }
+        }
+    }
+
+    public void NetworkSpawnTankRequest(byte id)
+    {
+        Client.Singleton.SendToServer(new NetTSpawnReq(id));
+    }
+
+
+    #region Events, messages
     private void registerToEvent(bool confirm)
     {
         if (confirm)
         {
             PlayerManager.Singleton.PlayerManagerIsReady += PlayerManagerIsReady;
+
+            NetUtility.C_T_SPAWN_REQ += OnClientReceivedTSpawnRequestMessage;
+            NetUtility.C_T_SPAWN += OnClientReceivedTSpawnMessage;
+            NetUtility.C_T_DIE += OnClientReceivedTDieMessage;
         }
         else
         {
             PlayerManager.Singleton.PlayerManagerIsReady -= PlayerManagerIsReady;
+
+            NetUtility.C_T_SPAWN_REQ -= OnClientReceivedTSpawnRequestMessage;
+            NetUtility.C_T_SPAWN -= OnClientReceivedTSpawnMessage;
+            NetUtility.C_T_DIE -= OnClientReceivedTDieMessage;
         }
+    }
+
+    // This is for local player, because other tank data dependent on local tank data
+    private void OnClientReceivedTSpawnRequestMessage(NetMessage message)
+    {
+        NetTSpawnReq tSpawnReqMessage = message as NetTSpawnReq;
+
+        OnTankSpawn?.Invoke(tSpawnReqMessage.ID, tSpawnReqMessage.Position);
+        Client.Singleton.SendToServer(new NetTSpawn(tSpawnReqMessage.ID, tSpawnReqMessage.Position));
+    }
+
+    // This is for all player
+    private void OnClientReceivedTSpawnMessage(NetMessage message)
+    {
+        NetTSpawn tSpawnMessage = message as NetTSpawn;
+
+        OnTankSpawn?.Invoke(tSpawnMessage.ID, tSpawnMessage.Position);
+    }
+
+    private void OnClientReceivedTDieMessage(NetMessage message)
+    {
+        OnTankDie?.Invoke((message as NetTDie).ID);
     }
 
     private void PlayerManagerIsReady(Player player)
@@ -42,6 +92,10 @@ public class TankManager : MonoBehaviour
         gameObject.AddComponent<TankInformation>();
         LocalTankInformation = GetComponent<TankInformation>();
         LocalTankInformation.Player = player;
+
         Client.Singleton.SendToServer(new NetTSpawnReq(player.ID));
     }
+
+    #endregion
+
 }
