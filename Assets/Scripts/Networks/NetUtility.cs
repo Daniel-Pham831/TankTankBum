@@ -33,6 +33,7 @@ public enum OpCode
 
     // For tank Interactions
     T_SPAWN,
+    T_SPAWN_REQ,
     T_DIE
 }
 
@@ -84,8 +85,10 @@ public static class NetUtility
 
     // Tank Interactions
     public static Action<NetMessage> C_T_DIE;
+    public static Action<NetMessage> C_T_SPAWN_REQ;
     public static Action<NetMessage> C_T_SPAWN;
     public static Action<NetMessage, NetworkConnection> S_T_DIE;
+    public static Action<NetMessage, NetworkConnection> S_T_SPAWN_REQ;
     public static Action<NetMessage, NetworkConnection> S_T_SPAWN;
 
 
@@ -173,6 +176,10 @@ public static class NetUtility
                 break;
 
             // Tank Interactions
+            case OpCode.T_SPAWN_REQ:
+                msg = new NetTSpawnReq(ref streamReader);
+                break;
+
             case OpCode.T_SPAWN:
                 msg = new NetTSpawn(ref streamReader);
                 break;

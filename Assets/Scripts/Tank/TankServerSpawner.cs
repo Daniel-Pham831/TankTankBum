@@ -28,10 +28,12 @@ public class TankServerSpawner : MonoBehaviour
     {
         if (confirm)
         {
+            NetUtility.S_T_SPAWN_REQ += OnServerReceivedTankSpawnRequestMessage;
             NetUtility.S_T_SPAWN += OnServerReceivedTankSpawnMessage;
         }
         else
         {
+            NetUtility.S_T_SPAWN_REQ -= OnServerReceivedTankSpawnRequestMessage;
             NetUtility.S_T_SPAWN -= OnServerReceivedTankSpawnMessage;
         }
     }
@@ -39,10 +41,16 @@ public class TankServerSpawner : MonoBehaviour
     private void OnServerReceivedTankSpawnMessage(NetMessage message, NetworkConnection sender)
     {
         NetTSpawn tSpawnMessage = message as NetTSpawn;
-        Player sendPlayerInfo = PlayerManager.Singleton.GetPlayer(tSpawnMessage.ID);
+        Server.Singleton.BroadCastExcept(tSpawnMessage, sender);
+    }
+
+    private void OnServerReceivedTankSpawnRequestMessage(NetMessage message, NetworkConnection sender)
+    {
+        NetTSpawnReq tSpawnReqMessage = message as NetTSpawnReq;
+        Player sendPlayerInfo = PlayerManager.Singleton.GetPlayer(tSpawnReqMessage.ID);
 
         Vector3 newSpawnPosition = spawnPosition.GetPosition(sendPlayerInfo.Role).position;
 
-        Server.Singleton.BroadCast(new NetTSpawn(tSpawnMessage.ID, newSpawnPosition));
+        Server.Singleton.SendToClient(sender, new NetTSpawnReq(tSpawnReqMessage.ID, newSpawnPosition));
     }
 }

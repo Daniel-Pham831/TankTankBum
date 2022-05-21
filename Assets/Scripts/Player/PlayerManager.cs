@@ -6,11 +6,12 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     public static PlayerManager Singleton { get; private set; }
-
     public Player MyPlayer;
     public Dictionary<byte, Player> Players;
     public Action<Player> PlayerManagerIsReady;
+    public Action<TankCamera> LocalCameraIsready;
 
+    [SerializeField] private TankSpawnerData tankSpawnerData;
 
     private void Awake()
     {

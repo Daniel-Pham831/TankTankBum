@@ -12,7 +12,6 @@ public class TankManager : MonoBehaviour
 
     // Tanks data
     [HideInInspector] public TankInformation LocalTankInformation;
-    private TankCamera LocalTankCamera { get; set; }
 
     private void Awake()
     {
@@ -43,6 +42,6 @@ public class TankManager : MonoBehaviour
         gameObject.AddComponent<TankInformation>();
         LocalTankInformation = GetComponent<TankInformation>();
         LocalTankInformation.Player = player;
-        Client.Singleton.SendToServer(new NetTSpawn(player.ID));
+        Client.Singleton.SendToServer(new NetTSpawnReq(player.ID));
     }
 }
