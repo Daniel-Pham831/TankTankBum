@@ -34,7 +34,14 @@ public enum OpCode
     // For tank Interactions
     T_SPAWN,
     T_SPAWN_REQ,
-    T_DIE
+    T_DIE,
+
+    // UI
+    UI_SPAWN_COUNTDOWN,
+
+
+
+    NONE
 }
 
 public static class NetUtility
@@ -91,6 +98,9 @@ public static class NetUtility
     public static Action<NetMessage, NetworkConnection> S_T_SPAWN_REQ;
     public static Action<NetMessage, NetworkConnection> S_T_SPAWN;
 
+    // UI 
+    public static Action<NetMessage> C_UI_SPAWN_COUNTDOWN;
+    public static Action<NetMessage, NetworkConnection> S_UI_SPAWN_COUNTDOWN;
 
     public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
     {
@@ -186,6 +196,11 @@ public static class NetUtility
 
             case OpCode.T_DIE:
                 msg = new NetTDie(ref streamReader);
+                break;
+
+            // UI
+            case OpCode.UI_SPAWN_COUNTDOWN:
+                msg = new NetUISpawnCountDown(ref streamReader);
                 break;
 
             default:
