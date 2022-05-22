@@ -93,8 +93,11 @@ public class TankManager : MonoBehaviour
 
     private void OnClientReceivedTDieMessage(NetMessage message)
     {
-        OnTankDie?.Invoke((message as NetTDie).ID);
-        NetworkSpawnTankRequest(PlayerManager.Singleton.MyPlayer.ID);
+        byte deadTankID = (message as NetTDie).ID;
+        OnTankDie?.Invoke(deadTankID);
+
+        if (deadTankID == PlayerManager.Singleton.MyPlayer.ID)
+            NetworkSpawnTankRequest(PlayerManager.Singleton.MyPlayer.ID);
     }
 
     #endregion
