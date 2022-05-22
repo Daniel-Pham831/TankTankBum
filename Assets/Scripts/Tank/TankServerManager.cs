@@ -130,6 +130,9 @@ public class TankServerManager : MonoBehaviour
     private void OnServerReceivedTFireInputMessage(NetMessage message, NetworkConnection sentPlayer)
     {
         NetTFireInput tFireInputMessage = message as NetTFireInput;
+        if (!TankRigidbodies.ContainsKey(tFireInputMessage.ID)) return;
+
+
         float nextSendTFireTime;
         if (!NextSendTFireTime.TryGetValue(tFireInputMessage.ID, out nextSendTFireTime))
             NextSendTFireTime[tFireInputMessage.ID] = 0;
@@ -149,6 +152,7 @@ public class TankServerManager : MonoBehaviour
     private void OnServerReceivedTTowerInputMessage(NetMessage message, NetworkConnection sentPlayer)
     {
         NetTTowerInput tankTowerInputMessage = message as NetTTowerInput;
+        if (!TankRigidbodies.ContainsKey(tankTowerInputMessage.ID)) return;
 
         GameObject sentPlayerTankTower = TankRigidbodies[tankTowerInputMessage.ID].GetComponent<TankMovement>().TankTower;
 
@@ -159,6 +163,7 @@ public class TankServerManager : MonoBehaviour
     private void OnServerReceivedTInputMessage(NetMessage message, NetworkConnection sentPlayer)
     {
         NetTInput tankInputMessage = message as NetTInput;
+        if (!TankRigidbodies.ContainsKey(tankInputMessage.ID)) return;
 
         Server.Singleton.BroadCast(new NetTInput(tankInputMessage.ID, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput));
 

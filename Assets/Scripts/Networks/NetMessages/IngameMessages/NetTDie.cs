@@ -6,11 +6,13 @@ using UnityEngine;
 public class NetTDie : NetMessage
 {
     public byte ID { get; set; }
+    public float NextSpawnDuration { get; set; }
 
-    public NetTDie(byte id)
+    public NetTDie(byte id, float nextSpawnDuration = 0)
     {
         Code = OpCode.T_DIE;
         ID = id;
+        NextSpawnDuration = nextSpawnDuration;
     }
 
     public NetTDie(ref DataStreamReader reader)
@@ -24,11 +26,13 @@ public class NetTDie : NetMessage
         base.Serialize(ref writer);
 
         writer.WriteByte(ID);
+        writer.WriteFloat(NextSpawnDuration);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
         ID = reader.ReadByte();
+        NextSpawnDuration = reader.ReadFloat();
     }
 
     public override void ReceivedOnClient()

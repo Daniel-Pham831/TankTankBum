@@ -6,9 +6,9 @@ using UnityEngine;
 public class NetUISpawnCountDown : NetMessage
 {
     public byte ID { get; set; }
-    public byte CountDownDuration { get; set; }
+    public float CountDownDuration { get; set; }
 
-    public NetUISpawnCountDown(byte id, byte countDownDuration)
+    public NetUISpawnCountDown(byte id, float countDownDuration)
     {
         Code = OpCode.UI_SPAWN_COUNTDOWN;
         ID = id;
@@ -26,13 +26,13 @@ public class NetUISpawnCountDown : NetMessage
         base.Serialize(ref writer);
 
         writer.WriteByte(ID);
-        writer.WriteByte(CountDownDuration);
+        writer.WriteFloat(CountDownDuration);
     }
 
     public override void Deserialize(ref DataStreamReader reader)
     {
         ID = reader.ReadByte();
-        CountDownDuration = reader.ReadByte();
+        CountDownDuration = reader.ReadFloat();
     }
 
     public override void ReceivedOnClient()

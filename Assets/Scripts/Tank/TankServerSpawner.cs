@@ -12,13 +12,11 @@ public class TankServerSpawner : MonoBehaviour
     public static TankServerSpawner Singleton { get; private set; }
     public SpawnPosition spawnPosition;
     public TankSpawnerData tankSpawnerData;
-    private List<byte> hasBeenSpawned;
     private List<byte> isInCountDown;
 
     private void Awake()
     {
         Singleton = this;
-        hasBeenSpawned = new List<byte>();
         isInCountDown = new List<byte>();
         DontDestroyOnLoad(gameObject);
     }
@@ -53,47 +51,43 @@ public class TankServerSpawner : MonoBehaviour
     private void OnServerReceivedTankSpawnRequestMessage(NetMessage message, NetworkConnection sender)
     {
         NetTSpawnReq tSpawnReqMessage = message as NetTSpawnReq;
-        HandleSpawnTank(tSpawnReqMessage.ID, sender);
 
-        // Player sendPlayerInfo = PlayerManager.Singleton.GetPlayer(tSpawnReqMessage.ID);
+        Player sendPlayerInfo = PlayerManager.Singleton.GetPlayer(tSpawnReqMessage.ID);
 
-        // Vector3 newSpawnPosition = spawnPosition.GetPosition(sendPlayerInfo.Role).position;
+        Vector3 newSpawnPosition = spawnPosition.GetPosition(sendPlayerInfo.Role).position;
 
-        // Server.Singleton.SendToClient(sender, new NetTSpawnReq(tSpawnReqMessage.ID, newSpawnPosition));
+        Server.Singleton.SendToClient(sender, new NetTSpawnReq(tSpawnReqMessage.ID, newSpawnPosition));
     }
 
     private void OnServerReceivedTDieMessage(NetMessage message, NetworkConnection sender)
     {
-        // At this point a tank just die
-        Server.Singleton.BroadCast(message as NetTDie);
+        NetTDie tankDieMessage = message as NetTDie;
+        Player player = PlayerManager.Singleton.GetPlayer(tankDieMessage.ID);
+        float countDuration = tankSpawnerData.GetRespawnTime(player.Role);
+        tankDieMessage.NextSpawnDuration = countDuration;
+
+        // At this point a tank just die so send the dead message to all player
+        // Which contains the death time, use this to show UI
+        Server.Singleton.BroadCast(tankDieMessage);
+
+        // after a countDuration send a spawn message to the death player
+        HandleSpawnTank(tankDieMessage.ID, player, countDuration, sender);
     }
-    private void HandleSpawnTank(byte id, NetworkConnection sender)
+
+    private void HandleSpawnTank(byte id, Player player, float countDuration, NetworkConnection sender)
     {
-        // if this player(id): has never been spawn before, then allow to spawn with out waitng
-        if (!hasBeenSpawned.Contains(id))
+        if (!isInCountDown.Contains(id))
         {
-            hasBeenSpawned.Add(id);
-            StartCoroutine(SendSpawnMessageCountDown(id, sender, true));
-        }
-        else
-        {
-            if (!isInCountDown.Contains(id))
-            {
-                StartCoroutine(SendSpawnMessageCountDown(id, sender));
-            }
+            StartCoroutine(SendSpawnMessageCountDown(id, player, countDuration, sender));
         }
     }
 
     /// <summary>
     /// This function will send a NetTSpawnReq back to client after a countDown which based on the RoleController
     /// </summary>
-    private IEnumerator SendSpawnMessageCountDown(byte id, NetworkConnection sender, bool shouldSendImmediately = false)
+    private IEnumerator SendSpawnMessageCountDown(byte id, Player player, float countDuration, NetworkConnection sender)
     {
         isInCountDown.Add(id);
-        Player player = PlayerManager.Singleton.GetPlayer(id);
-        float countDuration = tankSpawnerData.GetRespawnTime(player.Role);
-        if (shouldSendImmediately)
-            countDuration = 0;
 
         while (countDuration > 0)
         {

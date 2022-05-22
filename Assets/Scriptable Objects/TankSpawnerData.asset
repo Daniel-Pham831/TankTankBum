@@ -19,3 +19,7 @@ MonoBehaviour:
   BlueTankMaterial: {fileID: 2100000, guid: 4577ee2046668dc4faae41439ead563c, type: 2}
   RedTankMaterial: {fileID: 2100000, guid: 4bd122cb58a5d8645afd8bf406f31e3f, type: 2}
   TankDefaultHealth: 100
+  attackRespawnTime: 5
+  defendRespawnTime: 5
+  attackMaxSpawnLives: 5
+  defendMaxSpawnLives: 5

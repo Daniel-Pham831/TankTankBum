@@ -38,12 +38,6 @@ public class TankManager : MonoBehaviour
     //     }
     // }
 
-    public void NetworkSpawnTankRequest(byte id)
-    {
-        Client.Singleton.SendToServer(new NetTSpawnReq(id));
-    }
-
-
     #region Events, messages
     private void registerToEvent(bool confirm)
     {
@@ -93,13 +87,8 @@ public class TankManager : MonoBehaviour
 
     private void OnClientReceivedTDieMessage(NetMessage message)
     {
-        byte deadTankID = (message as NetTDie).ID;
-        OnTankDie?.Invoke(deadTankID);
-
-        if (deadTankID == PlayerManager.Singleton.MyPlayer.ID)
-            NetworkSpawnTankRequest(PlayerManager.Singleton.MyPlayer.ID);
+        OnTankDie?.Invoke((message as NetTDie).ID);
     }
 
     #endregion
-
 }
