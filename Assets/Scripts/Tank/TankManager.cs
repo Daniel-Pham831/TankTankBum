@@ -27,16 +27,16 @@ public class TankManager : MonoBehaviour
         registerToEvent(true);
     }
 
-    private void Update()
-    {
-        if (PlayerManager.Singleton.IsLocalPlayer)
-        {
-            if (Input.GetKeyDown(KeyCode.P))
-            {
-                NetworkSpawnTankRequest(PlayerManager.Singleton.MyPlayer.ID);
-            }
-        }
-    }
+    // private void Update()
+    // {
+    //     if (PlayerManager.Singleton.IsLocalPlayer)
+    //     {
+    //         if (Input.GetKeyDown(KeyCode.P))
+    //         {
+    //             NetworkSpawnTankRequest(PlayerManager.Singleton.MyPlayer.ID);
+    //         }
+    //     }
+    // }
 
     public void NetworkSpawnTankRequest(byte id)
     {
@@ -65,6 +65,15 @@ public class TankManager : MonoBehaviour
         }
     }
 
+    private void PlayerManagerIsReady(Player player)
+    {
+        gameObject.AddComponent<TankInformation>();
+        LocalTankInformation = GetComponent<TankInformation>();
+        LocalTankInformation.Player = player;
+
+        Client.Singleton.SendToServer(new NetTSpawnReq(player.ID));
+    }
+
     // This is for local player, because other tank data dependent on local tank data
     private void OnClientReceivedTSpawnRequestMessage(NetMessage message)
     {
@@ -85,15 +94,7 @@ public class TankManager : MonoBehaviour
     private void OnClientReceivedTDieMessage(NetMessage message)
     {
         OnTankDie?.Invoke((message as NetTDie).ID);
-    }
-
-    private void PlayerManagerIsReady(Player player)
-    {
-        gameObject.AddComponent<TankInformation>();
-        LocalTankInformation = GetComponent<TankInformation>();
-        LocalTankInformation.Player = player;
-
-        Client.Singleton.SendToServer(new NetTSpawnReq(player.ID));
+        NetworkSpawnTankRequest(PlayerManager.Singleton.MyPlayer.ID);
     }
 
     #endregion

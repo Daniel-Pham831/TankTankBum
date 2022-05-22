@@ -60,8 +60,6 @@ public class TankSpawner : MonoBehaviour
     private void OnTankSpawn(byte id, Vector3 spawnPostion)
     {
         Player player = PlayerManager.Singleton.GetPlayer(id);
-        Debug.Log($"Spawn {player.IsLocalPlayer}");
-        Debug.Log($"Spawn {player.Name}");
         SpawnAndSetupTankData(player, spawnPostion);
     }
 
@@ -71,7 +69,7 @@ public class TankSpawner : MonoBehaviour
     private void SpawnAndSetupTankData(Player player, Vector3 spawnPosition)
     {
         // Spawn tank
-        GameObject tank = Instantiate(tankSpawnerData.tankPrefab, spawnPosition, Quaternion.identity);
+        GameObject tank = Instantiate(tankSpawnerData.TankPrefab, spawnPosition, Quaternion.identity);
         Rigidbody tankRigid = tank.GetComponent<Rigidbody>();
 
         // Setup tank data
@@ -89,7 +87,7 @@ public class TankSpawner : MonoBehaviour
             SetTankName(tank, tankInformation); //Only show other tanks' name
         }
 
-        SetTankHealth(tank, tankSpawnerData.tankDefaultHealth);
+        SetTankHealth(tank, tankSpawnerData.TankDefaultHealth);
         SetTankColorBasedOnTeam(tank, player.Team);
 
         if (PlayerManager.Singleton.MyPlayer.IsHost)
@@ -99,7 +97,7 @@ public class TankSpawner : MonoBehaviour
     private void SetLocalTankCamera(GameObject tank, Role role)
     {
         GameObject localTankCameraObject =
-        LocalTankCamera == null ? Instantiate(tankSpawnerData.localTankCameraPrefab) : LocalTankCamera.gameObject;
+        LocalTankCamera == null ? Instantiate(tankSpawnerData.LocalTankCameraPrefab) : LocalTankCamera.gameObject;
 
         TankCamera localTankCameraScript = localTankCameraObject.GetComponent<TankCamera>();
 
@@ -109,7 +107,7 @@ public class TankSpawner : MonoBehaviour
 
     private void SetTankName(GameObject tank, TankInformation tankInformation)
     {
-        GameObject tankNameObject = Instantiate(tankSpawnerData.tankNamePrefab);
+        GameObject tankNameObject = Instantiate(tankSpawnerData.TankNamePrefab);
         TankName tankNameScript = tankNameObject.GetComponent<TankName>();
         tankNameScript.SetUpTankName(tank, tankInformation.Player.Name);
         tankNameScript.SetNameRot(LocalTankCamera.GetActualCameraRot);
@@ -118,7 +116,7 @@ public class TankSpawner : MonoBehaviour
 
     private void SetTankHealth(GameObject tank, float tankDefaultHealth)
     {
-        GameObject tankHealthObject = Instantiate(tankSpawnerData.tankHealthPrefab);
+        GameObject tankHealthObject = Instantiate(tankSpawnerData.TankHealthPrefab);
         HealthBar heathBar = tankHealthObject.GetComponent<HealthBar>();
         heathBar.SetupHealthBar(tank, tankDefaultHealth, LocalTankCamera.GetActualCameraRot);
 
@@ -130,7 +128,7 @@ public class TankSpawner : MonoBehaviour
         MeshRenderer[] meshRenderers = tank.GetComponentsInChildren<MeshRenderer>();
         foreach (MeshRenderer meshRenderer in meshRenderers)
         {
-            meshRenderer.material = team == Team.Blue ? tankSpawnerData.blueTankMaterial : tankSpawnerData.redTankMaterial;
+            meshRenderer.material = team == Team.Blue ? tankSpawnerData.BlueTankMaterial : tankSpawnerData.RedTankMaterial;
         }
     }
 }

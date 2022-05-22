@@ -5,6 +5,7 @@ using UnityEngine;
 
 /*
     This class in only available in the Server side.
+    this class is for handling all tanks inputs and movement
 */
 public class TankServerManager : MonoBehaviour
 {
@@ -93,7 +94,6 @@ public class TankServerManager : MonoBehaviour
             NetUtility.S_T_INPUT += OnServerReceivedTInputMessage;
             NetUtility.S_T_TOWER_INPUT += OnServerReceivedTTowerInputMessage;
             NetUtility.S_T_FIRE_INPUT += OnServerReceivedTFireInputMessage;
-            NetUtility.S_T_DIE += OnServerReceivedTDieMessage;
 
             TankSpawner.Singleton.OnNewTankAdded += OnNewTankAdded;
             TankSpawner.Singleton.OnTankRemoved += OnTankRemoved;
@@ -103,17 +103,10 @@ public class TankServerManager : MonoBehaviour
             NetUtility.S_T_INPUT -= OnServerReceivedTInputMessage;
             NetUtility.S_T_TOWER_INPUT -= OnServerReceivedTTowerInputMessage;
             NetUtility.S_T_FIRE_INPUT -= OnServerReceivedTFireInputMessage;
-            NetUtility.S_T_DIE -= OnServerReceivedTDieMessage;
 
             TankSpawner.Singleton.OnNewTankAdded -= OnNewTankAdded;
             TankSpawner.Singleton.OnTankRemoved -= OnTankRemoved;
         }
-    }
-
-    private void OnServerReceivedTDieMessage(NetMessage message, NetworkConnection sender)
-    {
-        // At this point a tank just die
-        Server.Singleton.BroadCast(message as NetTDie);
     }
 
     private void OnTankRemoved(byte removedTankID)

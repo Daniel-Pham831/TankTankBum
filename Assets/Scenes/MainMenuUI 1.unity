@@ -781,7 +781,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdc01c9324ce31f4d95236cfae862a7f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tankSpawnerData: {fileID: 11400000, guid: 521a2b586a539974e9d8880dde4793ae, type: 2}
 --- !u!4 &169763873
 Transform:
   m_ObjectHideFlags: 0
@@ -4073,6 +4072,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnPosition: {fileID: 11400000, guid: 17e11d0779cf15442b70c9ee50419856, type: 2}
+  tankSpawnerData: {fileID: 11400000, guid: 521a2b586a539974e9d8880dde4793ae, type: 2}
 --- !u!4 &1241565122
 Transform:
   m_ObjectHideFlags: 0

@@ -13,8 +13,6 @@ public class PlayerManager : MonoBehaviour
     public Action<Player> PlayerManagerIsReady;
     public Action<TankCamera> LocalCameraIsready;
 
-    [SerializeField] private TankSpawnerData tankSpawnerData;
-
     private void Awake()
     {
         Singleton = this;
