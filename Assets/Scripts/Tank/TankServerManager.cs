@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using Unity.Networking.Transport;
 using UnityEngine;
 
 /*
     This class in only available in the Server side.
+    this class is for handling all tanks inputs and movement
 */
 public class TankServerManager : MonoBehaviour
 {
@@ -27,7 +29,6 @@ public class TankServerManager : MonoBehaviour
     public Dictionary<byte, Rigidbody> TankRigidbodies;
     public Dictionary<byte, Vector3> PreRbPosition;
     public Dictionary<byte, Quaternion> PreRbRotation;
-    public Dictionary<byte, bool> CanBroadCastTFire;
     public Dictionary<byte, float> NextSendTFireTime;
 
 
@@ -39,7 +40,6 @@ public class TankServerManager : MonoBehaviour
         TankRigidbodies = new Dictionary<byte, Rigidbody>();
         PreRbPosition = new Dictionary<byte, Vector3>();
         PreRbRotation = new Dictionary<byte, Quaternion>();
-        CanBroadCastTFire = new Dictionary<byte, bool>();
         NextSendTFireTime = new Dictionary<byte, float>();
         DontDestroyOnLoad(gameObject);
     }
@@ -94,18 +94,45 @@ public class TankServerManager : MonoBehaviour
             NetUtility.S_T_INPUT += OnServerReceivedTInputMessage;
             NetUtility.S_T_TOWER_INPUT += OnServerReceivedTTowerInputMessage;
             NetUtility.S_T_FIRE_INPUT += OnServerReceivedTFireInputMessage;
+
+            TankSpawner.Singleton.OnNewTankAdded += OnNewTankAdded;
+            TankSpawner.Singleton.OnTankRemoved += OnTankRemoved;
         }
         else
         {
             NetUtility.S_T_INPUT -= OnServerReceivedTInputMessage;
             NetUtility.S_T_TOWER_INPUT -= OnServerReceivedTTowerInputMessage;
             NetUtility.S_T_FIRE_INPUT -= OnServerReceivedTFireInputMessage;
+
+            TankSpawner.Singleton.OnNewTankAdded -= OnNewTankAdded;
+            TankSpawner.Singleton.OnTankRemoved -= OnTankRemoved;
         }
+    }
+
+    private void OnTankRemoved(byte removedTankID)
+    {
+        TankRigidbodies.Remove(removedTankID);
+        PreRbPosition.Remove(removedTankID);
+        PreRbRotation.Remove(removedTankID);
+        NextSendTFireTime.Remove(removedTankID);
+    }
+
+    private void OnNewTankAdded(GameObject addedTank)
+    {
+        TankInformation tankInformation = addedTank.GetComponent<TankInformation>();
+
+        TankRigidbodies.Add(tankInformation.Player.ID, addedTank.GetComponent<Rigidbody>());
+        PreRbPosition.Add(tankInformation.Player.ID, addedTank.transform.position);
+        PreRbRotation.Add(tankInformation.Player.ID, addedTank.transform.rotation);
+        NextSendTFireTime.Add(tankInformation.Player.ID, 0);
     }
 
     private void OnServerReceivedTFireInputMessage(NetMessage message, NetworkConnection sentPlayer)
     {
         NetTFireInput tFireInputMessage = message as NetTFireInput;
+        if (!TankRigidbodies.ContainsKey(tFireInputMessage.ID)) return;
+
+
         float nextSendTFireTime;
         if (!NextSendTFireTime.TryGetValue(tFireInputMessage.ID, out nextSendTFireTime))
             NextSendTFireTime[tFireInputMessage.ID] = 0;
@@ -125,6 +152,7 @@ public class TankServerManager : MonoBehaviour
     private void OnServerReceivedTTowerInputMessage(NetMessage message, NetworkConnection sentPlayer)
     {
         NetTTowerInput tankTowerInputMessage = message as NetTTowerInput;
+        if (!TankRigidbodies.ContainsKey(tankTowerInputMessage.ID)) return;
 
         GameObject sentPlayerTankTower = TankRigidbodies[tankTowerInputMessage.ID].GetComponent<TankMovement>().TankTower;
 
@@ -135,6 +163,7 @@ public class TankServerManager : MonoBehaviour
     private void OnServerReceivedTInputMessage(NetMessage message, NetworkConnection sentPlayer)
     {
         NetTInput tankInputMessage = message as NetTInput;
+        if (!TankRigidbodies.ContainsKey(tankInputMessage.ID)) return;
 
         Server.Singleton.BroadCast(new NetTInput(tankInputMessage.ID, tankInputMessage.HorizontalInput, tankInputMessage.VerticalInput));
 

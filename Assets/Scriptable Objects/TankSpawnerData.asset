@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f5105730fd5b8d449d87d2303c66d17, type: 3}
+  m_Name: TankSpawnerData
+  m_EditorClassIdentifier: 
+  TankPrefab: {fileID: 4655256615376615491, guid: b68463d498615494c83cf1b8d6592fca, type: 3}
+  TankNamePrefab: {fileID: 7722871201896819139, guid: 8b7fcc8a86c716349883dc131663ebb1, type: 3}
+  TankHealthPrefab: {fileID: 7722871201896819139, guid: d2771c4e46703f0438ba5cc3f9ace403, type: 3}
+  LocalTankCameraPrefab: {fileID: 5882524695110162460, guid: 514c0e177303cc14d81b61ff3566eba2, type: 3}
+  BlueTankMaterial: {fileID: 2100000, guid: 4577ee2046668dc4faae41439ead563c, type: 2}
+  RedTankMaterial: {fileID: 2100000, guid: 4bd122cb58a5d8645afd8bf406f31e3f, type: 2}
+  TankDefaultHealth: 100
+  attackRespawnTime: 5
+  defendRespawnTime: 5
+  attackMaxSpawnLives: 5
+  defendMaxSpawnLives: 5

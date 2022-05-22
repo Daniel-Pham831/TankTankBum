@@ -15,14 +15,14 @@ public class ClientInformation : MonoBehaviour
 {
     public static ClientInformation Singleton { get; private set; }
 
-    public Player MyPlayerInformation;
-    public List<Player> PlayerList;
+    public SlotPlayerInformation MyPlayerInformation;
+    public List<SlotPlayerInformation> PlayerList;
     public List<byte> IdList;
     public List<string> NameList;
     public bool IsHost;
 
-    public Action<Player> OnNewJoinedPlayer;
-    public Action<Player> OnDisconnectedClient;
+    public Action<SlotPlayerInformation> OnNewJoinedPlayer;
+    public Action<SlotPlayerInformation> OnDisconnectedClient;
     public Action<bool> OnDeclareHost;
     public Action<byte> OnPlayerSwitchTeam;
     public Action<byte, ReadyState> OnPlayerSwitchReadyState;
@@ -33,7 +33,7 @@ public class ClientInformation : MonoBehaviour
         if (Singleton == null)
             Singleton = this;
 
-        MyPlayerInformation = new Player();
+        MyPlayerInformation = new SlotPlayerInformation();
         IdList = new List<byte>();
         NameList = new List<string>();
 
@@ -95,7 +95,7 @@ public class ClientInformation : MonoBehaviour
     {
         NetReady readyMessage = message as NetReady;
 
-        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref PlayerList, readyMessage.Id);
+        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindSlotPlayerWithIDAndRemove(ref PlayerList, readyMessage.Id);
 
         //Switch ReadyState
         if (sentPlayer != null)
@@ -110,7 +110,7 @@ public class ClientInformation : MonoBehaviour
     {
         NetSwitchTeam switchTeamMessage = message as NetSwitchTeam;
 
-        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref PlayerList, switchTeamMessage.Id);
+        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindSlotPlayerWithIDAndRemove(ref PlayerList, switchTeamMessage.Id);
 
         //SwitchTeam
         if (sentPlayer != null)
@@ -130,7 +130,7 @@ public class ClientInformation : MonoBehaviour
     {
         NetDisconnect disconnectMessage = message as NetDisconnect;
 
-        Player disconnectedPlayer = Player.FindPlayerWithID(PlayerList, disconnectMessage.DisconnectedClientId);
+        SlotPlayerInformation disconnectedPlayer = SlotPlayerInformation.FindSlotPlayerWithID(PlayerList, disconnectMessage.DisconnectedClientId);
 
         OnDisconnectedClient?.Invoke(disconnectedPlayer);
 
@@ -166,7 +166,7 @@ public class ClientInformation : MonoBehaviour
 
         PlayerList = welcomeMessage.PlayerList;
 
-        foreach (Player player in PlayerList)
+        foreach (SlotPlayerInformation player in PlayerList)
         {
             IdList.Add(player.Id);
             NameList.Add(player.Name);

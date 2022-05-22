@@ -36,7 +36,6 @@ public class GrenadeClient : MonoBehaviour
 
     private void OnClientReceivedGrenadeExplosionMessage(NetMessage message)
     {
-        Debug.Log("ReceivedOnClient");
         HandleGrenadeExplosionMessage(message as NetGrenadeExplosion);
     }
 
@@ -50,7 +49,7 @@ public class GrenadeClient : MonoBehaviour
                 float damage = grenadeExplosionInformation.Damage;
                 if (collider.TryGetComponent<TankInformation>(out TankInformation tankInformation))
                 {
-                    damage = message.Team != tankInformation.Team ? damage : grenadeExplosionInformation.SameTeamDamage;
+                    damage = message.Team != tankInformation.Player.Team ? damage : grenadeExplosionInformation.SameTeamDamage;
                 }
 
                 damageable.TakeDamage(damage);

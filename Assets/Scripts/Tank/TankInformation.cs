@@ -3,19 +3,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum Role
-{
-    Attacker = 0,
-    Defender = 1
-}
 
 /*
     This class is for storing ONE TankInformation
 */
 public class TankInformation : MonoBehaviour
 {
-    public byte ID;
-    public Team Team;
-    public bool IsLocalPlayer;
-    public bool IsHost;
+    [HideInInspector] public Player Player;
 }

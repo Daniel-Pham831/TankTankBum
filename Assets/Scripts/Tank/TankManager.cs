@@ -3,158 +3,92 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /*
-    This class is for spawning and assign tank for each players in the game
+    This class is for storing all tanks which are alive data
+    Every client will have this
 */
 public class TankManager : MonoBehaviour
 {
     public static TankManager Singleton { get; private set; }
-    [SerializeField] private GameObject tankPrefab;
-    [SerializeField] private GameObject tankNamePrefab;
-    [SerializeField] private GameObject tankHealthPrefab;
-    [SerializeField] private GameObject localTankCameraPrefab;
-    [SerializeField] private Material blueTankMaterial;
-    [SerializeField] private Material redTankMaterial;
-    [SerializeField] private GameObject[] spawnPositions;
-    [SerializeField] private float tankDefaultHealth = 100f;
 
     // Tanks data
-    public TankCamera LocalTankCamera { get; set; }
-    public TankInformation LocalTankInformation { get; set; }
-    public Dictionary<byte, TankInformation> TankInformations { get; set; }
-    public Dictionary<byte, Rigidbody> TankRigidbodies { get; set; }
-    public Dictionary<byte, TankName> TankNames { get; set; }
-    public Dictionary<byte, HealthBar> TankHealthBar { get; set; }
-
-    public bool IsLocalPlayer => LocalTankInformation.IsLocalPlayer;
-
+    [HideInInspector] public TankInformation LocalTankInformation;
+    public Action<byte, Vector3> OnTankSpawn;
+    public Action<byte> OnTankDie;
 
     private void Awake()
     {
         Singleton = this;
-        TankInformations = new Dictionary<byte, TankInformation>();
-        TankRigidbodies = new Dictionary<byte, Rigidbody>();
-        TankNames = new Dictionary<byte, TankName>();
-        TankHealthBar = new Dictionary<byte, HealthBar>();
 
         DontDestroyOnLoad(gameObject);
     }
-    // Start is called before the first frame update
-    void Start()
+
+    private void Start()
     {
         registerToEvent(true);
     }
 
+    // private void Update()
+    // {
+    //     if (PlayerManager.Singleton.IsLocalPlayer)
+    //     {
+    //         if (Input.GetKeyDown(KeyCode.P))
+    //         {
+    //             NetworkSpawnTankRequest(PlayerManager.Singleton.MyPlayer.ID);
+    //         }
+    //     }
+    // }
 
-    #region Networking Functions
-
+    #region Events, messages
     private void registerToEvent(bool confirm)
     {
         if (confirm)
         {
-            ClientInformation.Singleton.StartGame += OnStartGame;
+            PlayerManager.Singleton.PlayerManagerIsReady += PlayerManagerIsReady;
+
+            NetUtility.C_T_SPAWN_REQ += OnClientReceivedTSpawnRequestMessage;
+            NetUtility.C_T_SPAWN += OnClientReceivedTSpawnMessage;
+            NetUtility.C_T_DIE += OnClientReceivedTDieMessage;
         }
         else
         {
-            ClientInformation.Singleton.StartGame -= OnStartGame;
+            PlayerManager.Singleton.PlayerManagerIsReady -= PlayerManagerIsReady;
+
+            NetUtility.C_T_SPAWN_REQ -= OnClientReceivedTSpawnRequestMessage;
+            NetUtility.C_T_SPAWN -= OnClientReceivedTSpawnMessage;
+            NetUtility.C_T_DIE -= OnClientReceivedTDieMessage;
         }
     }
 
-    private void OnStartGame()
+    private void PlayerManagerIsReady(Player player)
     {
-        ClientInformation clientInformation = ClientInformation.Singleton;
-        Player myPlayer = clientInformation.MyPlayerInformation;
-        List<Player> otherPlayers = clientInformation.PlayerList;
+        gameObject.AddComponent<TankInformation>();
+        LocalTankInformation = GetComponent<TankInformation>();
+        LocalTankInformation.Player = player;
 
-        SpawnTank(myPlayer.Id, myPlayer.Team, myPlayer.Name, true, clientInformation.IsHost);
-
-        foreach (Player player in otherPlayers)
-        {
-            SpawnTank(player.Id, player.Team, player.Name, false, clientInformation.IsHost);
-        }
-
-        if (clientInformation.IsHost)
-        {
-            TankServerManager.Singleton.TankRigidbodies = TankRigidbodies;
-        }
-
-        SetupAllNamesData();
+        Client.Singleton.SendToServer(new NetTSpawnReq(player.ID));
     }
 
-
-
-    private void SpawnTank(byte id, Team team, string name, bool isLocalPlayer, bool isHost)
+    // This is for local player, because other tank data dependent on local tank data
+    private void OnClientReceivedTSpawnRequestMessage(NetMessage message)
     {
-        GameObject tank = Instantiate(tankPrefab, spawnPositions[id].transform.position, Quaternion.identity);
-        Rigidbody tankRigid = tank.GetComponent<Rigidbody>();
-        TankInformation tankInformation = tank.GetComponent<TankInformation>();
-        tankInformation.ID = id;
-        tankInformation.Team = team;
-        tankInformation.IsLocalPlayer = isLocalPlayer;
-        tankInformation.IsHost = isHost;
+        NetTSpawnReq tSpawnReqMessage = message as NetTSpawnReq;
 
-        if (isLocalPlayer)
-        {
-            LocalTankInformation = tankInformation;
-            SetLocalTankCamera(tank, team);
-        }
-        else
-        {
-            SetTankName(id, tank, name); //Only show other tanks' name
-        }
-        SetTankHealth(id, tank, tankDefaultHealth);
-        SetTankColorBasedOnTeam(tank, team);
-
-        TankInformations.Add(tankInformation.ID, tankInformation);
-        TankRigidbodies.Add(tankInformation.ID, tankRigid);
-        TankServerManager.Singleton.PreRbPosition.Add(id, tankRigid.position);
-        TankServerManager.Singleton.PreRbRotation.Add(id, tankRigid.rotation);
+        OnTankSpawn?.Invoke(tSpawnReqMessage.ID, tSpawnReqMessage.Position);
+        Client.Singleton.SendToServer(new NetTSpawn(tSpawnReqMessage.ID, tSpawnReqMessage.Position));
     }
 
-    private void SetTankHealth(byte id, GameObject tank, float tankDefaultHealth)
+    // This is for all player
+    private void OnClientReceivedTSpawnMessage(NetMessage message)
     {
-        GameObject tankHealthObject = Instantiate(tankHealthPrefab);
-        HealthBar heathBar = tankHealthObject.GetComponent<HealthBar>();
-        heathBar.SetUpTankHealth(tank, tankDefaultHealth);
-        heathBar.SetRot(LocalTankCamera.GetActualCameraRot);
+        NetTSpawn tSpawnMessage = message as NetTSpawn;
 
-        tank.GetComponent<TankHealth>().Health = tankDefaultHealth;
+        OnTankSpawn?.Invoke(tSpawnMessage.ID, tSpawnMessage.Position);
     }
 
-    private void SetLocalTankCamera(GameObject tank, Team team)
+    private void OnClientReceivedTDieMessage(NetMessage message)
     {
-        GameObject localTankCameraObject = Instantiate(localTankCameraPrefab);
-        TankCamera localTankCameraScript = localTankCameraObject.GetComponent<TankCamera>();
-
-        localTankCameraScript.SetupTankCamera(tank, team == Team.Blue ? Role.Defender : Role.Attacker);
-
-        LocalTankCamera = localTankCameraScript;
+        OnTankDie?.Invoke((message as NetTDie).ID);
     }
 
-    private void SetTankName(byte id, GameObject tank, string name)
-    {
-        GameObject tankNameObject = Instantiate(tankNamePrefab);
-        TankName tankNameScript = tankNameObject.GetComponent<TankName>();
-        tankNameScript.SetUpTankName(tank, name);
-
-        TankNames.Add(id, tankNameScript);
-    }
-
-    private void SetTankColorBasedOnTeam(GameObject tank, Team team)
-    {
-        MeshRenderer[] meshRenderers = tank.GetComponentsInChildren<MeshRenderer>();
-        foreach (MeshRenderer meshRenderer in meshRenderers)
-        {
-            meshRenderer.material = team == Team.Blue ? blueTankMaterial : redTankMaterial;
-        }
-    }
-
-    private void SetupAllNamesData()
-    {
-        foreach (byte id in TankNames.Keys)
-        {
-            TankNames[id].SetNameRot(LocalTankCamera.GetActualCameraRot);
-            TankNames[id].SetNameColor(LocalTankInformation.Team, TankInformations[id].Team);
-        }
-    }
     #endregion
 }

@@ -26,6 +26,11 @@ public class TankMovement : MonoBehaviour
         registerToEvent(true);
     }
 
+    private void OnDestroy()
+    {
+        registerToEvent(false);
+    }
+
     private void registerToEvent(bool confirm)
     {
         if (confirm)
@@ -48,7 +53,7 @@ public class TankMovement : MonoBehaviour
     {
         NetTPosition tPositionMessage = message as NetTPosition;
 
-        if (localTankInfo.ID != tPositionMessage.ID) return;
+        if (localTankInfo.Player.ID != tPositionMessage.ID) return;
 
         localRb.transform.position = Vector3.Lerp(localRb.transform.position, tPositionMessage.Position, Time.deltaTime * smoothTime);
     }
@@ -57,7 +62,7 @@ public class TankMovement : MonoBehaviour
     {
         NetTRotation tRotationMessage = message as NetTRotation;
 
-        if (localTankInfo.ID != tRotationMessage.ID) return;
+        if (localTankInfo.Player.ID != tRotationMessage.ID) return;
 
         localRb.transform.forward = Vector3.Lerp(localRb.transform.forward, tRotationMessage.Forward, Time.deltaTime * smoothTime);
     }
@@ -66,7 +71,7 @@ public class TankMovement : MonoBehaviour
     {
         NetTVelocity tVelocityMessage = message as NetTVelocity;
 
-        if (localTankInfo.ID != tVelocityMessage.ID) return;
+        if (localTankInfo.Player.ID != tVelocityMessage.ID) return;
 
         localRb.velocity = tVelocityMessage.Velocity;
     }
@@ -75,7 +80,7 @@ public class TankMovement : MonoBehaviour
     {
         NetTTowerRotation tTowerRotationMessage = message as NetTTowerRotation;
 
-        if (localTankInfo.ID != tTowerRotationMessage.ID) return;
+        if (localTankInfo.Player.ID != tTowerRotationMessage.ID) return;
 
         TankTower.transform.localEulerAngles = tTowerRotationMessage.LocalEulerAngles;
     }

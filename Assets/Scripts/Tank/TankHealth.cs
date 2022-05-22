@@ -19,24 +19,24 @@ public class TankHealth : MonoBehaviour, IDamageable
     public Action<float> OnCurrentHealthChanged;
     public Action OnDie;
 
-    private void Start()
-    {
-        RegisterToEvent(true);
-    }
-
-    private void RegisterToEvent(bool confirm)
-    {
-        if (confirm)
-        {
-        }
-        else
-        {
-        }
-    }
-
     public void Die()
     {
+        // Get explosion FX from pool
+        Pool tankExplosionPool = ObjectPoolManager.Singleton.GetPool(PoolType.TankExplosion);
+        GameObject tankExplosionFX = tankExplosionPool.Get();
+
+        // Move to explosion position and play
+        tankExplosionFX.transform.position = this.transform.position;
+        tankExplosionFX.GetComponent<ParticleSystem>().Play();
+
+        // Return tankExplosionFX to pool
+        tankExplosionFX.GetComponent<PoolableObject>().ReturnToPoolAfter(3f);
         OnDie?.Invoke();
+
+        if (localTankInfo.Player.IsLocalPlayer)
+        {
+            Client.Singleton.SendToServer(new NetTDie(localTankInfo.Player.ID));
+        }
     }
 
     public void TakeDamage(float damage)

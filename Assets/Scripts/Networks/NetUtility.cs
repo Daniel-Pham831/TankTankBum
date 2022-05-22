@@ -29,7 +29,19 @@ public enum OpCode
     T_ROTATION,
 
     // For tank grenade
-    GRENADE_EXPLOSION
+    GRENADE_EXPLOSION,
+
+    // For tank Interactions
+    T_SPAWN,
+    T_SPAWN_REQ,
+    T_DIE,
+
+    // UI
+    UI_SPAWN_COUNTDOWN,
+
+
+
+    NONE
 }
 
 public static class NetUtility
@@ -77,6 +89,18 @@ public static class NetUtility
     // Grenade events
     public static Action<NetMessage> C_GRENADE_EXPLOSION;
     public static Action<NetMessage, NetworkConnection> S_GRENADE_EXPLOSION;
+
+    // Tank Interactions
+    public static Action<NetMessage> C_T_DIE;
+    public static Action<NetMessage> C_T_SPAWN_REQ;
+    public static Action<NetMessage> C_T_SPAWN;
+    public static Action<NetMessage, NetworkConnection> S_T_DIE;
+    public static Action<NetMessage, NetworkConnection> S_T_SPAWN_REQ;
+    public static Action<NetMessage, NetworkConnection> S_T_SPAWN;
+
+    // UI 
+    public static Action<NetMessage> C_UI_SPAWN_COUNTDOWN;
+    public static Action<NetMessage, NetworkConnection> S_UI_SPAWN_COUNTDOWN;
 
     public static void OnData(ref DataStreamReader streamReader, NetworkConnection cnn, Server server = null)
     {
@@ -159,6 +183,24 @@ public static class NetUtility
             //Grenade
             case OpCode.GRENADE_EXPLOSION:
                 msg = new NetGrenadeExplosion(ref streamReader);
+                break;
+
+            // Tank Interactions
+            case OpCode.T_SPAWN_REQ:
+                msg = new NetTSpawnReq(ref streamReader);
+                break;
+
+            case OpCode.T_SPAWN:
+                msg = new NetTSpawn(ref streamReader);
+                break;
+
+            case OpCode.T_DIE:
+                msg = new NetTDie(ref streamReader);
+                break;
+
+            // UI
+            case OpCode.UI_SPAWN_COUNTDOWN:
+                msg = new NetUISpawnCountDown(ref streamReader);
                 break;
 
             default:

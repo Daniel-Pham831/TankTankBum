@@ -12,7 +12,7 @@ public class ServerInformation
 {
     public static ServerInformation Singleton;
 
-    public List<Player> PlayerList;
+    public List<SlotPlayerInformation> PlayerList;
     private SortedSet<byte> availableSlots;
     private List<ReadyState> readySlots;
 
@@ -22,7 +22,7 @@ public class ServerInformation
         if (Singleton == null)
             Singleton = this;
 
-        PlayerList = new List<Player>();
+        PlayerList = new List<SlotPlayerInformation>();
         availableSlots = new SortedSet<byte>();
         readySlots = new List<ReadyState>();
 
@@ -62,7 +62,7 @@ public class ServerInformation
     {
         NetReady readyMessage = message as NetReady;
 
-        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref PlayerList, readyMessage.Id);
+        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindSlotPlayerWithIDAndRemove(ref PlayerList, readyMessage.Id);
 
         if (sentPlayer.IsHost)
         {
@@ -84,7 +84,7 @@ public class ServerInformation
     {
         NetSwitchTeam switchTeamMessage = message as NetSwitchTeam;
 
-        Player sentPlayer = Player.FindPlayerWithIDAndRemove(ref PlayerList, switchTeamMessage.Id);
+        SlotPlayerInformation sentPlayer = SlotPlayerInformation.FindSlotPlayerWithIDAndRemove(ref PlayerList, switchTeamMessage.Id);
 
         //SwitchTeam
         if (sentPlayer != null)
@@ -103,7 +103,7 @@ public class ServerInformation
 
     private void OnClientDisconnected(byte disconnectedClientId)
     {
-        Player disconnectedPlayer = Player.FindPlayerWithID(PlayerList, disconnectedClientId);
+        SlotPlayerInformation disconnectedPlayer = SlotPlayerInformation.FindSlotPlayerWithID(PlayerList, disconnectedClientId);
         PlayerList.Remove(disconnectedPlayer);
 
         availableSlots.Add(disconnectedPlayer.SlotIndex);
@@ -133,7 +133,7 @@ public class ServerInformation
                 a List<Player>
         */
         NetSendName sendNameMessage = message as NetSendName;
-        Player connectedPlayer = GetNewPlayerInformation((byte)connectedClient.InternalId, sendNameMessage.Name);
+        SlotPlayerInformation connectedPlayer = GetNewPlayerInformation((byte)connectedClient.InternalId, sendNameMessage.Name);
         Server.Singleton.SendToClient(connectedClient, new NetWelcome(connectedPlayer, (byte)PlayerList.Count, PlayerList));
 
         // BroadCast to all player that a new player just joined
@@ -142,11 +142,11 @@ public class ServerInformation
         PlayerList.Add(connectedPlayer);
     }
 
-    private Player GetNewPlayerInformation(byte id, string playerName)
+    private SlotPlayerInformation GetNewPlayerInformation(byte id, string playerName)
     {
         Team team = Team.Blue; //new joined player will be on Team.Blue by default
         byte lobbyIndex = GetSlotIndexForNewPlayer();
-        return new Player(id, team, lobbyIndex, playerName, ReadyState.Unready);
+        return new SlotPlayerInformation(id, team, lobbyIndex, playerName, ReadyState.Unready);
     }
 
     private byte GetSlotIndexForNewPlayer()

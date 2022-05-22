@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour
 {
+    private readonly float timeToDestroyAfterTankDie = 1;
     private GameObject tank;
     [SerializeField] private Slider slider;
 
@@ -17,7 +18,7 @@ public class HealthBar : MonoBehaviour
         }
     }
 
-    public void SetUpTankHealth(GameObject tankToFollow, float maxHealth)
+    public void SetupHealthBar(GameObject tankToFollow, float maxHealth, Quaternion rot)
     {
         tank = tankToFollow;
         slider.minValue = 0;
@@ -28,6 +29,8 @@ public class HealthBar : MonoBehaviour
             tankHealth.OnCurrentHealthChanged += OnCurrentHealthChanged;
             tankHealth.OnDie += OnTankDie;
         }
+
+        transform.rotation = rot;
     }
 
     private void OnCurrentHealthChanged(float currentHealth)
@@ -41,11 +44,8 @@ public class HealthBar : MonoBehaviour
         {
             tankHealth.OnCurrentHealthChanged -= OnCurrentHealthChanged;
             tankHealth.OnDie -= OnTankDie;
-        }
-    }
 
-    public void SetRot(Quaternion rot)
-    {
-        transform.rotation = rot;
+            Destroy(this.gameObject, timeToDestroyAfterTankDie);
+        }
     }
 }
