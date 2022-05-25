@@ -15,3 +15,7 @@ MonoBehaviour:
   YouAreDead: You are dead\nRespawn in {0}
   PingCounter: 'Ping: {0} ms'
   FpsCounter: 'FPS: {0}'
+  BlueTeamKill: <b><color=#5CD0E5>{0}</color></b> Killed <b><color=#F86868>{1}</color></b>
+  BlueSameTeamKill: <b><color=#5CD0E5>{0}</color></b> Killed <b><color=#5CD0E5>{1}</color></b>
+  RedTeamKill: <b><color=#F86868>{0}</color></b> Killed <b><color=#5CD0E5>{1}</color></b>
+  RedSameTeamKill: <b><color=#F86868>{0}</color></b> Killed <b><color=#F86868>{1}</color></b>

@@ -15,6 +15,7 @@ public class NetworkUIManager : MonoBehaviour
     public GameObject LocalPlayerDeathUI;
 
     public Action<byte, float> OnLocalPlayerDeadUI;
+    public Action<Player, Player> OnPlayerKilledPlayer;
 
     private void Awake()
     {
