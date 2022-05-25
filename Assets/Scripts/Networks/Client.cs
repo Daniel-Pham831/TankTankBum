@@ -157,7 +157,7 @@ public class Client : MonoBehaviour
     {
         float deltaTime = (Time.time - preSendPingTime);
         deltaTime = Mathf.Round(deltaTime * 1000); // Multiplied by 1000 to get ms
-        pingCounterText.SetText($"Ping: {deltaTime}ms");
+        pingCounterText.SetText(StringUti.Format(StringUti.Singleton.PingCounter, deltaTime));
     }
 
     private void OnClientReceivedKeepAliveMessage(NetMessage keepAliveMessage)

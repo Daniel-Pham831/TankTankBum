@@ -13,4 +13,5 @@ MonoBehaviour:
   m_Name: StringUti
   m_EditorClassIdentifier: 
   YouAreDead: You are dead\nRespawn in {0}
-  RespawnIn: Respawn in {0}
+  PingCounter: 'Ping: {0} ms'
+  FpsCounter: 'FPS: {0}'
