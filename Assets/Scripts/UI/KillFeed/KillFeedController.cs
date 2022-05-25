@@ -12,6 +12,7 @@ public class KillFeedController : MonoBehaviour
     {
         registerToEvent(true);
     }
+
     private void OnDestroy()
     {
         registerToEvent(false);

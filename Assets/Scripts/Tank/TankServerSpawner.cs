@@ -33,13 +33,20 @@ public class TankServerSpawner : MonoBehaviour
             NetUtility.S_T_SPAWN_REQ += OnServerReceivedTankSpawnRequestMessage;
             NetUtility.S_T_SPAWN += OnServerReceivedTankSpawnMessage;
             NetUtility.S_T_DIE += OnServerReceivedTDieMessage;
+            NetUtility.S_T_KILL += OnServerReceivedTKillMessage;
         }
         else
         {
             NetUtility.S_T_SPAWN_REQ -= OnServerReceivedTankSpawnRequestMessage;
             NetUtility.S_T_SPAWN -= OnServerReceivedTankSpawnMessage;
             NetUtility.S_T_DIE -= OnServerReceivedTDieMessage;
+            NetUtility.S_T_KILL -= OnServerReceivedTKillMessage;
         }
+    }
+
+    private void OnServerReceivedTKillMessage(NetMessage message, NetworkConnection sender)
+    {
+        Server.Singleton.BroadCast(message as NetTKill);
     }
 
     private void OnServerReceivedTankSpawnMessage(NetMessage message, NetworkConnection sender)

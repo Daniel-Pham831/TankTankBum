@@ -19,7 +19,8 @@ public class TankHealth : MonoBehaviour, IDamageable
     public Action<float> OnCurrentHealthChanged;
     public Action OnDie;
 
-    public void Die()
+    public void Die() { }
+    private void Die(byte damageDealerID)
     {
         // Get explosion FX from pool
         Pool tankExplosionPool = ObjectPoolManager.Singleton.GetPool(PoolType.TankExplosion);
@@ -36,16 +37,18 @@ public class TankHealth : MonoBehaviour, IDamageable
         if (localTankInfo.Player.IsLocalPlayer)
         {
             Client.Singleton.SendToServer(new NetTDie(localTankInfo.Player.ID));
+
+            Client.Singleton.SendToServer(new NetTKill(localTankInfo.Player.ID, damageDealerID));
         }
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, byte damageDealerID)
     {
         Health -= damage;
         if (Health <= 0)
         {
             Health = 0;
-            Die();
+            Die(damageDealerID);
         }
     }
 }

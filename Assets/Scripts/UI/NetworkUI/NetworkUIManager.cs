@@ -37,11 +37,22 @@ public class NetworkUIManager : MonoBehaviour
         if (confirm)
         {
             NetUtility.C_T_DIE += OnClientReceivedTDieMessage;
+            NetUtility.C_T_KILL += OnClientReceivedTKillMessage;
         }
         else
         {
             NetUtility.C_T_DIE -= OnClientReceivedTDieMessage;
+            NetUtility.C_T_KILL -= OnClientReceivedTKillMessage;
         }
+    }
+
+    private void OnClientReceivedTKillMessage(NetMessage message)
+    {
+        NetTKill tankKillMessage = message as NetTKill;
+        Player killer = PlayerManager.Singleton.GetPlayer(tankKillMessage.KillerPlayerID);
+        Player killed = PlayerManager.Singleton.GetPlayer(tankKillMessage.DeadPlayerID);
+
+        OnPlayerKilledPlayer?.Invoke(killer, killed);
     }
 
     private void OnClientReceivedTDieMessage(NetMessage message)
