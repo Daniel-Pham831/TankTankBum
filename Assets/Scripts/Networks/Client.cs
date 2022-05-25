@@ -12,10 +12,9 @@ public class Client : MonoBehaviour
     private bool isActive = false;
     private bool isClientShutDown = false;
     private string playerName;
-    private float timeBetweenEachPingSend = .5f;
+    private float timeBetweenEachPingSend = 1f;
     private float nextPingSend;
     private float preSendPingTime;
-    private float currentPingTime;
 
     public static Client Singleton { get; private set; }
 
@@ -156,9 +155,9 @@ public class Client : MonoBehaviour
 
     private void OnClientReceivedPingMessage(NetMessage message)
     {
-        currentPingTime = (Time.time - preSendPingTime);
-        currentPingTime = Mathf.Round(currentPingTime * 1000); // Multiplied by 1000 to get ms
-        pingCounterText.SetText($"Ping: {currentPingTime}ms");
+        float deltaTime = (Time.time - preSendPingTime);
+        deltaTime = Mathf.Round(deltaTime * 1000); // Multiplied by 1000 to get ms
+        pingCounterText.SetText($"Ping: {deltaTime}ms");
     }
 
     private void OnClientReceivedKeepAliveMessage(NetMessage keepAliveMessage)
