@@ -7,7 +7,7 @@ public enum PoolType
 {
     TGrenade,
     GrenadeExplosion,
-    TankExplosion
+    TankExplosion,
 }
 
 public class ObjectPoolManager : MonoBehaviour

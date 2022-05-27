@@ -32,7 +32,6 @@ public class TankGrenadeMovement : MonoBehaviour
             Client.Singleton.SendToServer(new NetGrenadeExplosion(transform.position, grenadeInformation));
 
         SpawnExplosionFXOnTrigger();
-
         // Return this Grenade to its pool
         poolableObject.ReleaseAction?.Invoke(this.gameObject);
     }
