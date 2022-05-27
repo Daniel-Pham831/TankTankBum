@@ -6,4 +6,5 @@ using UnityEngine;
 public class WallsData : SingletonScriptableObject<WallsData>
 {
     public float defaultWallHealth = 100;
+    public float EffectRadius = 1.25f;
 }

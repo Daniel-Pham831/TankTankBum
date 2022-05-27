@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: WallsData
   m_EditorClassIdentifier: 
   defaultWallHealth: 100
+  EffectRadius: 1.3
