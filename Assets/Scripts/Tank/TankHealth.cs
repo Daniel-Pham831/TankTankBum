@@ -42,7 +42,7 @@ public class TankHealth : MonoBehaviour, IDamageable
         }
     }
 
-    public void TakeDamage(float damage, byte damageDealerID)
+    public void TakeDamage(float damage, byte damageDealerID, Vector3? damageSourcePos = null)
     {
         Health -= damage;
         if (Health <= 0)

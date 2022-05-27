@@ -19,15 +19,23 @@ public class Wall : MonoBehaviour, IDamageable
     public Action<float> OnCurrentHealthChanged;
     public Action OnDie;
 
+    private void Start()
+    {
+        Health = WallsData.Singleton.defaultWallHealth;
+    }
+
 
     public void Die()
     {
         OnDie?.Invoke();
+
+        Destroy(this.gameObject);
     }
 
-    public void TakeDamage(float damage, byte damageDealerID)
+    public void TakeDamage(float damage, byte damageDealerID, Vector3? damageSourcePos = null)
     {
         Health -= damage;
+        Debug.Log(damageSourcePos);
         if (Health <= 0)
         {
             Health = 0;
