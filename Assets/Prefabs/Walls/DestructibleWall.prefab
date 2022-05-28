@@ -5722,7 +5722,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4611458017899028315}
   m_Layer: 0
-  m_Name: Wall
+  m_Name: DestructibleWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5737,7 +5737,7 @@ Transform:
   m_GameObject: {fileID: 8417471921151555995}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.2, y: 1.2, z: 1.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2241662205313362457}
