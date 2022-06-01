@@ -12,7 +12,7 @@ public class TankName : MonoBehaviour
     [SerializeField] private Color myTeamNameColor;
     [SerializeField] private Color otherTeamNameColor;
 
-    private void Update()
+    private void LateUpdate()
     {
         if (tank != null)
         {

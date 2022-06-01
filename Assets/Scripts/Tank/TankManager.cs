@@ -27,17 +27,6 @@ public class TankManager : MonoBehaviour
         registerToEvent(true);
     }
 
-    // private void Update()
-    // {
-    //     if (PlayerManager.Singleton.IsLocalPlayer)
-    //     {
-    //         if (Input.GetKeyDown(KeyCode.P))
-    //         {
-    //             NetworkSpawnTankRequest(PlayerManager.Singleton.MyPlayer.ID);
-    //         }
-    //     }
-    // }
-
     #region Events, messages
     private void registerToEvent(bool confirm)
     {
