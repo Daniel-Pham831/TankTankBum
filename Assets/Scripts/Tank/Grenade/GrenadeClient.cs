@@ -52,7 +52,7 @@ public class GrenadeClient : MonoBehaviour
                     damage = message.Team != tankInformation.Player.Team ? damage : grenadeExplosionInformation.SameTeamDamage;
                 }
 
-                damageable.TakeDamage(damage);
+                damageable.TakeDamage(damage, message.ID, message.ExplosionPosition);
             }
         }
     }

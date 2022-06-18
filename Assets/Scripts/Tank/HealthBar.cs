@@ -10,7 +10,7 @@ public class HealthBar : MonoBehaviour
     private GameObject tank;
     [SerializeField] private Slider slider;
 
-    private void Update()
+    private void LateUpdate()
     {
         if (tank != null)
         {

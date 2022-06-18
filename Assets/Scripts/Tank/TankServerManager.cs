@@ -49,7 +49,7 @@ public class TankServerManager : MonoBehaviour
         registerToEvent(true);
     }
 
-    private void LateUpdate()
+    private void Update()
     {
         if (IsSendable())
             SendTransformToAll();

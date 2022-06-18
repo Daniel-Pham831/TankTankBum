@@ -11,6 +11,8 @@ public class Player
     public bool IsHost;
     public Role Role => RoleController.Singleton.GetRole(Team);
 
+    public Player() { }
+
     public Player(byte id, Team team, string name, bool isLocalPlayer, bool isHost)
     {
         ID = id;

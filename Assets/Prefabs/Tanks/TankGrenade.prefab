@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 7997908194639469129}
   - component: {fileID: 492655118496787721}
   - component: {fileID: 4250394738902659010}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: TankGrenade
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -84,7 +84,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rb: {fileID: 5298587962358593089}
   grenadeInformation: {fileID: 492655118496787721}
-  grenadeExplosionInformation: {fileID: 11400000, guid: 3976ee7f9ec523d47bd81c84b0b64bf0, type: 2}
   poolableObject: {fileID: 7997908194639469129}
 --- !u!114 &7997908194639469129
 MonoBehaviour:
@@ -140,7 +139,7 @@ GameObject:
   - component: {fileID: 2144114593726181863}
   - component: {fileID: 7946876698427383371}
   - component: {fileID: 2028313026012025277}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: OutlineGlow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5010,7 +5009,7 @@ GameObject:
   - component: {fileID: 4126475214689006150}
   - component: {fileID: 7486327482274762893}
   - component: {fileID: 1500046526269314916}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: TankMissle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5092,7 +5091,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4278996458079295662}
   - component: {fileID: 8879076820487587563}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Trail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5231,7 +5230,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6377500871191843937}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: GrenadeModel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -5264,6 +5263,10 @@ PrefabInstance:
     - target: {fileID: 1207640726961642, guid: ce9f6c3e7c8dda742ae2b958a30ede4b, type: 3}
       propertyPath: m_Name
       value: pfx_DrivingDust Damaged
+      objectReference: {fileID: 0}
+    - target: {fileID: 1207640726961642, guid: ce9f6c3e7c8dda742ae2b958a30ede4b, type: 3}
+      propertyPath: m_Layer
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4493781773076084, guid: ce9f6c3e7c8dda742ae2b958a30ede4b, type: 3}
       propertyPath: m_RootOrder

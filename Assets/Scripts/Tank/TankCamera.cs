@@ -14,7 +14,7 @@ public class TankCamera : MonoBehaviour
 
     private GameObject tank;
 
-    private void Update()
+    private void LateUpdate()
     {
         if (tank != null)
         {

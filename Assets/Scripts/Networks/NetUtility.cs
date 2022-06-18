@@ -35,6 +35,7 @@ public enum OpCode
     T_SPAWN,
     T_SPAWN_REQ,
     T_DIE,
+    T_KILL,
 
     // UI
     UI_SPAWN_COUNTDOWN,
@@ -94,9 +95,11 @@ public static class NetUtility
     public static Action<NetMessage> C_T_DIE;
     public static Action<NetMessage> C_T_SPAWN_REQ;
     public static Action<NetMessage> C_T_SPAWN;
+    public static Action<NetMessage> C_T_KILL;
     public static Action<NetMessage, NetworkConnection> S_T_DIE;
     public static Action<NetMessage, NetworkConnection> S_T_SPAWN_REQ;
     public static Action<NetMessage, NetworkConnection> S_T_SPAWN;
+    public static Action<NetMessage, NetworkConnection> S_T_KILL;
 
     // UI 
     public static Action<NetMessage> C_UI_SPAWN_COUNTDOWN;
@@ -196,6 +199,10 @@ public static class NetUtility
 
             case OpCode.T_DIE:
                 msg = new NetTDie(ref streamReader);
+                break;
+
+            case OpCode.T_KILL:
+                msg = new NetTKill(ref streamReader);
                 break;
 
             // UI
